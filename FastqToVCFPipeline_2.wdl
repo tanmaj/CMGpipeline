@@ -1,8 +1,8 @@
 version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
-import "./AnnotationPipeline.wdl" as Annotation
-import "./Conifer.wdl" as Conifer
+import "https://github.com/AlesMaver/CMGpipeline/blob/master/AnnotationPipeline.wdl" as Annotation
+import "https://github.com/AlesMaver/CMGpipeline/blob/master/Conifer.wdl" as Conifer
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
