@@ -579,7 +579,6 @@ task BaseRecalibrator {
   parameter_meta {
     input_bam: {
       localization_optional: true
-      maxRetries: 3
     }
   }
 
