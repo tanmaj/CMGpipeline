@@ -208,6 +208,7 @@ task LeftAlignAndTrimVariants {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcf = "~{sample_basename}.fixed.gz"
@@ -234,6 +235,7 @@ task NormalizeVCF {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcf = "~{sample_basename}.normalized.vcf.gz"
@@ -258,6 +260,7 @@ task CompressAndIndexVCF {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcfgz = "~{sample_basename}.vcf.gz"
@@ -304,6 +307,7 @@ task bcftoolsAnnotate {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcf = "~{output_filename}"
@@ -383,6 +387,7 @@ task VCFANNO {
   
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcfgz = "~{sample_basename}.vcf.gz"
@@ -411,6 +416,7 @@ task runSnpEff {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcf = "~{sample_basename}.snpEff.vcf"
@@ -441,6 +447,7 @@ task MergeVCFs {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcfgz = "~{sample_basename}.annotated.vcf.gz"
@@ -467,6 +474,7 @@ task GenerateVariantTable {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_table = " ~{sample_basename}.tab"

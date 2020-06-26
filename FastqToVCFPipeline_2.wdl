@@ -82,10 +82,19 @@ workflow FastqToVCF {
   Array[String] chromosomes = read_lines(chromosome_list)
 
 
-  call CutAdapters {
+  call CutAdapters as CutAdapters_fq1 {
     input:
-      input_fq1=input_fq1,
-      input_fq2=input_fq2,
+      input_fq=input_fq1,
+      sample_basename=sample_basename,
+      illuminaAdapters=illuminaAdapters,
+
+      # Runtime 
+      docker = cutadapt_docker
+  }
+  
+  call CutAdapters as CutAdapters_fq2 {
+    input:
+      input_fq=input_fq2,
       sample_basename=sample_basename,
       illuminaAdapters=illuminaAdapters,
 
@@ -96,8 +105,8 @@ workflow FastqToVCF {
   call PairedFastQsToUnmappedBAM {
       input:
         sample_name = sample_basename,
-        fastq_1 = CutAdapters.output_fq1_trimmed,
-        fastq_2 = CutAdapters.output_fq2_trimmed,
+        fastq_1 = CutAdapters_fq1.output_fq_trimmed,
+        fastq_2 = CutAdapters_fq2.output_fq_trimmed,
         readgroup_name = sample_basename,
         library_name = sample_basename,
         platform_unit = "NextSeq550",
@@ -426,8 +435,7 @@ workflow FastqToVCF {
 task CutAdapters {
   input {
     # Command parameters
-    File input_fq1
-    File input_fq2
+    File input_fq
     String sample_basename
     
     File illuminaAdapters
@@ -438,16 +446,13 @@ task CutAdapters {
   
   command {
   set -e
-     cutadapt -j 20 -a file:~{illuminaAdapters} --mask-adapter -o ~{sample_basename}.trimmed.R1.fq.gz ~{input_fq1}
-     cutadapt -j 20 -a file:~{illuminaAdapters} --mask-adapter -o ~{sample_basename}.trimmed.R2.fq.gz ~{input_fq2}
-
+     cutadapt -j 20 -a file:~{illuminaAdapters} --mask-adapter -o ~{sample_basename}.trimmed.fq.gz ~{input_fq}
   }
   runtime {
     docker: docker
   }
   output {
-    File output_fq1_trimmed = "~{sample_basename}.trimmed.R1.fq.gz"
-    File output_fq2_trimmed = "~{sample_basename}.trimmed.R2.fq.gz"
+    File output_fq_trimmed = "~{sample_basename}.trimmed.fq.gz"
   }
 }
 
@@ -488,6 +493,7 @@ task Align {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -594,6 +600,7 @@ task BaseRecalibrator {
     preemptible: preemptible_tries
     memory: "6 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    maxRetries: 3
   }
   output {
     File recalibration_report = "~{recalibration_report_filename}"
@@ -656,6 +663,7 @@ task ApplyBQSR {
   runtime {
     docker: gatk_docker
     preemptible: preemptible_tries
+    maxRetries: 3
     memory: "~{memory_size} MiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -715,6 +723,7 @@ task GatherSortedBamFiles {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
     preemptible: preemptible_tries
+    maxRetries: 3
     memory: "3 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -775,6 +784,7 @@ task RecalibrateBAM {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -816,6 +826,7 @@ task HaplotypeCaller {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -842,6 +853,7 @@ task MergeVCFs {
   }
   runtime {
     docker: docker
+    maxRetries: 3
   }
   output {
     File output_vcf = "~{sample_basename}.raw.vcf.gz"
@@ -890,6 +902,7 @@ task SplitSNPindel {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -927,6 +940,7 @@ task VariantFiltrationSNP {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -964,6 +978,7 @@ task VariantFiltrationINDEL {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -994,6 +1009,7 @@ task CombineSNPindel {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -1029,6 +1045,7 @@ task SelectFinalVariants {
 
   runtime {
     docker: "~{docker}"
+    maxRetries: 3
   }
 }
 
@@ -1074,6 +1091,7 @@ task PairedFastQsToUnmappedBAM {
     memory: machine_mem_gb + " GB"
     disks: "local-disk " + disk_space_gb + " HDD"
     preemptible: preemptible_attempts
+    maxRetries: 3
   }
   output {
     File output_unmapped_bam = "~{readgroup_name}.unmapped.bam"
@@ -1111,6 +1129,7 @@ task SamSplitter {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
     preemptible: preemptible_tries
+    maxRetries: 3
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -1137,6 +1156,7 @@ task GatherUnsortedBamFiles {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
     preemptible: preemptible_tries
+    maxRetries: 3
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -1173,6 +1193,7 @@ task SortSam {
     cpu: "1"
     memory: "5000 MiB"
     preemptible: preemptible_tries
+    maxRetries: 3
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
