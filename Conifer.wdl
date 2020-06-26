@@ -8,7 +8,7 @@ workflow Conifer {
     File input_bam_index
 
     Array[File] input_reference_rpkms 
-    String CONIFER_svd
+    Int CONIFER_svd
 
     String enrichment
     File enrichment_bed
