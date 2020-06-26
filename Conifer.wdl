@@ -86,7 +86,7 @@ task CONIFER_Analyze {
   
   command {
   set -e
-  RPKMDIR=dirname $(readlink -f ~{input_reference_rpkms})
+  RPKMDIR=dirname $(readlink -f ~{input_reference_rpkms[0]})
   echo $RPKMDIR
   cp ~{input_rpkm} $RPKMDIR
 
