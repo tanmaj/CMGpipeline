@@ -54,12 +54,12 @@ task MakeRPKM {
     File enrichment_bed
 
     # Runtime parameters
-    String docker = "tmiyazaki/conifer:latest"
+    String docker = "molecular/conifer"
   }
   
   command {
   set -e
-  python /conifer_v0.2.2/conifer.py rpkm --probes ~{enrichment_bed} --input ~{input_bam} --output ~{enrichment}_~{sample_basename}.txt 
+  python /home/bio/conifer_v0.2.2/conifer.py rpkm --probes ~{enrichment_bed} --input ~{input_bam} --output ~{enrichment}_~{sample_basename}.txt 
   }
   runtime {
     docker: docker
@@ -81,7 +81,7 @@ task CONIFER_Analyze {
     File enrichment_bed
 
     # Runtime parameters
-    String docker = "ielis/conifer:latest"
+    String docker = "molecular/conifer"
   }
   
   command {
@@ -90,7 +90,7 @@ task CONIFER_Analyze {
   echo $RPKMDIR
   cp ~{input_rpkm} $RPKMDIR
 
-  python /conifer_v0.2.2/conifer.py analyze --probes ~{enrichment_bed} --rpkm_dir $RPKMDIR --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals --svd ~{sample_basename}.singular_values.txt --plot_scree ~{sample_basename}.screeplot.png") --write_sd ~{sample_basename}.sd_values.txt
+  python /home/bio/conifer_v0.2.2/conifer.py analyze --probes ~{enrichment_bed} --rpkm_dir $RPKMDIR --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals --svd ~{sample_basename}.singular_values.txt --plot_scree ~{sample_basename}.screeplot.png") --write_sd ~{sample_basename}.sd_values.txt
   }
   runtime {
     docker: docker
