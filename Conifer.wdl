@@ -87,8 +87,8 @@ task CONIFER_Analyze {
   command {
   set -e
   RPKMDIR=dirname $(readlink -f ~{input_reference_rpkms})
-  echo RPKMDIR$
-  cp ~{input_rpkm} ${RPKMDIR}/
+  echo $RPKMDIR
+  cp ~{input_rpkm} $RPKMDIR
 
   python /root/conifer/conifer.py analyze --probes ~{enrichment_bed} --rpkm_dir $RPKMDIR --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals --svd ~{sample_basename}.singular_values.txt --plot_scree ~{sample_basename}.screeplot.png") --write_sd ~{sample_basename}.sd_values.txt
   }
