@@ -89,7 +89,7 @@ task CONIFER_Analyze {
   command {
   set -e
   echo ~{input_reference_rpkms_dir}
-  cp ~{input_rpkm} $RPKMDIR
+  cp ~{input_rpkm} ~{input_reference_rpkms_dir}
 
   python /home/bio/conifer_v0.2.2/conifer.py analyze --probes ~{enrichment_bed} --rpkm_dir ~{input_reference_rpkms_dir} --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals --svd ~{sample_basename}.singular_values.txt --plot_scree ~{sample_basename}.screeplot.png") --write_sd ~{sample_basename}.sd_values.txt
   }
