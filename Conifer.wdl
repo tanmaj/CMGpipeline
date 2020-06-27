@@ -84,7 +84,7 @@ task CONIFER_Analyze {
     String docker = "molecular/conifer"
   }
 
-  String input_reference_rpkms_dir = sub(input_reference_rpkms[0], "\\/.*", "" )
+  String input_reference_rpkms_dir = sub(input_reference_rpkms[1], "\\/.*", "" )
   
   command {
   set -e
