@@ -2,6 +2,7 @@ version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
+import "import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -65,8 +66,12 @@ workflow FastqToVCF {
     Array[File] known_indels_sites_vcfs
     Array[File] known_indels_sites_indices
 
-    String? enrichment
-    File? enrichment_bed
+    String enrichment
+    File enrichment_bed
+
+    Array[File] input_reference_rpkms 
+    Int CONIFER_svd
+    Float CONIFER_threshold
 
     String cutadapt_docker = "kfdrc/cutadapt:latest"
     String gatk_docker = "broadinstitute/gatk:latest"
@@ -396,6 +401,19 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
+  call Conifer.Conifer as Conifer{
+  input:
+    input_bam = SortSam.output_bam,
+    input_bam_index = SortSam.output_bam_index
+
+    Array[File] input_reference_rpkms 
+    Int CONIFER_svd
+    Float CONIFER_threshold
+
+    String enrichment
+    File enrichment_bed
+  }
+
 
   output {
     File output_bam = SortSam.output_bam
@@ -410,6 +428,9 @@ workflow FastqToVCF {
     File output_annotated_vcf = AnnotateVCF.output_vcf
     File output_annotated_vcf_index = AnnotateVCF.output_vcf_index
     File output_table = AnnotateVCF.output_table
+
+    File output_conifer_calls = Conifer.output_conifer_calls
+    Array[File] output_plotcalls = Conifer.output_plotcalls
   }
 }
 
