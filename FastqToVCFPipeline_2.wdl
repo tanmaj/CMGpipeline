@@ -2,7 +2,7 @@ version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
+#import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -397,16 +397,6 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
-#  if (defined(enrichment_bed)) {
-#    call Conifer.MakeRPKM {
-#      input:
-#        input_bam=SortSam.output_bam,
-#        input_bam_index=SortSam.output_bam_index,
-#        sample_basename=sample_basename,
-#        enrichment=enrichment,
-#        enrichment_bed=enrichment_bed
-#    }
-  }
 
   output {
     File output_bam = SortSam.output_bam
