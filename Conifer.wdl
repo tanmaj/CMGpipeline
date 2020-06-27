@@ -65,7 +65,7 @@ task MakeRPKM {
     docker: docker
   }
   output {
-    File output_rpkm = "sample_basename.~{enrichment}.rpkm"
+    File output_rpkm = "~{enrichment}_~{sample_basename}.txt"
   }
 }
 
