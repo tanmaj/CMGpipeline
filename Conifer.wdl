@@ -9,6 +9,7 @@ workflow Conifer {
 
     Array[File] input_reference_rpkms 
     Int CONIFER_svd
+    Float CONIFER_threshold
 
     String enrichment
     File enrichment_bed
@@ -36,8 +37,14 @@ workflow Conifer {
         enrichment_bed=enrichment_bed
 
   }
-}
 
+  call CONIFER_Call {
+      input:
+        input_hdf5=CONIFER_Analyze.output_hdf5,
+        CONIFER_threshold=CONIFER_threshold,
+        sample_basename=sample_basename
+  }
+}
 
 ##################
 # TASK DEFINITIONS
@@ -100,3 +107,29 @@ task CONIFER_Analyze {
   }
 }
 
+task CONIFER_Call {
+  input {
+    # Command parameters
+    File input_hdf5
+    Float CONIFER_threshold
+    String sample_basename
+
+    # Runtime parameters
+    String docker = "molecular/conifer"
+  }
+  
+  command {
+  set -e
+  python /home/bio/conifer_v0.2.2/conifer.py analyze call --threshold ~{CONIFER_threshold} --input ~{input_hdf5} --output ~{sample_basename}.CONIFER_CALLS_POPULATION.txt
+
+  head -n 1 ~{sample_basename}.CONIFER_CALLS.txt > ~{sample_basename}.CONIFER_CALLS.txt
+  cat ~{sample_basename}.CONIFER_CALLS.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
+  }
+
+  runtime {
+    docker: docker
+  }
+  output {
+    File output_conifer_calls = "~{sample_basename}.CONIFER_CALLS.txt"
+  }
+}
