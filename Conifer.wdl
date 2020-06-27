@@ -120,7 +120,7 @@ task CONIFER_Call {
   
   command {
   set -e
-  python /home/bio/conifer_v0.2.2/conifer.py analyze call --threshold ~{CONIFER_threshold} --input ~{input_hdf5} --output ~{sample_basename}.CONIFER_CALLS_POPULATION.txt
+  python /home/bio/conifer_v0.2.2/conifer.py call --threshold ~{CONIFER_threshold} --input ~{input_hdf5} --output ~{sample_basename}.CONIFER_CALLS_POPULATION.txt
 
   head -n 1 ~{sample_basename}.CONIFER_CALLS.txt > ~{sample_basename}.CONIFER_CALLS.txt
   cat ~{sample_basename}.CONIFER_CALLS.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
