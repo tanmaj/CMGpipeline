@@ -404,14 +404,14 @@ workflow FastqToVCF {
   call Conifer.Conifer as Conifer{
   input:
     input_bam = SortSam.output_bam,
-    input_bam_index = SortSam.output_bam_index
+    input_bam_index = SortSam.output_bam_index,
 
-    Array[File] input_reference_rpkms 
-    Int CONIFER_svd
-    Float CONIFER_threshold
+    input_reference_rpkms = input_reference_rpkms,
+    CONIFER_svd = CONIFER_svd,
+    CONIFER_threshold = CONIFER_threshold,
 
-    String enrichment
-    File enrichment_bed
+    enrichment = enrichment,
+    enrichment_bed = enrichment_bed
   }
 
 
