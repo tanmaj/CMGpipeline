@@ -24,7 +24,6 @@ workflow Conifer {
         sample_basename=sample_basename,
         enrichment=enrichment,
         enrichment_bed=enrichment_bed
-
   }
 
   call CONIFER_Analyze {
@@ -43,6 +42,18 @@ workflow Conifer {
         input_hdf5=CONIFER_Analyze.output_hdf5,
         CONIFER_threshold=CONIFER_threshold,
         sample_basename=sample_basename
+  }
+
+    call CONIFER_Plotcalls {
+      input:
+        input_hdf5=CONIFER_Analyze.output_hdf5,
+        input_conifer_calls=CONIFER_Call.output_conifer_calls,
+        sample_basename=sample_basename
+  }
+
+  output {
+    File output_conifer_calls = CONIFER_Call.output_conifer_calls
+    Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
   }
 }
 
@@ -122,8 +133,8 @@ task CONIFER_Call {
   set -e
   python /home/bio/conifer_v0.2.2/conifer.py call --threshold ~{CONIFER_threshold} --input ~{input_hdf5} --output ~{sample_basename}.CONIFER_CALLS_POPULATION.txt
 
-  head -n 1 ~{sample_basename}.CONIFER_CALLS.txt > ~{sample_basename}.CONIFER_CALLS.txt
-  cat ~{sample_basename}.CONIFER_CALLS.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
+  head -n 1 ~{sample_basename}.CONIFER_CALLS_POPULATION.txt > ~{sample_basename}.CONIFER_CALLS.txt
+  cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
   }
 
   runtime {
@@ -131,5 +142,29 @@ task CONIFER_Call {
   }
   output {
     File output_conifer_calls = "~{sample_basename}.CONIFER_CALLS.txt"
+  }
+}
+
+task CONIFER_Plotcalls {
+  input {
+    # Command parameters
+    File input_hdf5
+    File input_conifer_calls
+    String sample_basename
+
+    # Runtime parameters
+    String docker = "molecular/conifer"
+  }
+  
+  command {
+  set -e
+  python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
+  }
+
+  runtime {
+    docker: docker
+  }
+  output {
+    Array[File] output_plotcalls = glob("*.png")
   }
 }
