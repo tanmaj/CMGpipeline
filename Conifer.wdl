@@ -86,7 +86,7 @@ task CONIFER_Analyze {
   
   command {
   set -e
-  echo ~{input_reference_rpkms[0] |sed 's#/[^/]*/[^/]*$##'
+  echo ~{input_reference_rpkms[0] | sed 's#/[^/]*/[^/]*$##'
   echo $RPKMDIR
   cp ~{input_rpkm} $RPKMDIR
 
