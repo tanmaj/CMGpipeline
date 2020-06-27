@@ -158,6 +158,8 @@ task CONIFER_Plotcalls {
   
   command {
   set -e
+  export LC_ALL="en_US.UTF-8"
+  export LC_CTYPE="en_US.UTF-8"
   python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
   }
 
