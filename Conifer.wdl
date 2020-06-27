@@ -83,8 +83,6 @@ task CONIFER_Analyze {
     # Runtime parameters
     String docker = "molecular/conifer"
   }
-
-  #String input_reference_rpkms_dir = sub(input_reference_rpkms[1], "\/.*", "")
   
   command <<<
   set -e
