@@ -397,15 +397,15 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
-  if (defined(enrichment_bed)) {
-    call Conifer.MakeRPKM {
-      input:
-        input_bam=SortSam.output_bam,
-        input_bam_index=SortSam.output_bam_index,
-        sample_basename=sample_basename,
-        enrichment=enrichment,
-        enrichment_bed=enrichment_bed
-    }
+#  if (defined(enrichment_bed)) {
+#    call Conifer.MakeRPKM {
+#      input:
+#        input_bam=SortSam.output_bam,
+#        input_bam_index=SortSam.output_bam_index,
+#        sample_basename=sample_basename,
+#        enrichment=enrichment,
+#        enrichment_bed=enrichment_bed
+#    }
   }
 
   output {
