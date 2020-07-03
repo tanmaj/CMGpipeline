@@ -93,11 +93,11 @@ task CallROH {
   }
   output {
     File ROH_calls = "~{sample_basename}.ROHcalls.wig"
-    File BAF_vcf = ~{sample_basename}.dbSNP.AF.vcf.bgz
+    File BAF_vcf = "~{sample_basename}.dbSNP.AF.vcf.bgz"
   }
 }
 
-task CallROH_plink {
+task CallPlink {
   input {
     # Command parameters
     File input_vcf
@@ -105,7 +105,7 @@ task CallROH_plink {
     String sample_basename
 
     # Runtime parameters
-    String docker = "asherkhb/plink"
+    String docker
   }
   
   command <<<
