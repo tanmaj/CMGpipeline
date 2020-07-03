@@ -8,6 +8,8 @@ version 1.0
 task bamqc {
     input {
         File bam
+        File enrichment_bed
+        String sample_basename
         Int ncpu = 1
         Int max_retries = 1
         Int memory_gb = 8
@@ -15,7 +17,7 @@ task bamqc {
     }
 
     String out_directory = basename(bam, ".bam") + '_qualimap_bamqc_results'
-    String out_tar_gz_file = out_directory + ".tar.gz"
+    String out_tar_gz_file = sample_basename + ".tar.gz"
 
     Int java_heap_size = ceil(memory_gb * 0.9)
     Float bam_size = size(bam, "GiB")
