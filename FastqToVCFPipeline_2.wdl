@@ -486,6 +486,8 @@ workflow FastqToVCF {
     Array[File] output_plotcalls = Conifer.output_plotcalls
 
     File Qulimap_results = Qualimap.results
+
+    File ROHplink_calls = CallPlink.ROHplink_calls
   }
 }
 
