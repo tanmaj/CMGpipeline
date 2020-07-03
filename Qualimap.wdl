@@ -16,7 +16,7 @@ task bamqc {
     }
 
     String out_directory = basename(bam, ".bam") + '_qualimap_bamqc_results'
-    String out_tar_gz_file = sample_basename + ".tar.gz"
+    String out_tar_gz_file = sample_basename + ".Qualimap.tar.gz"
 
     Int java_heap_size = ceil(memory_gb * 0.9)
     Float bam_size = size(bam, "GiB")
