@@ -17,7 +17,7 @@ task calculateBAF {
     String docker
   }
   
-  command {
+  command <<<
   set -e
   
   # The perl script converts mpileup to BAF wiggle file for IGV display
@@ -51,8 +51,8 @@ task calculateBAF {
           }''' > mpileupToWig.pl
 
   samtools mpileup -q 15 -Q20 -f ~{reference_fa} -l ~{ dbSNPcommon_bed} ~{input_bam} | perl mpileupToWig.pl --min-reads=20 > ~{sample_basename}.BAF.wig  
+  >>>
   
-  }
   runtime {
     docker: docker
   }
