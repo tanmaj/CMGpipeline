@@ -3,6 +3,7 @@ version 1.0
 
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -414,6 +415,16 @@ workflow FastqToVCF {
     enrichment_bed = enrichment_bed
   }
 
+  call Qualimap.bamqc as Qualimap {
+  input:
+    bam = SortSam.output_bam,
+    sample_basename=sample_basename,
+
+    enrichment_bed = enrichment_bed,
+
+    ncpu = 8
+  }
+
 
   output {
     File output_bam = SortSam.output_bam
@@ -431,6 +442,8 @@ workflow FastqToVCF {
 
     File output_conifer_calls = Conifer.output_conifer_calls
     Array[File] output_plotcalls = Conifer.output_plotcalls
+
+    File Qulimap_results = Qualimap.results
   }
 }
 
