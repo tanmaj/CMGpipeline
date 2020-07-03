@@ -101,7 +101,6 @@ task CallPlink {
   input {
     # Command parameters
     File input_vcf
-
     String sample_basename
 
     # Runtime parameters
