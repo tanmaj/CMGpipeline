@@ -63,7 +63,7 @@ workflow FastqToVCF {
     File dbNSFP
     File dbNSFP_index
 
-    File dbSNPcommon_bed_index
+    File dbSNPcommon_bed
     File dbSNPcommon_bed_index
 
     File dbsnp_vcf
