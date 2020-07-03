@@ -66,8 +66,12 @@ workflow FastqToVCF {
     Array[File] known_indels_sites_vcfs
     Array[File] known_indels_sites_indices
 
-    String? enrichment
-    File? enrichment_bed
+    String enrichment
+    File enrichment_bed
+
+    Array[File] input_reference_rpkms 
+    Int CONIFER_svd
+    Float CONIFER_threshold
 
     String cutadapt_docker = "kfdrc/cutadapt:latest"
     String gatk_docker = "broadinstitute/gatk:latest"
@@ -397,16 +401,19 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
-  if (defined(enrichment_bed)) {
-    call Conifer.MakeRPKM {
-      input:
-        input_bam=SortSam.output_bam,
-        input_bam_index=SortSam.output_bam_index,
-        sample_basename=sample_basename,
-        enrichment=enrichment,
-        enrichment_bed=enrichment_bed
-    }
+  call Conifer.Conifer as Conifer{
+  input:
+    input_bam = SortSam.output_bam,
+    input_bam_index = SortSam.output_bam_index,
+
+    input_reference_rpkms = input_reference_rpkms,
+    CONIFER_svd = CONIFER_svd,
+    CONIFER_threshold = CONIFER_threshold,
+
+    enrichment = enrichment,
+    enrichment_bed = enrichment_bed
   }
+
 
   output {
     File output_bam = SortSam.output_bam
@@ -421,6 +428,9 @@ workflow FastqToVCF {
     File output_annotated_vcf = AnnotateVCF.output_vcf
     File output_annotated_vcf_index = AnnotateVCF.output_vcf_index
     File output_table = AnnotateVCF.output_table
+
+    File output_conifer_calls = Conifer.output_conifer_calls
+    Array[File] output_plotcalls = Conifer.output_plotcalls
   }
 }
 
