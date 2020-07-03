@@ -26,6 +26,7 @@ task bamqc {
         set -euo pipefail
         
         qualimap bamqc -bam ~{bam} \
+            -gff ~{enrichment_bed} \
             -outdir ~{out_directory} \
             -nt ~{ncpu} \
             -nw 400 \
