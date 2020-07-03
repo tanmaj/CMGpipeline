@@ -4,6 +4,7 @@ version 1.0
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" as ROH
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -61,6 +62,9 @@ workflow FastqToVCF {
 
     File dbNSFP
     File dbNSFP_index
+
+    File dbSNPcommon_bed_index
+    File dbSNPcommon_bed_index
 
     File dbsnp_vcf
     File dbsnp_vcf_index
@@ -425,6 +429,36 @@ workflow FastqToVCF {
     ncpu = 8
   }
 
+  call ROH.calculateBAF as calculateBAF {
+  input:
+    input_bam = SortSam.output_bam,
+    input_bam_index = SortSam.output_bam_index,
+    sample_basename=sample_basename,
+
+    reference_fa=reference_fa,
+
+    dbSNPcommon_bed = dbSNPcommon_bed,
+    dbSNPcommon_bed_index = dbSNPcommon_bed_index,
+
+    docker = "alesmaver/bwa_samtools_picard"
+  }
+
+  call ROH.CallROH as CallROH {
+  input:
+    input_bam = SortSam.output_bam,
+    input_bam_index = SortSam.output_bam_index,
+    sample_basename=sample_basename,
+
+    reference_fa=reference_fa,
+
+    dbSNPcommon_bed = dbSNPcommon_bed,
+    dbSNPcommon_bed_index = dbSNPcommon_bed_index,
+
+    gnomAD_vcf = gnomAD_vcf,
+    gnomAD_vcf_index = gnomAD_vcf_index,
+
+    docker = bcftools_docker
+  }
 
   output {
     File output_bam = SortSam.output_bam
