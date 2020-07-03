@@ -119,7 +119,7 @@ task CallPlink {
   }
   output {
     File ROHplink_calls = "~{sample_basename}.hom"
-    File ROHplink_calls = "~{sample_basename}.hom.summary"
-    File ROHplink_calls = "~{sample_basename}.hom.indiv"
+    File ROHplink_calls_windows = "~{sample_basename}.hom.summary"
+    File ROHplink_calls_summary = "~{sample_basename}.hom.indiv"
   }
 }
