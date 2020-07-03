@@ -2,7 +2,6 @@
 ##
 ## This WDL tool wraps the [QualiMap](http://qualimap.bioinfo.cipf.es/) tool.
 ## QualiMap computes metrics to facilitate evaluation of sequencing data. 
-
 version 1.0
 
 task bamqc {
