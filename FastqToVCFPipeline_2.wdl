@@ -460,6 +460,14 @@ workflow FastqToVCF {
     docker = bcftools_docker
   }
 
+  call ROH.CallPlink as CallPlink {
+  input:
+    input_vcf = CallROH.BAF_vcf,
+    sample_basename=sample_basename,
+
+    docker = "asherkhb/plink"
+  }
+
   output {
     File output_bam = SortSam.output_bam
     File output_bam_index = SortSam.output_bam_index

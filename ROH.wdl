@@ -93,5 +93,33 @@ task CallROH {
   }
   output {
     File ROH_calls = "~{sample_basename}.ROHcalls.wig"
+    File BAF_vcf = ~{sample_basename}.dbSNP.AF.vcf.bgz
+  }
+}
+
+task CallROH_plink {
+  input {
+    # Command parameters
+    File input_vcf
+
+    String sample_basename
+
+    # Runtime parameters
+    String docker = "asherkhb/plink"
+  }
+  
+  command <<<
+  set -e
+  /usr/local/bin/plink1.9 --vcf ~{input_vcf} --make-bed --out ~{sample_basename} --no-sex --no-parents --no-fid --no-pheno --allow-extra-chr
+  /usr/local/bin/plink1.9 -bfile ~{sample_basename} --homozyg --allow-extra-chr --out ~{sample_basename}
+  >>>
+
+  runtime {
+    docker: docker
+  }
+  output {
+    File ROHplink_calls = "~{sample_basename}.hom"
+    File ROHplink_calls = "~{sample_basename}.hom.summary"
+    File ROHplink_calls = "~{sample_basename}.hom.indiv"
   }
 }
