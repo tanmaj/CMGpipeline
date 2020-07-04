@@ -85,8 +85,8 @@ task CallROH {
   set -e
   bcftools mpileup -q 15 -Q20 -f ~{reference_fa} -T ~{dbSNPcommon_bed} ~{input_bam} | bcftools call -m | bcftools view -i 'DP>10 && QUAL>100' -V indels -Oz -o ~{sample_basename}.dbSNP.vcf.gz
   bcftools index -t ~{sample_basename}.dbSNP.vcf.gz
-  bcftools annotate -a ~{gnomAD_vcf} -c AF ~{sample_basename}.dbSNP.vcf.bgz -Ob -o ~{sample_basename}.dbSNP.AF.vcf.bgz
-  bcftools --AF-tag AF -G30 -I ~{sample_basename}.dbSNP.AF.vcf.bgz | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.wig
+  bcftools annotate -a ~{gnomAD_vcf} -c AF -Oz -o ~{sample_basename}.dbSNP.AF.vcf.gz ~{sample_basename}.dbSNP.vcf.gz
+  bcftools --AF-tag AF -G30 -I ~{sample_basename}.dbSNP.AF.vcf.gz | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.wig
   >>>
 
   runtime {
@@ -94,7 +94,7 @@ task CallROH {
   }
   output {
     File ROH_calls = "~{sample_basename}.ROHcalls.wig"
-    File BAF_vcf = "~{sample_basename}.dbSNP.AF.vcf.bgz"
+    File BAF_vcf = "~{sample_basename}.dbSNP.AF.vcf.gz"
   }
 }
 
