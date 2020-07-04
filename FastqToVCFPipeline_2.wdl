@@ -443,30 +443,30 @@ workflow FastqToVCF {
     docker = "alesmaver/bwa_samtools_picard"
   }
 
-  call ROH.CallROH as CallROH {
-  input:
-    input_bam = SortSam.output_bam,
-    input_bam_index = SortSam.output_bam_index,
-    sample_basename=sample_basename,
+  #call ROH.CallROH as CallROH {
+  #input:
+  #  input_bam = SortSam.output_bam,
+  #  input_bam_index = SortSam.output_bam_index,
+  #  sample_basename=sample_basename,
+  #
+  #  reference_fa=reference_fa,
+  #
+  #  dbSNPcommon_bed = dbSNPcommon_bed,
+  #  dbSNPcommon_bed_index = dbSNPcommon_bed_index,
+  #
+  #  gnomAD_vcf = gnomAD_vcf,
+  #  gnomAD_vcf_index = gnomAD_vcf_index,
+  #
+  #  docker = bcftools_docker
+  #}
 
-    reference_fa=reference_fa,
-
-    dbSNPcommon_bed = dbSNPcommon_bed,
-    dbSNPcommon_bed_index = dbSNPcommon_bed_index,
-
-    gnomAD_vcf = gnomAD_vcf,
-    gnomAD_vcf_index = gnomAD_vcf_index,
-
-    docker = bcftools_docker
-  }
-
-  call ROH.CallPlink as CallPlink {
-  input:
-    input_vcf = CallROH.BAF_vcf,
-    sample_basename=sample_basename,
-
-    docker = "asherkhb/plink"
-  }
+  #call ROH.CallPlink as CallPlink {
+  #input:
+  #  input_vcf = CallROH.BAF_vcf,
+  #  sample_basename=sample_basename,
+  #
+  #  docker = "asherkhb/plink"
+  #}
 
   output {
     File output_bam = SortSam.output_bam
@@ -487,7 +487,7 @@ workflow FastqToVCF {
 
     File Qulimap_results = Qualimap.results
 
-    File ROHplink_calls = CallPlink.ROHplink_calls
+    #File ROHplink_calls = CallPlink.ROHplink_calls
   }
 }
 
