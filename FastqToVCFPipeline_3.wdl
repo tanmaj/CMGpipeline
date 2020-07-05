@@ -445,22 +445,22 @@ workflow FastqToVCF {
     docker = "alesmaver/bwa_samtools_picard"
   }
 
-  #call ROH.CallROH as CallROH {
-  #input:
-  #  input_bam = SortSam.output_bam,
-  #  input_bam_index = SortSam.output_bam_index,
-  #  sample_basename=sample_basename,
-  #
-  #  reference_fa=reference_fa,
-  #
-  #  dbSNPcommon_bed = dbSNPcommon_bed,
-  #  dbSNPcommon_bed_index = dbSNPcommon_bed_index,
-  #
-  #  gnomAD_maf01_vcf = gnomAD_maf01_vcf,
-  #  gnomAD_maf01_vcf = gnomAD_maf01_vcf_index,
-  #
-  #  docker = bcftools_docker
-  #}
+  call ROH.CallROH as CallROH {
+  input:
+    input_bam = SortSam.output_bam,
+    input_bam_index = SortSam.output_bam_index,
+    sample_basename=sample_basename,
+  
+    reference_fa=reference_fa,
+  
+    dbSNPcommon_bed = dbSNPcommon_bed,
+    dbSNPcommon_bed_index = dbSNPcommon_bed_index,
+  
+    gnomAD_maf01_vcf = gnomAD_maf01_vcf,
+    gnomAD_maf01_vcf = gnomAD_maf01_vcf_index,
+  
+    docker = bcftools_docker
+  }
 
   #call ROH.CallPlink as CallPlink {
   #input:
