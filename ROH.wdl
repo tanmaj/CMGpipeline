@@ -74,8 +74,8 @@ task CallROH {
     File dbSNPcommon_bed
     File dbSNPcommon_bed_index
 
-    File gnomAD_vcf
-    File gnomAD_vcf_index
+    File gnomAD_maf01_vcf
+    File gnomAD_maf01_vcf_index
 
     # Runtime parameters
     String docker
@@ -85,7 +85,7 @@ task CallROH {
   set -e
   bcftools mpileup -q 15 -Q20 -f ~{reference_fa} -T ~{dbSNPcommon_bed} ~{input_bam} | bcftools call -m | bcftools view -i 'DP>10 && QUAL>100' -V indels -Oz -o ~{sample_basename}.dbSNP.vcf.gz
   bcftools index -t ~{sample_basename}.dbSNP.vcf.gz
-  bcftools annotate -a ~{gnomAD_vcf} -c AF -Oz -o ~{sample_basename}.dbSNP.AF.vcf.gz ~{sample_basename}.dbSNP.vcf.gz
+  bcftools annotate -a ~{gnomAD_maf01_vcf} -c AF -Oz -o ~{sample_basename}.dbSNP.AF.vcf.gz ~{sample_basename}.dbSNP.vcf.gz
   bcftools --AF-tag AF -G30 -I ~{sample_basename}.dbSNP.AF.vcf.gz | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.wig
   >>>
 
