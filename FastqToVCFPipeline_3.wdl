@@ -457,7 +457,7 @@ workflow FastqToVCF {
     dbSNPcommon_bed_index = dbSNPcommon_bed_index,
   
     gnomAD_maf01_vcf = gnomAD_maf01_vcf,
-    gnomAD_maf01_vcf = gnomAD_maf01_vcf_index,
+    gnomAD_maf01_vcf_index = gnomAD_maf01_vcf_index,
   
     docker = bcftools_docker
   }
