@@ -97,8 +97,8 @@ task CallROH {
   bcftools roh --AF-file ~{gnomAD_maf01_tab} -G30 -I ~{sample_basename}.dbSNP.vcf.gz ~{sample_basename}.dbSNP.vcf.gz > ~{sample_basename}.bcftoolsROH.output
   cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.qual.wig
   cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$7}' OFS='\t' > ~{sample_basename}.ROHcalls.size.wig
-  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$5}' OFS='\t' > ~{sample_basename}.ROHintervals.state.wig
-  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$6}' OFS='\t' > ~{sample_basename}.ROHintervals.qual.wig
+  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$4,$5}' OFS='\t' > ~{sample_basename}.ROHintervals.state.wig
+  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$4,$6}' OFS='\t' > ~{sample_basename}.ROHintervals.qual.wig
   >>>
 
   runtime {
