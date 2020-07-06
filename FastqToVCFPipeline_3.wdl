@@ -63,10 +63,13 @@ workflow FastqToVCF {
     File dbNSFP
     File dbNSFP_index
 
+    # Files containing frequency information for common SNPs used for ROH calculation
     File dbSNPcommon_bed
     File dbSNPcommon_bed_index
     File gnomAD_maf01_vcf
     File gnomAD_maf01_vcf_index
+    File gnomAD_maf01_tab
+    File gnomAD_maf01_tab_index
 
     File dbsnp_vcf
     File dbsnp_vcf_index
@@ -458,6 +461,9 @@ workflow FastqToVCF {
   
     gnomAD_maf01_vcf = gnomAD_maf01_vcf,
     gnomAD_maf01_vcf_index = gnomAD_maf01_vcf_index,
+
+    gnomAD_maf01_tab = gnomAD_maf01_tab,
+    gnomAD_maf01_tab_index = gnomAD_maf01_tab_index,
   
     docker = bcftools_docker
   }
