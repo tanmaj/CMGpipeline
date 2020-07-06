@@ -105,7 +105,10 @@ task CallROH {
     docker: docker
   }
   output {
-    File ROH_calls = "~{sample_basename}.ROHcalls.wig"
+    File ROH_calls_qual = "~{sample_basename}.ROHcalls.qual.wig"
+    File ROH_calls_size = "~{sample_basename}.ROHcalls.size.wig"
+    File ROH_intervals_state = "~{sample_basename}.ROHintervals.state.wig"
+    File ROH_intervals_qual = "~{sample_basename}.ROHintervals.qual.wig"
     File BAF_vcf = "~{sample_basename}.dbSNP.vcf.gz"
   }
 }

@@ -515,7 +515,14 @@ workflow FastqToVCF {
     File output_conifer_calls = Conifer.output_conifer_calls
     Array[File] output_plotcalls = Conifer.output_plotcalls
 
-    File Qulimap_results = Qualimap.results
+    File Qualimap_results = Qualimap.results
+
+    File ROH_calls_qual = CallROH.ROH_calls_qual
+    File ROH_calls_size = CallROH.ROH_calls_size
+    File ROH_intervals_state = CallROH.ROH_intervals_state
+    File ROH_intervals_qual = CallROH.ROH_intervals_qual
+
+    File DepthOfCoverage_output = DepthOfCoverage.DepthOfCoverage_output
 
     #File ROHplink_calls = CallPlink.ROHplink_calls
   }
