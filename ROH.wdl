@@ -74,8 +74,18 @@ task CallROH {
     File dbSNPcommon_bed
     File dbSNPcommon_bed_index
 
+    # This file is used for determining the locations of common gnomAD SNPs (>1%) for variant calling
     File gnomAD_maf01_vcf
     File gnomAD_maf01_vcf_index
+
+    # This file contains the frequencies of common gnomAD SNPs (>1%) required for the bcftools roh function
+    # The file was generated from the gnomAD vcf file, filtered for common (>1%) SNPs
+    # This is performed using the following two commands
+    # bcftools query -f'%CHROM\t%POS\t%REF,%ALT\t%INFO/AF\n' gnomad.genomes.r2.1.1.sites.hg19.maf01.vcf.bgz | bgzip -c > gnomad.genomes.r2.1.1.sites.hg19.maf01.tab.gz
+    # tabix -s1 -b2 -e2 -f gnomad.genomes.r2.1.1.sites.hg19.maf01.tab.gz 
+
+    File gnomAD_maf01_tab
+    File gnomAD_maf01_tab_index
 
     # Runtime parameters
     String docker
@@ -85,8 +95,7 @@ task CallROH {
   set -e
   bcftools mpileup -q 15 -Q20 -f ~{reference_fa} -T ~{dbSNPcommon_bed} ~{input_bam} | bcftools call -m | bcftools view -i 'DP>10 && QUAL>100' -V indels -Oz -o ~{sample_basename}.dbSNP.vcf.gz
   bcftools index -t ~{sample_basename}.dbSNP.vcf.gz
-  bcftools annotate -a ~{gnomAD_maf01_vcf} -c AF -Oz -o ~{sample_basename}.dbSNP.AF.vcf.gz ~{sample_basename}.dbSNP.vcf.gz
-  bcftools --AF-tag AF -G30 -I ~{sample_basename}.dbSNP.AF.vcf.gz | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.wig
+  bcftools roh --AF-file ~{gnomAD_maf01_tab} -G30 -I ~{sample_basename}.dbSNP.vcf.gz ~{sample_basename}.dbSNP.vcf.gz  | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.wig
   >>>
 
   runtime {
@@ -94,7 +103,7 @@ task CallROH {
   }
   output {
     File ROH_calls = "~{sample_basename}.ROHcalls.wig"
-    File BAF_vcf = "~{sample_basename}.dbSNP.AF.vcf.gz"
+    File BAF_vcf = "~{sample_basename}.dbSNP.vcf.gz"
   }
 }
 
