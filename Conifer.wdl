@@ -139,14 +139,14 @@ task CONIFER_Call {
     String docker = "molecular/conifer"
   }
   
-  command {
+  command <<<
   set -e
   python /home/bio/conifer_v0.2.2/conifer.py call --threshold ~{CONIFER_threshold} --input ~{input_hdf5} --output ~{sample_basename}.CONIFER_CALLS_POPULATION.txt
 
   head -n 1 ~{sample_basename}.CONIFER_CALLS_POPULATION.txt > ~{sample_basename}.CONIFER_CALLS.txt
   cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
   cat ~{sample_basename}.CONIFER_CALLS.txt | grep -v "start" | awk -F'\t' '{ if ($5 == "dup") $5="1"; if ($5 == "del") $5="-1";print $2,$3,$4,$5}' OFS='\t' > ~{sample_basename}.CNV.wig
-  }
+  >>>
 
   runtime {
     docker: docker
@@ -194,13 +194,13 @@ task CONIFER_Export {
     String docker = "molecular/conifer"
   }
   
-  command {
+  command <<<
   set -e
   export LC_ALL="C.UTF-8"
   export LC_CTYPE="C.UTF-8"
   python /home/bio/conifer_v0.2.2/conifer.py export --input ~{input_hdf5} --sample ~{enrichment}_~{sample_basename} --output ./
   cat ~{enrichment}_~{sample_basename}.bed | awk -F'\t' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.CNV.wig
-  }
+  >>>
 
   runtime {
     docker: docker
