@@ -88,7 +88,7 @@ task DepthOfCoverage {
       DepthOfCoverage \
       -R ~{reference_fa} \
       -I ~{input_bam} \
-      -O ~{sample_basename}.coverage \
+      -O coverage \
       ~{"-L " + enrichment_bed} \
        --omit-depth-output-at-each-base \
        -ip 2 \
@@ -106,7 +106,28 @@ task DepthOfCoverage {
        --summary-coverage-threshold 100 \
        --gene-list ~{refSeqFile}
 
-       tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz ~{sample_basename}.coverage*
+    ~{gatk_path} --java-options "-Xmx8g -XX:ParallelGCThreads=~{threads}"  \
+      DepthOfCoverage \
+       -R ~{reference_fa} \
+       -I ~{input_bam} \
+       -O mitochondrial.coverage \
+       -L chrM \
+       --omit-depth-output-at-each-base \
+       -ip 2 \
+       --summary-coverage-threshold 5 \
+       --summary-coverage-threshold 10 \
+       --summary-coverage-threshold 15 \
+       --summary-coverage-threshold 20 \
+       --summary-coverage-threshold 30 \
+       --summary-coverage-threshold 40 \
+       --summary-coverage-threshold 50 \
+       --summary-coverage-threshold 60 \
+       --summary-coverage-threshold 70 \
+       --summary-coverage-threshold 80 \
+       --summary-coverage-threshold 90 \
+       --summary-coverage-threshold 100
+
+       tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz coverage*
     }
     
     output {
