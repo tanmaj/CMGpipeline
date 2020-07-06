@@ -61,3 +61,53 @@ task bamqc {
         bam: "Input BAM format file to generate coverage for"
     }
 }
+
+## An additional option for calculating coverage using GATK
+task DepthOfCoverage {
+    input {
+        File input_bam
+        File input_bam_index
+        File? enrichment_bed
+        File refSeqFile
+        String sample_basename
+        
+        Int threads
+        String docker
+    }
+
+    command {
+    set -e
+    ~{gatk_path} --java-options "-Xmx8g -XX:ParallelGCThreads=~{threads}"  \
+      DepthOfCoverage \
+      -R ~{reference_fa} \
+      -I ~{input_bam} \
+      -O ~{sample_basename}.coverage \
+      ~{"-L " + enrichment_bed} \
+       --omit-depth-output-at-each-base \
+       -ip 2 \
+       --summary-coverage-threshold 5 \
+       --summary-coverage-threshold 10 \
+       --summary-coverage-threshold 15 \
+       --summary-coverage-threshold 20 \
+       --summary-coverage-threshold 30 \
+       --summary-coverage-threshold 40 \
+       --summary-coverage-threshold 50 \
+       --summary-coverage-threshold 60 \
+       --summary-coverage-threshold 70 \
+       --summary-coverage-threshold 80 \
+       --summary-coverage-threshold 90 \
+       --summary-coverage-threshold 100 \
+       --gene-list ~{refSeqFile}
+
+       tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz ~{sample_basename}.coverage*
+    }
+    
+    output {
+    File DepthOfCoverage_output = "~{sample_basename}.DepthOfCoverage.tar.gz"
+    }
+
+    runtime {
+        docker: "~{docker}"
+        maxRetries: 3
+    }
+}

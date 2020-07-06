@@ -76,6 +76,8 @@ workflow FastqToVCF {
     Array[File] known_indels_sites_vcfs
     Array[File] known_indels_sites_indices
 
+    File refSeqFile
+
     String enrichment
     File enrichment_bed
 
@@ -432,6 +434,23 @@ workflow FastqToVCF {
     enrichment_bed = enrichment_bed,
 
     ncpu = 8
+  }
+
+  # Merge per-interval GVCFs
+  call Qualimap.DepthOfCoverage as DepthOfCoverage {
+    input:
+      input_bam = SortSam.output_bam,
+      input_bam_index = SortSam.output_bam_index,
+      sample_basename = sample_basename,
+
+      enrichment_bed = enrichment_bed,
+
+      refSeqFile = refSeqFile,
+
+      threads = threads,
+
+      docker = gatk_docker,
+      gatk_path = gatk_path
   }
 
   call ROH.calculateBAF as calculateBAF {
