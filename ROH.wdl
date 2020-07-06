@@ -78,12 +78,11 @@ task CallROH {
     File gnomAD_maf01_vcf
     File gnomAD_maf01_vcf_index
 
-    # This file contains the frequencies of common gnomAD SNPs (>1%) required for the bcftools roh function
+    # This gnomad maf01 tab file contains the frequencies of common gnomAD SNPs (>1%) required for the bcftools roh function
     # The file was generated from the gnomAD vcf file, filtered for common (>1%) SNPs
     # This is performed using the following two commands
     # bcftools query -f'%CHROM\t%POS\t%REF,%ALT\t%INFO/AF\n' gnomad.genomes.r2.1.1.sites.hg19.maf01.vcf.bgz | bgzip -c > gnomad.genomes.r2.1.1.sites.hg19.maf01.tab.gz
-    # tabix -s1 -b2 -e2 -f gnomad.genomes.r2.1.1.sites.hg19.maf01.tab.gz 
-
+    # tabix -s1 -b2 -e2 -f gnomad.genomes.r2.1.1.sites.hg19.maf01.tab.gz # Index as recommended, otherwise bcftools roh won't work
     File gnomAD_maf01_tab
     File gnomAD_maf01_tab_index
 
@@ -95,7 +94,11 @@ task CallROH {
   set -e
   bcftools mpileup -q 15 -Q20 -f ~{reference_fa} -T ~{dbSNPcommon_bed} ~{input_bam} | bcftools call -m | bcftools view -i 'DP>10 && QUAL>100' -V indels -Oz -o ~{sample_basename}.dbSNP.vcf.gz
   bcftools index -t ~{sample_basename}.dbSNP.vcf.gz
-  bcftools roh --AF-file ~{gnomAD_maf01_tab} -G30 -I ~{sample_basename}.dbSNP.vcf.gz ~{sample_basename}.dbSNP.vcf.gz  | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.wig
+  bcftools roh --AF-file ~{gnomAD_maf01_tab} -G30 -I ~{sample_basename}.dbSNP.vcf.gz ~{sample_basename}.dbSNP.vcf.gz > ~{sample_basename}.bcftoolsROH.output
+  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$8}' OFS='\t' > ~{sample_basename}.ROHcalls.qual.wig
+  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$7}' OFS='\t' > ~{sample_basename}.ROHcalls.size.wig
+  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$5}' OFS='\t' > ~{sample_basename}.ROHintervals.state.wig
+  cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$6}' OFS='\t' > ~{sample_basename}.ROHintervals.qual.wig
   >>>
 
   runtime {
