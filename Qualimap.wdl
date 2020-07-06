@@ -67,10 +67,12 @@ task DepthOfCoverage {
     input {
         File input_bam
         File input_bam_index
+        String sample_basename
+
+        File reference_fa
         File? enrichment_bed
         File refSeqFile
-        String sample_basename
-        
+                
         # Runtime params
         String gatk_path
         Int threads

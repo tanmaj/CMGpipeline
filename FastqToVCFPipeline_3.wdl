@@ -443,12 +443,12 @@ workflow FastqToVCF {
       input_bam_index = SortSam.output_bam_index,
       sample_basename = sample_basename,
 
+      reference_fa=reference_fa,
       enrichment_bed = enrichment_bed,
 
       refSeqFile = refSeqFile,
 
       threads = threads,
-
       docker = gatk_docker,
       gatk_path = gatk_path
   }
