@@ -70,6 +70,9 @@ task DepthOfCoverage {
         String sample_basename
 
         File reference_fa
+        File reference_fai
+        File reference_dict
+        
         File? enrichment_bed
         File refSeqFile
                 

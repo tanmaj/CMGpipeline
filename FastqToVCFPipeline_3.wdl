@@ -444,6 +444,9 @@ workflow FastqToVCF {
       sample_basename = sample_basename,
 
       reference_fa=reference_fa,
+      reference_fai=reference_fai,
+      reference_dict=reference_dict,
+
       enrichment_bed = enrichment_bed,
 
       refSeqFile = refSeqFile,
