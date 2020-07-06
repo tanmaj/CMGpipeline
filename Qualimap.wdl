@@ -71,6 +71,8 @@ task DepthOfCoverage {
         File refSeqFile
         String sample_basename
         
+        # Runtime params
+        String gatk_path
         Int threads
         String docker
     }
