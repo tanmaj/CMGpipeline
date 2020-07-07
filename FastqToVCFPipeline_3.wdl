@@ -437,7 +437,7 @@ workflow FastqToVCF {
   }
 
   # Merge per-interval GVCFs
-  call Qualimap.DepthOfCoverage as DepthOfCoverage {
+  call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
     input:
       input_bam = SortSam.output_bam,
       input_bam_index = SortSam.output_bam_index,

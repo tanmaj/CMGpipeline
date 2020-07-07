@@ -147,3 +147,91 @@ task DepthOfCoverage {
         maxRetries: 3
     }
 }
+
+## An additional option for calculating coverage using GATK
+task DepthOfCoverage34 {
+    input {
+        File input_bam
+        File input_bam_index
+        String sample_basename
+
+        File reference_fa
+        File reference_fai
+        File reference_dict
+        
+        File? enrichment_bed
+        File refSeqFile
+                
+        # Runtime params
+        String gatk_path
+        Int threads
+        String docker
+    }
+
+    command <<<
+    set -e
+    java -Xmx8g -jar /usr/GenomeAnalysisTK.jar \
+      -T DepthOfCoverage \
+      -nt ~{threads} \
+      -R ~{reference_fa} \
+      -I ~{input_bam} \
+      -o targetGenes.coverage \
+      ~{"-L " + enrichment_bed} \
+       -omitBaseOutput \
+       -ip 2 \
+       -ct 5 \
+       -ct 10 \
+       -ct 15 \
+       -ct 20 \
+       -ct 30 \
+       -ct 40 \
+       -ct 50 \
+       -ct 60 \
+       -ct 70 \
+       -ct 80 \
+       -ct 90 \
+       -ct 100 \
+       -geneList ~{refSeqFile}
+
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.coverage_mean.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11)}' OFS='\t' > ~{sample_basename}.coverage.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' > ~{sample_basename}.coverage_neg.wig
+
+    java -Xmx8g -jar /usr/GenomeAnalysisTK.jar \
+      -T DepthOfCoverage \
+      -nt ~{threads} \
+      -R ~{reference_fa} \
+      -I ~{input_bam} \
+      -o mitochondrial.coverage \
+       -L chrM \
+       -omitBaseOutput \
+       -ip 2 \
+       -ct 5 \
+       -ct 10 \
+       -ct 15 \
+       -ct 20 \
+       -ct 30 \
+       -ct 40 \
+       -ct 50 \
+       -ct 60 \
+       -ct 70 \
+       -ct 80 \
+       -ct 90 \
+       -ct 100
+
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_mean.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11)}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_neg.wig
+
+    tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz *coverage*
+    >>>
+    
+    output {
+    File DepthOfCoverage_output = "~{sample_basename}.DepthOfCoverage.tar.gz"
+    }
+
+    runtime {
+        docker: "~{docker}"
+        maxRetries: 3
+    }
+}
