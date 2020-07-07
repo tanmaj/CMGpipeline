@@ -452,8 +452,8 @@ workflow FastqToVCF {
       refSeqFile = refSeqFile,
 
       threads = threads,
-      docker = gatk_docker,
-      gatk_path = gatk_path
+      docker = "broadinstitute/gatk3:3.8-1",
+      gatk_path = "/usr/GenomeAnalysisTK.jar"
   }
 
   call ROH.calculateBAF as calculateBAF {
