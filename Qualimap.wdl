@@ -172,7 +172,6 @@ task DepthOfCoverage34 {
     set -e
     java -Xmx8g -jar /usr/GenomeAnalysisTK.jar \
       -T DepthOfCoverage \
-      -nt ~{threads} \
       -R ~{reference_fa} \
       -I ~{input_bam} \
       -o targetGenes.coverage \
@@ -200,7 +199,6 @@ task DepthOfCoverage34 {
 
     java -Xmx8g -jar /usr/GenomeAnalysisTK.jar \
       -T DepthOfCoverage \
-      -nt ~{threads} \
       -R ~{reference_fa} \
       -I ~{input_bam} \
       -o mitochondrial.coverage \
