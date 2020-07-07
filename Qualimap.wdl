@@ -82,7 +82,7 @@ task DepthOfCoverage {
         String docker
     }
 
-    command {
+    command <<<
     set -e
     ~{gatk_path} --java-options "-Xmx8g -XX:ParallelGCThreads=~{threads}"  \
       DepthOfCoverage \
@@ -136,7 +136,7 @@ task DepthOfCoverage {
     cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_neg.wig
 
     tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz *coverage*
-    }
+    >>>
     
     output {
     File DepthOfCoverage_output = "~{sample_basename}.DepthOfCoverage.tar.gz"
