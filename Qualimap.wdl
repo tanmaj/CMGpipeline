@@ -181,15 +181,8 @@ task DepthOfCoverage34 {
         -allowPotentiallyMisencodedQuals \
        -ct 5 \
        -ct 10 \
-       -ct 15 \
        -ct 20 \
-       -ct 30 \
-       -ct 40 \
        -ct 50 \
-       -ct 60 \
-       -ct 70 \
-       -ct 80 \
-       -ct 90 \
        -ct 100 \
        -geneList ~{refSeqFile}
 
@@ -208,15 +201,8 @@ task DepthOfCoverage34 {
         -allowPotentiallyMisencodedQuals \
        -ct 5 \
        -ct 10 \
-       -ct 15 \
        -ct 20 \
-       -ct 30 \
-       -ct 40 \
        -ct 50 \
-       -ct 60 \
-       -ct 70 \
-       -ct 80 \
-       -ct 90 \
        -ct 100
 
     cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_mean.wig
