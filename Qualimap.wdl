@@ -179,6 +179,7 @@ task DepthOfCoverage34 {
       ~{"-L " + enrichment_bed} \
        -omitBaseOutput \
        -ip 2 \
+        -allowPotentiallyMisencodedQuals \
        -ct 5 \
        -ct 10 \
        -ct 15 \
@@ -206,6 +207,7 @@ task DepthOfCoverage34 {
        -L chrM \
        -omitBaseOutput \
        -ip 2 \
+        -allowPotentiallyMisencodedQuals \
        -ct 5 \
        -ct 10 \
        -ct 15 \
