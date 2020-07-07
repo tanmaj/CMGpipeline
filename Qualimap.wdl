@@ -88,7 +88,7 @@ task DepthOfCoverage {
       DepthOfCoverage \
       -R ~{reference_fa} \
       -I ~{input_bam} \
-      -O coverage \
+      -O targetGenes.coverage \
       ~{"-L " + enrichment_bed} \
        --omit-depth-output-at-each-base \
        -ip 2 \
@@ -105,6 +105,10 @@ task DepthOfCoverage {
        --summary-coverage-threshold 90 \
        --summary-coverage-threshold 100 \
        --gene-list ~{refSeqFile}
+
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.coverage_mean.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11)}' OFS='\t' > ~{sample_basename}.coverage.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' > ~{sample_basename}.coverage_neg.wig
 
     ~{gatk_path} --java-options "-Xmx8g -XX:ParallelGCThreads=~{threads}"  \
       DepthOfCoverage \
@@ -127,7 +131,11 @@ task DepthOfCoverage {
        --summary-coverage-threshold 90 \
        --summary-coverage-threshold 100
 
-       tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz coverage*
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_mean.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11)}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_neg.wig
+
+    tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz *coverage*
     }
     
     output {
