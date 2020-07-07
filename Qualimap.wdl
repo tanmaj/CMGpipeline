@@ -165,7 +165,7 @@ task DepthOfCoverage34 {
         # Runtime params
         String gatk_path
         Int threads
-        String docker
+        String docker = "broadinstitute/gatk3:3.8-1"
     }
 
     command <<<
