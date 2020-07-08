@@ -520,6 +520,7 @@ workflow FastqToVCF {
 
     File Qualimap_results = Qualimap.results
 
+    File output_BAF = calculateBAF.output_BAF
     File ROH_calls_qual = CallROH.ROH_calls_qual
     File ROH_calls_size = CallROH.ROH_calls_size
     File ROH_intervals_state = CallROH.ROH_intervals_state
