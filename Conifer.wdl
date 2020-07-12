@@ -91,6 +91,9 @@ task MakeRPKM {
   }
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 3000
+    cpu: 2
+    runtime_minutes: 120
   }
   output {
     File output_rpkm = "~{enrichment}_~{sample_basename}.txt"
@@ -122,6 +125,9 @@ task CONIFER_Analyze {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 3000
+    cpu: 2
+    runtime_minutes: 120
   }
   output {
     File output_hdf5 = "~{sample_basename}.analysis.hdf5"
@@ -150,6 +156,9 @@ task CONIFER_Call {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 3000
+    cpu: 2
+    runtime_minutes: 120
   }
   output {
     File output_conifer_calls = "~{sample_basename}.CONIFER_CALLS.txt"
@@ -177,6 +186,9 @@ task CONIFER_Plotcalls {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 3000
+    cpu: 2
+    runtime_minutes: 120
   }
   output {
     Array[File] output_plotcalls = glob("*.png")
@@ -204,6 +216,9 @@ task CONIFER_Export {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 4000
+    cpu: 1
+    runtime_minutes: 60
   }
   output {
     File CNV_bed = "~{enrichment}_~{sample_basename}.bed" 
