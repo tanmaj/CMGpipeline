@@ -56,6 +56,9 @@ task calculateBAF {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 4000
+    cpu: 2
+    runtime_minutes: 120
   }
   output {
     File output_BAF = "~{sample_basename}.BAF.wig"
@@ -103,6 +106,9 @@ task CallROH {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 3000
+    cpu: 2
+    runtime_minutes: 120
   }
   output {
     File ROH_calls_qual = "~{sample_basename}.ROHcalls.qual.wig"
@@ -131,6 +137,9 @@ task CallPlink {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 3000
+    cpu: 2
+    runtime_minutes: 120
   }
   output {
     File ROHplink_calls = "~{sample_basename}.hom"
