@@ -515,7 +515,7 @@ workflow FastqToVCF {
     File output_conifer_calls = Conifer.output_conifer_calls
     Array[File] output_plotcalls = Conifer.output_plotcalls
     File output_conifer_calls_wig = Conifer.output_conifer_calls_wig
-    File CNV_bed = Conifer.CNV_bed
+    #File CNV_bed = Conifer.CNV_bed
     File CNV_wig = Conifer.CNV_wig
 
     File Qualimap_results = Qualimap.results
