@@ -45,6 +45,9 @@ task bamqc {
         disk: disk_size + " GB"
         docker: 'stjudecloud/qualimap:1.0.0'
         maxRetries: max_retries
+        requested_memory_mb_per_core: 9000
+        cpu: 1
+        runtime_minutes: 180
     }
 
     output {
@@ -145,6 +148,9 @@ task DepthOfCoverage {
     runtime {
         docker: "~{docker}"
         maxRetries: 3
+        requested_memory_mb_per_core: 9000
+        cpu: 1
+        runtime_minutes: 180
     }
 }
 
@@ -219,5 +225,8 @@ task DepthOfCoverage34 {
     runtime {
         docker: "~{docker}"
         maxRetries: 3
+        requested_memory_mb_per_core: 9000
+        cpu: 1
+        runtime_minutes: 180
     }
 }
