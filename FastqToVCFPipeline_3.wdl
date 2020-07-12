@@ -558,6 +558,9 @@ task CutAdapters {
   }
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 1000
+    cpu: 7
+    runtime_minutes: 120
   }
   output {
     File output_fq_trimmed = "~{sample_basename}.trimmed.fq.gz"
@@ -602,6 +605,9 @@ task Align {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
+    requested_memory_mb_per_core: 2000
+    cpu: 8
+    runtime_minutes: 180
   }
 }
 
@@ -654,6 +660,9 @@ task CreateSequenceGroupingTSV {
     preemptible: preemptible_tries
     docker: "us.gcr.io/broad-gotc-prod/python:2.7"
     memory: "2 GiB"
+    requested_memory_mb_per_core: 1000
+    cpu: 1
+    runtime_minutes: 20
   }
   output {
     Array[Array[String]] sequence_grouping = read_tsv("sequence_grouping.txt")
