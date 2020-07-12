@@ -718,6 +718,9 @@ task BaseRecalibrator {
     memory: "6 GiB"
     disks: "local-disk " + disk_size + " HDD"
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 120
   }
   output {
     File recalibration_report = "~{recalibration_report_filename}"
@@ -783,6 +786,9 @@ task ApplyBQSR {
     maxRetries: 3
     memory: "~{memory_size} MiB"
     disks: "local-disk " + disk_size + " HDD"
+    requested_memory_mb_per_core: 3000
+    cpu: 1
+    runtime_minutes: 90
   }
   output {
     File recalibrated_bam = "~{output_bam_basename}.bam"
@@ -810,6 +816,9 @@ task GatherBqsrReports {
     preemptible: preemptible_tries
     memory: "3500 MiB"
     disks: "local-disk 20 HDD"
+    requested_memory_mb_per_core: 3500
+    cpu: 1
+    runtime_minutes: 60
   }
   output {
     File output_bqsr_report = "~{output_report_filename}"
@@ -843,6 +852,9 @@ task GatherSortedBamFiles {
     maxRetries: 3
     memory: "3 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    requested_memory_mb_per_core: 4000
+    cpu: 1
+    runtime_minutes: 120
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -944,6 +956,9 @@ task HaplotypeCaller {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 180
   }
 }
 
@@ -971,6 +986,9 @@ task MergeVCFs {
   runtime {
     docker: docker
     maxRetries: 3
+    requested_memory_mb_per_core: 4000
+    cpu: 1
+    runtime_minutes: 60
   }
   output {
     File output_vcf = "~{sample_basename}.raw.vcf.gz"
@@ -1019,6 +1037,9 @@ task SplitSNPindel {
 
   runtime {
     docker: "~{docker}"
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 60
     maxRetries: 3
   }
 }
@@ -1058,6 +1079,9 @@ task VariantFiltrationSNP {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 60
   }
 }
 
@@ -1096,6 +1120,9 @@ task VariantFiltrationINDEL {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 60
   }
 }
 
@@ -1127,6 +1154,9 @@ task CombineSNPindel {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 60
   }
 }
 
@@ -1163,6 +1193,9 @@ task SelectFinalVariants {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 60
   }
 }
 
@@ -1209,6 +1242,9 @@ task PairedFastQsToUnmappedBAM {
     disks: "local-disk " + disk_space_gb + " HDD"
     preemptible: preemptible_attempts
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 180
   }
   output {
     File output_unmapped_bam = "~{readgroup_name}.unmapped.bam"
@@ -1249,6 +1285,9 @@ task SamSplitter {
     maxRetries: 3
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 180
   }
 }
 
@@ -1274,6 +1313,9 @@ task GatherUnsortedBamFiles {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
     preemptible: preemptible_tries
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 120
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -1311,6 +1353,9 @@ task SortSam {
     memory: "5000 MiB"
     preemptible: preemptible_tries
     maxRetries: 3
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 180
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
