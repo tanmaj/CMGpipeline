@@ -58,7 +58,7 @@ task calculateBAF {
     docker: docker
     requested_memory_mb_per_core: 4000
     cpu: 2
-    runtime_minutes: 120
+    runtime_minutes: 180
   }
   output {
     File output_BAF = "~{sample_basename}.BAF.wig"
