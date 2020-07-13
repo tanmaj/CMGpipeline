@@ -150,7 +150,7 @@ task DepthOfCoverage {
         maxRetries: 3
         requested_memory_mb_per_core: 9000
         cpu: 1
-        runtime_minutes: 180
+        runtime_minutes: 300
     }
 }
 
@@ -227,6 +227,6 @@ task DepthOfCoverage34 {
         maxRetries: 3
         requested_memory_mb_per_core: 9000
         cpu: 1
-        runtime_minutes: 180
+        runtime_minutes: 300
     }
 }
