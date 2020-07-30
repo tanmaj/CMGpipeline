@@ -9,8 +9,10 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
   input {
-    File input_fq1
-    File input_fq2
+    File? input_fq1
+    File? input_fq2
+
+    File? input_bam
     
     File illuminaAdapters
 
@@ -85,6 +87,8 @@ workflow FastqToVCF {
     Int CONIFER_svd
     Float CONIFER_threshold
 
+    # Here are the global docker environment variables for tools used in this workflow
+    # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
     String gatk_docker = "broadinstitute/gatk:latest"
     String gatk_path = "/gatk/gatk"
@@ -93,21 +97,27 @@ workflow FastqToVCF {
     String SnpEff_docker = "alesmaver/snpeff_v43:latest"
   }  
 
-  String sample_basename = sub(basename(input_fq1), "[\_,\.].*", "" )
+  # Terminate workflow in case neither input_fq1 or input_bam is provided
+  Float fileSize = size(select_first([input_bam, input_fq1, ""]))
 
+  # Get sample name from either an input FASTQ R1 file or from the input BAM file
+  String sample_basename = select_first(sub(basename(input_fq1), "[\_,\.].*", "" ), sub(basename(input_bam), "[\_,\.].*", "" ))
+
+  # Get a list of chromosome contig names, containing one contig per line 
   Array[String] chromosomes = read_lines(chromosome_list)
 
+  # Run adaptor trimming and create uBAM, but only when input FASTQ is provided
+  if defined(input_fq1){
+    call CutAdapters as CutAdapters_fq1 {
+      input:
+        input_fq=input_fq1,
+        sample_basename=sample_basename,
+        illuminaAdapters=illuminaAdapters,
 
-  call CutAdapters as CutAdapters_fq1 {
-    input:
-      input_fq=input_fq1,
-      sample_basename=sample_basename,
-      illuminaAdapters=illuminaAdapters,
+        # Runtime 
+        docker = cutadapt_docker
+    }
 
-      # Runtime 
-      docker = cutadapt_docker
-  }
-  
   call CutAdapters as CutAdapters_fq2 {
     input:
       input_fq=input_fq2,
@@ -132,10 +142,11 @@ workflow FastqToVCF {
         gatk_path = gatk_path,
         docker = gatk_docker
     }
+  }
 
   call SamSplitter {
     input :
-      input_bam = PairedFastQsToUnmappedBAM.output_unmapped_bam,
+      input_bam = select_first(input_bam,PairedFastQsToUnmappedBAM.output_unmapped_bam),
       n_reads = split_reads_num,
       preemptible_tries = 3,
       compression_level = 2
