@@ -107,7 +107,7 @@ workflow FastqToVCF {
   Array[String] chromosomes = read_lines(chromosome_list)
 
   # Run adaptor trimming and create uBAM, but only when input FASTQ is provided
-  if defined(input_fq1){
+  if (defined(input_fq1)){
     call CutAdapters as CutAdapters_fq1 {
       input:
         input_fq=input_fq1,
@@ -146,7 +146,7 @@ workflow FastqToVCF {
 
   call SamSplitter {
     input :
-      input_bam = select_first(input_bam,PairedFastQsToUnmappedBAM.output_unmapped_bam),
+      input_bam = select_first(input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam),
       n_reads = split_reads_num,
       preemptible_tries = 3,
       compression_level = 2
