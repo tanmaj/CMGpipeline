@@ -13,6 +13,10 @@ workflow FastqToVCF {
     File? input_fq2
 
     File? input_bam
+
+    File? input_cram
+
+    String sample_basename
     
     File illuminaAdapters
 
@@ -92,22 +96,24 @@ workflow FastqToVCF {
     String cutadapt_docker = "kfdrc/cutadapt:latest"
     String gatk_docker = "broadinstitute/gatk:latest"
     String gatk_path = "/gatk/gatk"
+    String gitc_docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817"
+    String samtools_path = "samtools" # Path to samtools command within GITC docker
     String vcfanno_docker = "clinicalgenomics/vcfanno:0.3.2"
     String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
     String SnpEff_docker = "alesmaver/snpeff_v43:latest"
   }  
 
   # Terminate workflow in case neither input_fq1 or input_bam is provided
-  Float fileSize = size(select_first([input_bam, input_fq1, ""]))
+  Float fileSize = size(select_first([input_cram, input_bam, input_fq1, ""]))
 
   # Get sample name from either an input FASTQ R1 file or from the input BAM file
-  String sample_basename = select_first(sub(basename(input_fq1), "[\_,\.].*", "" ), sub(basename(input_bam), "[\_,\.].*", "" ))
+  # String sample_basename = select_first([sub(basename(input_fq1), "[\_,\.].*", "" ), sub(basename(input_bam), "[\_,\.].*", "" )])
 
   # Get a list of chromosome contig names, containing one contig per line 
   Array[String] chromosomes = read_lines(chromosome_list)
 
   # Run adaptor trimming and create uBAM, but only when input FASTQ is provided
-  if (defined(input_fq1)){
+  if ( defined(input_fq1) ) {
     call CutAdapters as CutAdapters_fq1 {
       input:
         input_fq=input_fq1,
@@ -144,9 +150,22 @@ workflow FastqToVCF {
     }
   }
 
+  if ( defined(input_cram) ) {
+    call CramToBam {
+      input:
+        input_cram = input_cram,
+        sample_name = sample_basename,
+        ref_dict = reference_dict,
+        ref_fasta = reference_fa,
+        ref_fasta_index = reference_fai,
+        docker = gitc_docker,
+        samtools_path = samtools_path
+    }
+  }
+
   call SamSplitter {
     input :
-      input_bam = select_first(input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam),
+      input_bam = select_first([CramToBam.output_bam, input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam]),
       n_reads = split_reads_num,
       preemptible_tries = 3,
       compression_level = 2
@@ -268,6 +287,14 @@ workflow FastqToVCF {
       total_input_size = agg_bam_size,
       compression_level = 2,
       preemptible_tries = 3
+  }
+
+  call ConvertToCram {
+    input:
+      input_bam = SortSam.output_bam,
+      ref_fasta = reference_fa,
+      ref_fasta_index = reference_fai,
+      sample_basename = sample_basename
   }
 
   scatter (chromosome in chromosomes) {
@@ -554,7 +581,7 @@ workflow FastqToVCF {
 task CutAdapters {
   input {
     # Command parameters
-    File input_fq
+    File? input_fq # The fastq file is given the optional flag to correspond to optional fastq input in the workflow
     String sample_basename
     
     File illuminaAdapters
@@ -1372,6 +1399,83 @@ task SortSam {
     File output_bam = "~{output_bam_basename}.bam"
     File output_bam_index = "~{output_bam_basename}.bai"
     File output_bam_md5 = "~{output_bam_basename}.bam.md5"
+  }
+}
+
+# Convert CRAM to BAM file
+# Obtained from Broad workflows, here: https://github.com/gatk-workflows/gatk4-germline-snps-indels/blob/master/haplotypecaller-gvcf-gatk4.wdl
+task CramToBam {
+  input {
+    # Command parameters
+    File ref_fasta
+    File ref_fasta_index
+    File ref_dict
+    File? input_cram # Declared this as an optional input because the input of workflow is also optional
+    String sample_name
+
+    # Runtime parameters
+    String docker
+    String samtools_path
+  }
+  
+  command {
+    set -e
+    set -o pipefail
+
+    ~{samtools_path} view -h -T ~{ref_fasta} ~{input_cram} |
+    ~{samtools_path} view -b -o ~{sample_name}.bam -
+    ~{samtools_path} index -b ~{sample_name}.bam
+    mv ~{sample_name}.bam.bai ~{sample_name}.bai
+  }
+  runtime {
+    docker: docker
+    maxRetries: 3
+    requested_memory_mb_per_core: 5000
+    cpu: 1
+    runtime_minutes: 180
+ }
+  output {
+    File output_bam = "~{sample_name}.bam"
+    File output_bai = "~{sample_name}.bai"
+  }
+}
+
+# Convert BAM to CRAM
+# Obtained from Broad workflows, here: https://github.com/gatk-workflows/gatk4-genome-processing-pipeline/blob/master/tasks/Utilities.wdl
+task ConvertToCram {
+  input {
+    File input_bam
+    File ref_fasta
+    File ref_fasta_index
+    String sample_basename
+  }
+
+  command <<<
+    set -e
+    set -o pipefail
+
+    samtools view -C -T ~{ref_fasta} ~{input_bam} | \
+    tee ~{sample_basename}.cram | \
+    md5sum | awk '{print $1}' > ~{sample_basename}.cram.md5
+
+    # Create REF_CACHE. Used when indexing a CRAM
+    seq_cache_populate.pl -root ./ref/cache ~{ref_fasta}
+    export REF_PATH=:
+    export REF_CACHE=./ref/cache/%2s/%2s/%s
+
+    samtools index ~{sample_basename}.cram
+  >>>
+  runtime {
+    docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
+    maxRetries: 3
+    requested_memory_mb_per_core: 5000
+    cpu: 1
+    runtime_minutes: 180
+  }
+  output {
+    File output_cram = "~{sample_basename}.cram"
+    File output_cram_index = "~{sample_basename}.cram.crai"
+    File output_cram_md5 = "~{sample_basename}.cram.md5"
   }
 }
 
