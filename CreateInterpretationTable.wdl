@@ -10,7 +10,8 @@ workflow CreateInterpretationTable {
     String R_docker = "alesmaver/r-base"
   }  
 
-  File makeXSLSXoutputs_Rscript = "/home/ales/FastqToVCFPipeline/makeXLSXoutputs.R"
+  #File makeXSLSXoutputs_Rscript = "/home/ales/FastqToVCFPipeline/makeXLSXoutputs.R"
+  String GenerateXLSXscriptUrl = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/makeXLSXoutputs.R"
   String sample_basename = basename(input_vcf, ".annotated.vcf.gz")
 
   # Get snpEff and dbNSFP annotations
@@ -20,6 +21,12 @@ workflow CreateInterpretationTable {
       sample_basename = sample_basename,
       docker = SnpEff_docker
   }
+
+  # Download R script for XLSX file generation
+    call GetGenerateXLSXscript {
+    input:
+      GenerateXLSXscriptUrl = GenerateXLSXscriptUrl
+    }
 
   # Get snpEff and dbNSFP annotations
     call GenerateXLSX {
@@ -32,7 +39,7 @@ workflow CreateInterpretationTable {
       CLINVAR_FILTERED = GenerateVariantTable.CLINVAR_FILTERED,
       CLINVAR_ALL = GenerateVariantTable.CLINVAR_ALL,
       sample_basename = sample_basename,
-      makeXSLSXoutputs_Rscript = makeXSLSXoutputs_Rscript,
+      makeXSLSXoutputs_Rscript = GetGenerateXLSXscript.makeXSLSXoutputs_Rscript,
       docker = R_docker
   }
  
@@ -91,6 +98,25 @@ task GenerateVariantTable {
     File CLINVAR_FILTERED = "~{sample_basename}.CLINVAR_FILTERED.tab"
     File CLINVAR_ALL = "~{sample_basename}.CLINVAR_ALL.tab"
 
+  }
+}
+
+task GetGenerateXLSXscript {
+  input {
+    String GenerateXLSXscriptUrl
+  }
+
+  command {
+    set -e
+    wget ~{GenerateXLSXscriptUrl}
+  }
+
+  runtime {
+    docker: docker
+  }
+
+  output {
+    File makeXSLSXoutputs_Rscript = "makeXLSXoutputs.R"
   }
 }
 
