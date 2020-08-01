@@ -558,8 +558,8 @@ workflow FastqToVCF {
     File output_bam = SortSam.output_bam
     File output_bam_index = SortSam.output_bam_index
 
-    File? ConvertToCram.output_cram
-    File? ConvertToCram.output_cram_index
+    File? output_cram = ConvertToCram.output_cram
+    File? output_cram_index = ConvertToCram.output_cram_index
 
     File output_vcf_raw = MergeVCFs.output_vcf
     File output_vcf_raw_index = MergeVCFs.output_vcf_index
