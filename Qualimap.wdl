@@ -65,6 +65,24 @@ task bamqc {
     }
 }
 
+## GATK coverage calculation can output per-gene coverage based on the refSeq models in the UCSC format 
+## For this purpose a refSeqFile is needed and is created in the following way
+## 1. Download refGene models from using the table option in the UCSC browser, use the standard UCSC output format 
+## 2. Then run the following script
+## rm -rf tmp
+## mkdir -p tmp
+## # Divide all chromosomes into separate files.
+## gawk '($3 ~ /_/ || $0 ~ /^#/){next;}{print > "./tmp/tmp.sort."$3""}' refGene.select.refseq
+## 
+## # initiate an empty output
+## echo -n "" > refGene.select.sorted.refseq
+## head -n1 refGene.select.refseq > refGene.select.sorted.refseq
+## 
+## for chr in chr{1..22} chr{X,Y} ; do
+##    # sort each chromsome file by transcript starts (field number 5)
+##     sort  -k5,5g -s  ./tmp/tmp.sort.$chr >> refGene.select.sorted.refseq
+## done 
+
 ## An additional option for calculating coverage using GATK
 task DepthOfCoverage {
     input {

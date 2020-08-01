@@ -25,7 +25,8 @@ workflow CreateInterpretationTable {
   # Download R script for XLSX file generation
     call GetGenerateXLSXscript {
     input:
-      GenerateXLSXscriptUrl = GenerateXLSXscriptUrl
+      GenerateXLSXscriptUrl = GenerateXLSXscriptUrl,
+      docker = SnpEff_docker
     }
 
   # Get snpEff and dbNSFP annotations
@@ -104,6 +105,9 @@ task GenerateVariantTable {
 task GetGenerateXLSXscript {
   input {
     String GenerateXLSXscriptUrl
+
+    # Runtime parameters
+    String docker
   }
 
   command {

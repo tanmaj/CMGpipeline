@@ -1,10 +1,17 @@
 version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
+## Usage
+# This workflow accepts three types of inputs: Illumina FASTQ files, a BAM file, or CRAM files
+# Currently, the input CRAM files should be aligned to the hg19 reference genome assembly, we will implement support for other genome formats in the future
+# The CRAM output is optional and disabled by default at the moment, until production switches to CRAM
+
+# Subworkflows
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/devel/Conifer.wdl" as Conifer
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" as ROH
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/devel/CreateInterpretationTable.wdl" as CreateInterpretationTable
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -91,6 +98,10 @@ workflow FastqToVCF {
     Int CONIFER_svd
     Float CONIFER_threshold
 
+    Boolean GenerateCRAM = false
+
+    Boolean GVCFmode = false
+
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
@@ -103,10 +114,10 @@ workflow FastqToVCF {
     String SnpEff_docker = "alesmaver/snpeff_v43:latest"
   }  
 
-  # Terminate workflow in case neither input_fq1 or input_bam is provided
+  # Terminate workflow in case neither input_fq1 or input_bam or input_cram is provided
   Float fileSize = size(select_first([input_cram, input_bam, input_fq1, ""]))
 
-  # Get sample name from either an input FASTQ R1 file or from the input BAM file
+  # Get sample name from either an input FASTQ R1 file or from the input BAM file - this causes problems with optional inputs, so it is left disabled and the input variable sample_basename is now a workflow input
   # String sample_basename = select_first([sub(basename(input_fq1), "[\_,\.].*", "" ), sub(basename(input_bam), "[\_,\.].*", "" )])
 
   # Get a list of chromosome contig names, containing one contig per line 
@@ -289,12 +300,14 @@ workflow FastqToVCF {
       preemptible_tries = 3
   }
 
+  if ( GenerateCRAM ) {
   call ConvertToCram {
-    input:
-      input_bam = SortSam.output_bam,
-      ref_fasta = reference_fa,
-      ref_fasta_index = reference_fai,
-      sample_basename = sample_basename
+      input:
+        input_bam = SortSam.output_bam,
+        ref_fasta = reference_fa,
+        ref_fasta_index = reference_fai,
+        sample_basename = sample_basename
+    }
   }
 
   scatter (chromosome in chromosomes) {
@@ -451,6 +464,10 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
+  call CreateInterpretationTable.CreateInterpretationTable as CreateInterpretationTable {
+    input_vcf = AnnotateVCF.output_vcf
+  }
+
   call Conifer.Conifer as Conifer{
   input:
     input_bam = SortSam.output_bam,
@@ -540,6 +557,9 @@ workflow FastqToVCF {
     File output_bam = SortSam.output_bam
     File output_bam_index = SortSam.output_bam_index
 
+    File? ConvertToCram.output_cram
+    File? ConvertToCram.output_cram_index
+
     File output_vcf_raw = MergeVCFs.output_vcf
     File output_vcf_raw_index = MergeVCFs.output_vcf_index
 
@@ -563,15 +583,11 @@ workflow FastqToVCF {
     File ROH_calls_size = CallROH.ROH_calls_size
     File ROH_intervals_state = CallROH.ROH_intervals_state
     File ROH_intervals_qual = CallROH.ROH_intervals_qual
+    #File ROHplink_calls = CallPlink.ROHplink_calls
 
     File DepthOfCoverage_output = DepthOfCoverage.DepthOfCoverage_output
-
-    #File ROHplink_calls = CallPlink.ROHplink_calls
   }
 }
-
-
-
 
 
 ##################
