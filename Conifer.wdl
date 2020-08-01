@@ -152,7 +152,7 @@ task CONIFER_Call {
   echo "Generating sample specific CNV calls..."
   head -n 1 ~{sample_basename}.CONIFER_CALLS_POPULATION.txt > ~{sample_basename}.CONIFER_CALLS.txt
   echo "Sample specific CNV calls generated..."
-  if [ `cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename} ]; then
+  if [ `cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename}` ]; then
     cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
     cat ~{sample_basename}.CONIFER_CALLS.txt | grep -v "start" | awk -F'\t' '{ if ($5 == "dup") $5="1"; if ($5 == "del") $5="-1";print $2,$3,$4,$5}' OFS='\t' > ~{sample_basename}.CNV.wig
     echo "Sample specific CNV calls generated."
