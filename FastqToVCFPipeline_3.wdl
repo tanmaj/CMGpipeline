@@ -465,7 +465,8 @@ workflow FastqToVCF {
   }
 
   call CreateInterpretationTable.CreateInterpretationTable as CreateInterpretationTable {
-    input_vcf = AnnotateVCF.output_vcf
+    input:
+      input_vcf = AnnotateVCF.output_vcf
   }
 
   call Conifer.Conifer as Conifer{
