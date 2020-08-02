@@ -8,10 +8,10 @@ version 1.0
 
 # Subworkflows
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/devel/Conifer.wdl" as Conifer
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" as ROH
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/devel/CreateInterpretationTable.wdl" as CreateInterpretationTable
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
