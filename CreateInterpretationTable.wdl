@@ -89,6 +89,9 @@ task GenerateVariantTable {
   }
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 180
   }
   output {
     File RARE_FUNCTIONAL = "~{sample_basename}.RARE_FUNCTIONAL.tab"
@@ -117,6 +120,9 @@ task GetGenerateXLSXscript {
 
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 2000
+    cpu: 1
+    runtime_minutes: 20
   }
 
   output {
@@ -149,6 +155,9 @@ task GenerateXLSX {
   }
   runtime {
     docker: docker
+    requested_memory_mb_per_core: 6000
+    cpu: 1
+    runtime_minutes: 60
   }
   output {
     File XLSX_OUTPUT = "~{sample_basename}.FinalReportNew.xlsx"
