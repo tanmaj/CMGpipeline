@@ -26,7 +26,7 @@ workflow CreateInterpretationTable {
     call GetGenerateXLSXscript {
     input:
       GenerateXLSXscriptUrl = GenerateXLSXscriptUrl,
-      docker = SnpEff_docker
+      docker = "davidsouthgate/alpine-bash-wget"
     }
 
   # Get snpEff and dbNSFP annotations
