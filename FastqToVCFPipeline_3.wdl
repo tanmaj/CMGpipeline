@@ -571,6 +571,8 @@ workflow FastqToVCF {
     File output_annotated_vcf_index = AnnotateVCF.output_vcf_index
     File output_table = AnnotateVCF.output_table
 
+    File? XLSX_OUTPUT = CreateInterpretationTable.XLSX_OUTPUT
+
     File output_conifer_calls = Conifer.output_conifer_calls
     Array[File] output_plotcalls = Conifer.output_plotcalls
     File output_conifer_calls_wig = Conifer.output_conifer_calls_wig
