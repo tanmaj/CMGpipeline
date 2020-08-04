@@ -15,7 +15,7 @@ workflow CreateInterpretationTable {
   }  
 
   #File makeXSLSXoutputs_Rscript = "/home/ales/FastqToVCFPipeline/makeXLSXoutputs.R"
-  String GenerateXLSXscriptUrl = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/makeXLSXoutputs.R"
+  String GenerateXLSXscriptUrl = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/devel/makeXLSXoutputs.R"
   String sample_basename = basename(input_vcf, ".annotated.vcf.gz")
 
   # Get snpEff and dbNSFP annotations

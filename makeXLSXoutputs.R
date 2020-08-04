@@ -34,8 +34,8 @@ reportList$HOM_RECESSIVE <- read.table(opt$HOM_RECESSIVE, sep="\t", header=T, qu
 reportList$CLINVAR_PATHOGENIC <- read.table(opt$CLINVAR_PATHOGENIC, sep="\t", header=T, quote="", dec = ".", fill=NA)
 reportList$CLINVAR_FILTERED <- read.table(opt$CLINVAR_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
 reportList$CLINVAR_ALL <- read.table(opt$CLINVAR_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
-if(!missing(opt$PANEL_FILTERED)) reportList$PANEL_FILTERED <- read.table(opt$PANEL_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
-if(!missing(opt$PANEL_ALL)) reportList$PANEL_ALL <- read.table(opt$PANEL_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if(!is.null(opt$PANEL_FILTERED)) reportList$PANEL_FILTERED <- read.table(opt$PANEL_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if(!is.null(opt$PANEL_ALL)) reportList$PANEL_ALL <- read.table(opt$PANEL_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
 
 # Prepare outputs
 hs <- createStyle(fontColour = "#ffffff", fgFill = "#4F80BD",
