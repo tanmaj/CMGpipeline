@@ -102,6 +102,8 @@ workflow FastqToVCF {
 
     Boolean GVCFmode = false
 
+    String? panel_gene_list
+
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
