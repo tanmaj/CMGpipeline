@@ -149,10 +149,11 @@ task CONIFER_Call {
   set -e
   python /home/bio/conifer_v0.2.2/conifer.py call --threshold ~{CONIFER_threshold} --input ~{input_hdf5} --output ~{sample_basename}.CONIFER_CALLS_POPULATION.txt
 
-  echo "Generating sample specific CNV calls..."
+  echo "Filtering sample specific CNV calls..."
   head -n 1 ~{sample_basename}.CONIFER_CALLS_POPULATION.txt > ~{sample_basename}.CONIFER_CALLS.txt
-  echo "Sample specific CNV calls generated..."
-  if [ `cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename}` ]; then
+
+  # Check if any calls have been generated - otherwise grep returns an error which interrupts the script and stops the call execution
+  if grep -q "~{sample_basename}" ~{sample_basename}.CONIFER_CALLS_POPULATION.txt; then
     cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
     cat ~{sample_basename}.CONIFER_CALLS.txt | grep -v "start" | awk -F'\t' '{ if ($5 == "dup") $5="1"; if ($5 == "del") $5="-1";print $2,$3,$4,$5}' OFS='\t' > ~{sample_basename}.CNV.wig
     echo "Sample specific CNV calls generated."
