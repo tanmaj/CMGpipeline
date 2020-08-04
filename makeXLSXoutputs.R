@@ -13,6 +13,8 @@ option_list = list(
   make_option(c("--CLINVAR_PATHOGENIC"), type="character", default=NULL, help="CLINVAR_PATHOGENIC output", metavar="character"),
   make_option(c("--CLINVAR_FILTERED"), type="character", default=NULL, help="CLINVAR_FILTERED output", metavar="character"),
   make_option(c("--CLINVAR_ALL"), type="character", default=NULL, help="CLINVAR_ALL output", metavar="character"),
+  make_option(c("--PANEL_FILTERED"), type="character", default=NULL, help="PANEL_FILTERED output", metavar="character"),
+  make_option(c("--PANEL_ALL"), type="character", default=NULL, help="PANEL_ALL output", metavar="character"),
   make_option(c("--XLSX_OUTPUT"), type="character", default=NULL, help="Output XLSX", metavar="character")
 );
 opt_parser = OptionParser(option_list=option_list);
@@ -32,6 +34,8 @@ reportList$HOM_RECESSIVE <- read.table(opt$HOM_RECESSIVE, sep="\t", header=T, qu
 reportList$CLINVAR_PATHOGENIC <- read.table(opt$CLINVAR_PATHOGENIC, sep="\t", header=T, quote="", dec = ".", fill=NA)
 reportList$CLINVAR_FILTERED <- read.table(opt$CLINVAR_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
 reportList$CLINVAR_ALL <- read.table(opt$CLINVAR_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if(!is.null(opt$PANEL_FILTERED)) reportList$PANEL_FILTERED <- read.table(opt$PANEL_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if(!is.null(opt$PANEL_ALL)) reportList$PANEL_ALL <- read.table(opt$PANEL_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
 
 # Prepare outputs
 hs <- createStyle(fontColour = "#ffffff", fgFill = "#4F80BD",
