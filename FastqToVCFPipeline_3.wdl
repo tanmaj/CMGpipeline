@@ -91,12 +91,12 @@ workflow FastqToVCF {
 
     File refSeqFile
 
-    String enrichment
-    File enrichment_bed
+    String? enrichment
+    File? enrichment_bed
 
-    Array[File] input_reference_rpkms 
-    Int CONIFER_svd
-    Float CONIFER_threshold
+    Array[File]? input_reference_rpkms 
+    Int? CONIFER_svd
+    Float? CONIFER_threshold
 
     Boolean GenerateCRAM = false
 
@@ -471,47 +471,53 @@ workflow FastqToVCF {
       input_vcf = AnnotateVCF.output_vcf
   }
 
-  call Conifer.Conifer as Conifer{
-  input:
-    input_bam = SortSam.output_bam,
-    input_bam_index = SortSam.output_bam_index,
-
-    input_reference_rpkms = input_reference_rpkms,
-    CONIFER_svd = CONIFER_svd,
-    CONIFER_threshold = CONIFER_threshold,
-
-    enrichment = enrichment,
-    enrichment_bed = enrichment_bed
-  }
-
-  call Qualimap.bamqc as Qualimap {
-  input:
-    bam = SortSam.output_bam,
-    sample_basename=sample_basename,
-
-    enrichment_bed = enrichment_bed,
-
-    ncpu = 8
-  }
-
-  # Merge per-interval GVCFs
-  call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
+  if( defined(input_reference_rpkms) ){
+    call Conifer.Conifer as Conifer{
     input:
       input_bam = SortSam.output_bam,
       input_bam_index = SortSam.output_bam_index,
-      sample_basename = sample_basename,
 
-      reference_fa=reference_fa,
-      reference_fai=reference_fai,
-      reference_dict=reference_dict,
+      input_reference_rpkms = input_reference_rpkms,
+      CONIFER_svd = CONIFER_svd,
+      CONIFER_threshold = CONIFER_threshold,
+
+      enrichment = enrichment,
+      enrichment_bed = enrichment_bed
+    }
+  }
+
+  if( defined(enrichment_bed) ){
+    call Qualimap.bamqc as Qualimap {
+    input:
+      bam = SortSam.output_bam,
+      sample_basename=sample_basename,
 
       enrichment_bed = enrichment_bed,
 
-      refSeqFile = refSeqFile,
+      ncpu = 8
+    }
+  }
 
-      threads = threads,
-      docker = "broadinstitute/gatk3:3.8-1",
-      gatk_path = "/usr/GenomeAnalysisTK.jar"
+  # Merge per-interval GVCFs
+  if( defined(enrichment_bed) ){
+    call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
+      input:
+        input_bam = SortSam.output_bam,
+        input_bam_index = SortSam.output_bam_index,
+        sample_basename = sample_basename,
+
+        reference_fa=reference_fa,
+        reference_fai=reference_fai,
+        reference_dict=reference_dict,
+
+        enrichment_bed = enrichment_bed,
+
+        refSeqFile = refSeqFile,
+
+        threads = threads,
+        docker = "broadinstitute/gatk3:3.8-1",
+        gatk_path = "/usr/GenomeAnalysisTK.jar"
+    }
   }
 
   call ROH.calculateBAF as calculateBAF {
@@ -573,13 +579,16 @@ workflow FastqToVCF {
     File output_annotated_vcf_index = AnnotateVCF.output_vcf_index
     File? XLSX_OUTPUT = CreateInterpretationTable.XLSX_OUTPUT
 
-    File output_conifer_calls = Conifer.output_conifer_calls
-    Array[File] output_plotcalls = Conifer.output_plotcalls
-    File output_conifer_calls_wig = Conifer.output_conifer_calls_wig
+    File? output_rpkm = Conifer.output_rpkm 
+    File? output_conifer_calls = Conifer.output_conifer_calls
+    Array[File]? output_plotcalls = Conifer.output_plotcalls
+    File? output_conifer_calls_wig = Conifer.output_conifer_calls_wig
     #File CNV_bed = Conifer.CNV_bed
-    File CNV_wig = Conifer.CNV_wig
+    File? CNV_wig = Conifer.CNV_wig
 
-    File Qualimap_results = Qualimap.results
+    File? Qualimap_results = Qualimap.results
+
+    File? DepthOfCoverage_output = DepthOfCoverage.DepthOfCoverage_output
 
     File output_BAF = calculateBAF.output_BAF
     File ROH_calls_qual = CallROH.ROH_calls_qual
@@ -587,8 +596,6 @@ workflow FastqToVCF {
     File ROH_intervals_state = CallROH.ROH_intervals_state
     File ROH_intervals_qual = CallROH.ROH_intervals_qual
     #File ROHplink_calls = CallPlink.ROHplink_calls
-
-    File DepthOfCoverage_output = DepthOfCoverage.DepthOfCoverage_output
   }
 }
 

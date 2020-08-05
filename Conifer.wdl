@@ -64,6 +64,7 @@ workflow Conifer {
     Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
     File CNV_bed = CONIFER_Export.CNV_bed
     File CNV_wig = CONIFER_Export.CNV_wig
+    File output_rpkm = MakeRPKM.output_rpkm
   }
 }
 
@@ -105,7 +106,7 @@ task CONIFER_Analyze {
     # Command parameters
     File input_rpkm
     Array[File]? input_reference_rpkms 
-    String?CONIFER_svd
+    String? CONIFER_svd
     String sample_basename
 
     String? enrichment
