@@ -7,7 +7,7 @@ version 1.0
 task bamqc {
     input {
         File bam
-        File enrichment_bed
+        File? enrichment_bed
         String sample_basename
         Int ncpu = 1
         Int max_retries = 1
@@ -26,7 +26,7 @@ task bamqc {
         set -euo pipefail
         
         qualimap bamqc -bam ~{bam} \
-            -gff ~{enrichment_bed} \
+            ~{if (defined(enrichment_bed) then "-gff " + enrichment_bed else ""} \
             -outdir ~{out_directory} \
             -nt ~{ncpu} \
             -nw 400 \
@@ -110,7 +110,7 @@ task DepthOfCoverage {
       -R ~{reference_fa} \
       -I ~{input_bam} \
       -O targetGenes.coverage \
-      ~{"-L " + enrichment_bed} \
+      ~{if (defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
        --omit-depth-output-at-each-base \
        -ip 2 \
        --summary-coverage-threshold 5 \
@@ -199,7 +199,7 @@ task DepthOfCoverage34 {
       -R ~{reference_fa} \
       -I ~{input_bam} \
       -o targetGenes.coverage \
-      ~{"-L " + enrichment_bed} \
+      ~{if (defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
        -omitBaseOutput \
        -ip 2 \
         -allowPotentiallyMisencodedQuals \

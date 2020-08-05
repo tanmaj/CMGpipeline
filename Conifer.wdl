@@ -7,12 +7,12 @@ workflow Conifer {
     File input_bam
     File input_bam_index
 
-    Array[File] input_reference_rpkms 
-    Int CONIFER_svd
-    Float CONIFER_threshold
+    Array[File]? input_reference_rpkms 
+    Int? CONIFER_svd
+    Float? CONIFER_threshold
 
-    String enrichment
-    File enrichment_bed
+    String? enrichment
+    File? enrichment_bed
   }  
 
   String sample_basename = sub(basename(input_bam), "[\_,\.].*", "" )
