@@ -105,7 +105,7 @@ task CONIFER_Analyze {
   input {
     # Command parameters
     File input_rpkm
-    Array[File]? input_reference_rpkms 
+    Array[File] input_reference_rpkms 
     String? CONIFER_svd
     String sample_basename
 
