@@ -563,6 +563,20 @@ workflow FastqToVCF {
   #  docker = "asherkhb/plink"
   #}
 
+  call MitoMap.CreateMitoFasta as CreateMitoFasta {
+    input_vcf = SelectFinalVariants.output_vcf,
+    sample_basename = sample_basename,
+
+    reference_fa = reference_fa,
+    reference_fai = reference_fai,
+    reference_dict = reference_dict
+  }
+
+  call MitoMap.MitoMap as MitoMap {
+    mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
+    sample_basename = sample_basename
+  }
+
   output {
     File output_bam = SortSam.output_bam
     File output_bam_index = SortSam.output_bam_index
