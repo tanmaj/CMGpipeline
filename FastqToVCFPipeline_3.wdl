@@ -564,6 +564,7 @@ workflow FastqToVCF {
   #}
 
   call MitoMap.CreateMitoFasta as CreateMitoFasta {
+    input:
     input_vcf = SelectFinalVariants.output_vcf,
     sample_basename = sample_basename,
 
@@ -573,6 +574,7 @@ workflow FastqToVCF {
   }
 
   call MitoMap.MitoMap as MitoMap {
+    input:
     mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
     sample_basename = sample_basename
   }
