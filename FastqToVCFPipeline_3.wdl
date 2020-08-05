@@ -468,7 +468,8 @@ workflow FastqToVCF {
 
   call CreateInterpretationTable.CreateInterpretationTable as CreateInterpretationTable {
     input:
-      input_vcf = AnnotateVCF.output_vcf
+      input_vcf = AnnotateVCF.output_vcf,
+      panel_gene_list = panel_gene_list
   }
 
   if( defined(input_reference_rpkms) ){
