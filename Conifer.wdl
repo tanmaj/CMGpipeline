@@ -7,7 +7,8 @@ workflow Conifer {
     File input_bam
     File input_bam_index
 
-    Array[File]? input_reference_rpkms 
+    #Array[File]? input_reference_rpkms 
+    Array[File] input_reference_rpkms = select_first([input_reference_rpkms, [""]])
     Int? CONIFER_svd
     Float? CONIFER_threshold
 
@@ -16,7 +17,7 @@ workflow Conifer {
   }  
 
   String sample_basename = sub(basename(input_bam), "[\_,\.].*", "" )
-
+  
   call MakeRPKM {
       input:
         input_bam=input_bam,
@@ -105,7 +106,7 @@ task CONIFER_Analyze {
   input {
     # Command parameters
     File input_rpkm
-    Array[File]? input_reference_rpkms 
+    Array[File] input_reference_rpkms 
     String? CONIFER_svd
     String sample_basename
 
@@ -115,8 +116,6 @@ task CONIFER_Analyze {
     # Runtime parameters
     String docker = "molecular/conifer"
   }
-  
-  String rpkm_file = select_first([input_reference_rpkms[0], ""])
 
   command <<<
   set -e
