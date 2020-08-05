@@ -97,6 +97,9 @@ task GenerateVariantTable {
     ~{if defined(panel_gene_list) then "echo " + panel_gene_list + " | awk '{gsub(/\,/,\"\\n\",$0);print $0}' > panel_gene_list.txt" else ""}
 
     if [ -f panel_gene_list.txt ]; then
+      echo "Generating panel filtered variant results..."
+      cat panel_gene_list.txt
+
       zcat ~{input_vcf} | java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter -s panel_gene_list.txt "((( gnomAD.AF < 0.05 ) | !( exists gnomAD.AC )) & (( gnomAD.nhomalt < 10 ) | !( exists gnomAD.nhomalt )) & (( SLOpopulation.AC_Het < 100 ) | !( exists SLOpopulation.AC_Het )) & (!( exists SLOpopulation.AC_Hom ) | ( SLOpopulation.AC_Hom <= 6 ))) & (( ANN[*].IMPACT has 'MODERATE') | (ANN[*].IMPACT has 'HIGH') | (dbscSNV.ada_score > 0.5) | (dbscSNV.rf_score > 0.5)) & (ANN[*].GENE in SET[0])" | eval $SNPSIFT_EXTRACTFIELDS > ~{sample_basename}.PANEL_FILTERED.tab
 
       zcat ~{input_vcf} | java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter -s panel_gene_list.txt "ANN[*].GENE in SET[0]" | eval $SNPSIFT_EXTRACTFIELDS > ~{sample_basename}.PANEL_ALL.tab
