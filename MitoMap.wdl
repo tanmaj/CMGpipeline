@@ -14,12 +14,9 @@ task CreateMitoFasta {
         File reference_fa
         File reference_fai
         File reference_dict
-        
-        File? enrichment_bed
-        File refSeqFile
     }
 
-    command <<<
+    command {
     set -e
     java -Xmx5g -jar /usr/GenomeAnalysisTK.jar \
       -T FastaAlternateReferenceMaker \
@@ -27,7 +24,7 @@ task CreateMitoFasta {
       --variant ~{input_vcf} \
       -o mtDNA.fasta \
       -L chrM
-     >>>
+     }
     
     output {
     File mtDNA_fasta = "mtDNA.fasta"
@@ -45,17 +42,20 @@ task CreateMitoFasta {
 task MitoMap {
     input {
         File mtDNA_fasta
+        String sample_basename
     }
 
     command {
     set -e
 	cp /usr/src/app/mitomap.py ./
 	cp ~{mtDNA_fasta} ./
-	python mitomap.py
+	python mitomap.py > ~{sample_basename}_mitoResults.txt
+	cp ~{sample_basename}_mitoResults.txt ~{sample_basename}_mitoResults.xls
     }
 
     output {
-    File mtDNA_fasta = "mtDNA.fasta"
+    File mitoResults_txt = "~{sample_basename}_mitoResults.txt"
+    File mitoResults_xls = "~{sample_basename}_mitoResults.xls"
     }
 
     runtime {
