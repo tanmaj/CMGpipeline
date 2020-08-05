@@ -19,7 +19,7 @@ task CreateMitoFasta {
 
     command {
     set -e
-    java -Xmx5g -jar /usr/GenomeAnalysisTK.jar \
+    java -Xmx3g -jar /usr/GenomeAnalysisTK.jar \
       -T FastaAlternateReferenceMaker \
       -R ~{reference_fa} \
       --variant ~{input_vcf} \
@@ -34,7 +34,7 @@ task CreateMitoFasta {
     runtime {
         docker: "~{docker}"
         maxRetries: 3
-        requested_memory_mb_per_core: 6000
+        requested_memory_mb_per_core: 9000
         cpu: 1
         runtime_minutes: 60
     }
