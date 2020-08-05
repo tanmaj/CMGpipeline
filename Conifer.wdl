@@ -116,7 +116,7 @@ task CONIFER_Analyze {
     String docker = "molecular/conifer"
   }
   
-  rpkm_file = select_first([input_reference_rpkms[0], ""])
+  String rpkm_file = select_first([input_reference_rpkms[0], ""])
 
   command <<<
   set -e
