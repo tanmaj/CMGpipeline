@@ -571,7 +571,9 @@ workflow FastqToVCF {
 
     reference_fa = reference_fa,
     reference_fai = reference_fai,
-    reference_dict = reference_dict
+    reference_dict = reference_dict,
+
+    docker = "broadinstitute/gatk3:3.8-1"
   }
 
   call MitoMap.MitoMap as MitoMap {

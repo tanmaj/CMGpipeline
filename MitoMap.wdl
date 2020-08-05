@@ -4,7 +4,6 @@
 ## QualiMap computes metrics to facilitate evaluation of sequencing data. 
 version 1.0
 
-
 ## An additional option for calculating coverage using GATK
 task CreateMitoFasta {
     input {
@@ -14,6 +13,8 @@ task CreateMitoFasta {
         File reference_fa
         File reference_fai
         File reference_dict
+
+        String docker
     }
 
     command {
@@ -45,13 +46,13 @@ task MitoMap {
         String sample_basename
     }
 
-    command {
+    command <<<
     set -e
-	cp /usr/src/app/mitomap.py ./
-	cp ~{mtDNA_fasta} ./
-	python mitomap.py > ~{sample_basename}_mitoResults.txt
-	cp ~{sample_basename}_mitoResults.txt ~{sample_basename}_mitoResults.xls
-    }
+    cp /usr/src/app/mitomap.py ./
+    cp ~{mtDNA_fasta} ./
+    python mitomap.py > ~{sample_basename}_mitoResults.txt
+    cp ~{sample_basename}_mitoResults.txt ~{sample_basename}_mitoResults.xls
+    >>>
 
     output {
     File mitoResults_txt = "~{sample_basename}_mitoResults.txt"
