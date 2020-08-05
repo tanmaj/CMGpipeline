@@ -26,7 +26,7 @@ task bamqc {
         set -euo pipefail
         
         qualimap bamqc -bam ~{bam} \
-            ~{if (defined(enrichment_bed) then "-gff " + enrichment_bed else ""} \
+            ~{if defined(enrichment_bed) then "-gff " + enrichment_bed else ""} \
             -outdir ~{out_directory} \
             -nt ~{ncpu} \
             -nw 400 \
@@ -110,7 +110,7 @@ task DepthOfCoverage {
       -R ~{reference_fa} \
       -I ~{input_bam} \
       -O targetGenes.coverage \
-      ~{if (defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
+      ~{if defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
        --omit-depth-output-at-each-base \
        -ip 2 \
        --summary-coverage-threshold 5 \
@@ -199,7 +199,7 @@ task DepthOfCoverage34 {
       -R ~{reference_fa} \
       -I ~{input_bam} \
       -o targetGenes.coverage \
-      ~{if (defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
+      ~{if defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
        -omitBaseOutput \
        -ip 2 \
         -allowPotentiallyMisencodedQuals \
