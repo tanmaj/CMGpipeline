@@ -78,8 +78,8 @@ task MakeRPKM {
     File input_bam_index
     String sample_basename
 
-    String enrichment
-    File enrichment_bed
+    String? enrichment
+    File? enrichment_bed
 
     # Runtime parameters
     String docker = "molecular/conifer"
@@ -104,12 +104,12 @@ task CONIFER_Analyze {
   input {
     # Command parameters
     File input_rpkm
-    Array[File] input_reference_rpkms 
-    String CONIFER_svd
+    Array[File]? input_reference_rpkms 
+    String?CONIFER_svd
     String sample_basename
 
-    String enrichment
-    File enrichment_bed
+    String? enrichment
+    File? enrichment_bed
 
     # Runtime parameters
     String docker = "molecular/conifer"
@@ -138,7 +138,7 @@ task CONIFER_Call {
   input {
     # Command parameters
     File input_hdf5
-    Float CONIFER_threshold
+    Float? CONIFER_threshold
     String sample_basename
 
     # Runtime parameters
@@ -210,7 +210,7 @@ task CONIFER_Export {
     # Command parameters
     File input_hdf5
     String sample_basename
-    String enrichment
+    String? enrichment
 
     # Runtime parameters
     String docker = "molecular/conifer"
