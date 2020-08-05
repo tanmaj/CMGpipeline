@@ -611,6 +611,9 @@ workflow FastqToVCF {
     File ROH_intervals_state = CallROH.ROH_intervals_state
     File ROH_intervals_qual = CallROH.ROH_intervals_qual
     #File ROHplink_calls = CallPlink.ROHplink_calls
+
+    File? mitoResults_xls = MitoMap.mitoResults_xls
+    File? mitoResults_txt = MitoMap.mitoResults_txt
   }
 }
 
