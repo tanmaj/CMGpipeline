@@ -51,6 +51,7 @@ workflow CreateInterpretationTable {
 
       sample_basename = sample_basename,
 
+      GenerateXLSXscriptUrl = GenerateXLSXscriptUrl,
       makeXSLSXoutputs_Rscript = GetGenerateXLSXscript.makeXSLSXoutputs_Rscript,
       docker = R_docker
   }
@@ -78,6 +79,14 @@ task GenerateVariantTable {
 
   command {
     set -e
+    # This line would merge multiple VCF files 
+    # merge /mnt/EXOMES/PX5400/annotation/PX5400.annotated.vcf.gz /mnt/EXOMES/PX5401/annotation/PX5401.annotated.vcf.gz -Oz -o  ~{input_vcf} ~{sep=' ' relative_vcfs}
+
+    # input_vcf = select_first([merged_vcf, input_vcf])
+
+    # This line will create SnpSift genotype extractor for single and multi sample VCFs
+    # bcftools query -l ~{input_vcf} | awk '{print "GEN["$1"].GT GEN["$1"].AD GEN["$1"].DP GEN["$1"].GQ"}' | tr '\n' ' '
+
     SNPSIFT_EXTRACTFIELDS='/home/biodocker/bin/snpEff/scripts/vcfEffOnePerLine.pl | java -jar /home/biodocker/bin/snpEff/SnpSift.jar extractFields  - CHROM POS REF ALT QUAL GEN[0].GT GEN[0].AD GEN[0].DP GEN[0].GQ "ANN[*].GENE" "Disease_name" "Categorization" Inheritance Age HPO "OMIM" "ANN[*].FEATUREID" "ANN[*].HGVS_C" "ANN[*].RANK" "ANN[*].HGVS_P" "ANN[*].IMPACT" "ANN[*].EFFECT"  SLOpopulation.AC_Het SLOpopulation.AC_Hom SLOpopulation.AC_Hemi gnomAD.AC gnomAD.AF gnomAD.nhomalt gnomADexomes.AC gnomADexomes.AF gnomADexomes.nhomalt clinvar.CLNSIG clinvar.CLNDN clinvar.CLNHGVS clinvar.CLNSIGCONF clinvar.CLNSIGINCL dbNSFP_REVEL_rankscore  dbNSFP_MetaSVM_pred dbNSFP_CADD_phred  dbNSFP_DANN_rankscore dbNSFP_SIFT_pred  dbNSFP_SIFT4G_pred  dbNSFP_Polyphen2_HDIV_pred  dbNSFP_MutationTaster_pred dbNSFP_PrimateAI_pred dbNSFP_Polyphen2_HDIV_score SpliceAI.SpliceAI dbscSNV.ada_score dbscSNV.rf_score dbNSFP_GERP___NR  dbNSFP_GERP___RS dbNSFP_Interpro_domain pLI oe_mis pRec "LOF[*].GENE" "LOF[*].GENEID" "LOF[*].NUMTR" "LOF[*].PERC" "NMD[*].GENE" "NMD[*].GENEID" "NMD[*].NUMTR" "NMD[*].PERC"'
 
     # Optional fields available in the VCF files, consider adding them later
@@ -169,6 +178,7 @@ task GenerateXLSX {
     String? mitoResults_txt
     String sample_basename
 
+    String GenerateXLSXscriptUrl
     File makeXSLSXoutputs_Rscript
 
     # Runtime parameters
@@ -176,7 +186,9 @@ task GenerateXLSX {
   }
 
   command {
-  Rscript ~{makeXSLSXoutputs_Rscript} --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx 
+  wget ~{GenerateXLSXscriptUrl}
+  Rscript makeXLSXoutputs.R --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx 
+  #Rscript ~{makeXSLSXoutputs_Rscript} --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx 
     
   }
   runtime {
