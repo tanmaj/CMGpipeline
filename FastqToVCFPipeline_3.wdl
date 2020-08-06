@@ -467,10 +467,29 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
+  call MitoMap.CreateMitoFasta as CreateMitoFasta {
+    input:
+    input_vcf = SelectFinalVariants.output_vcf,
+    sample_basename = sample_basename,
+
+    reference_fa = reference_fa,
+    reference_fai = reference_fai,
+    reference_dict = reference_dict,
+
+    docker = "broadinstitute/gatk3:3.8-1"
+  }
+
+  call MitoMap.MitoMap as MitoMap {
+    input:
+    mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
+    sample_basename = sample_basename
+  }
+
   call CreateInterpretationTable.CreateInterpretationTable as CreateInterpretationTable {
     input:
       input_vcf = AnnotateVCF.output_vcf,
-      panel_gene_list = panel_gene_list
+      panel_gene_list = panel_gene_list,
+      mitoResults_txt = MitoMap.mitoResults_txt
   }
 
   if( defined(input_reference_rpkms) ){
@@ -563,24 +582,6 @@ workflow FastqToVCF {
   #
   #  docker = "asherkhb/plink"
   #}
-
-  call MitoMap.CreateMitoFasta as CreateMitoFasta {
-    input:
-    input_vcf = SelectFinalVariants.output_vcf,
-    sample_basename = sample_basename,
-
-    reference_fa = reference_fa,
-    reference_fai = reference_fai,
-    reference_dict = reference_dict,
-
-    docker = "broadinstitute/gatk3:3.8-1"
-  }
-
-  call MitoMap.MitoMap as MitoMap {
-    input:
-    mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
-    sample_basename = sample_basename
-  }
 
   output {
     File output_bam = SortSam.output_bam

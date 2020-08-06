@@ -47,6 +47,7 @@ workflow CreateInterpretationTable {
       CLINVAR_ALL = GenerateVariantTable.CLINVAR_ALL,
       PANEL_FILTERED = GenerateVariantTable.PANEL_FILTERED,
       PANEL_ALL = GenerateVariantTable.PANEL_ALL,
+      mitoResults_txt = mitoResults_txt,
 
       sample_basename = sample_basename,
 
