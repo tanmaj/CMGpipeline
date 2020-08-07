@@ -104,6 +104,8 @@ workflow FastqToVCF {
     Boolean GVCFmode = false
 
     String? panel_gene_list
+    Array[File]? relative_vcfs
+    Array[File]? relative_vcf_indexes
 
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
@@ -488,6 +490,9 @@ workflow FastqToVCF {
   call CreateInterpretationTable.CreateInterpretationTable as CreateInterpretationTable {
     input:
       input_vcf = AnnotateVCF.output_vcf,
+      input_vcf_index = AnnotateVCF.output_vcf_index,
+      relative_vcfs = relative_vcfs,
+      relative_vcf_indexes = relative_vcf_indexes,
       panel_gene_list = panel_gene_list,
       mitoResults_txt = MitoMap.mitoResults_txt
   }

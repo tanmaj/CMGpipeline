@@ -7,7 +7,12 @@ workflow CreateInterpretationTable {
     #File input_vcf
     #String? panel_gene_list
 
-    String input_vcf
+    File input_vcf
+    File input_vcf_index
+
+    Array[File]? relative_vcfs
+    Array[File]? relative_vcf_indexes
+
     String? panel_gene_list
     File? mitoResults_txt
 
@@ -19,10 +24,23 @@ workflow CreateInterpretationTable {
   String GenerateXLSXscriptUrl = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/makeXLSXoutputs.R"
   String sample_basename = basename(input_vcf, ".annotated.vcf.gz")
 
+  if( defined(relative_vcfs) ) {
+    call MergeMultipleSampleVCFs {
+    input:
+      input_vcf = input_vcf,
+      input_vcf_index = input_vcf_index,
+      relative_vcfs = relative_vcfs,
+      relative_vcf_indexes = relative_vcf_indexes,
+      sample_basename = sample_basename
+    }
+  }
+
   # Get snpEff and dbNSFP annotations
     call GenerateVariantTable {
     input:
-      input_vcf = input_vcf,
+      single_vcf = input_vcf,
+      merged_vcf = MergeMultipleSampleVCFs.output_vcf,
+      merged_sample_list = MergeMultipleSampleVCFs.merged_sample_list,
       panel_gene_list = panel_gene_list,
       sample_basename = sample_basename,
       docker = SnpEff_docker
@@ -65,20 +83,58 @@ workflow CreateInterpretationTable {
 # TASK DEFINITIONS
 ##################
 # Generate table of variants for interpretation
+task MergeMultipleSampleVCFs {
+  input {
+    File input_vcf
+    File input_vcf_index
+    Array[File]? relative_vcfs
+    Array[File]? relative_vcf_indexes
+    String sample_basename
+  }
+  
+  command <<<
+  set -e
+    bcftools merge ~{input_vcf} ~{sep=' ' relative_vcfs} -Oz -o ~{sample_basename}.merged.vcf.gz
+    bcftools query -l ~{sample_basename}.merged.vcf.gz > ~{sample_basename}.merged_sample_list.txt
+  >>>
+
+  runtime {
+    docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
+    maxRetries: 3
+    requested_memory_mb_per_core: 5000
+    cpu: 1
+    runtime_minutes: 90
+  }
+  output {
+    File output_vcf = "~{sample_basename}.merged.vcf.gz"
+    File merged_sample_list = "~{sample_basename}.merged_sample_list.txt"
+  }
+}
+
 task GenerateVariantTable {
   input {
     # Command parameters
-    File input_vcf
+    File single_vcf
+    File? merged_vcf
+    File? merged_sample_list
+    
     String sample_basename
     String? panel_gene_list
-
     # Runtime parameters
     String docker
   }
 
-  command {
+  File input_vcf = select_first([merged_vcf, single_vcf])
+
+  command <<<
     set -e
-    SNPSIFT_EXTRACTFIELDS='/home/biodocker/bin/snpEff/scripts/vcfEffOnePerLine.pl | java -jar /home/biodocker/bin/snpEff/SnpSift.jar extractFields  - CHROM POS REF ALT QUAL GEN[0].GT GEN[0].AD GEN[0].DP GEN[0].GQ "ANN[*].GENE" "Disease_name" "Categorization" Inheritance Age HPO "OMIM" "ANN[*].FEATUREID" "ANN[*].HGVS_C" "ANN[*].RANK" "ANN[*].HGVS_P" "ANN[*].IMPACT" "ANN[*].EFFECT"  SLOpopulation.AC_Het SLOpopulation.AC_Hom SLOpopulation.AC_Hemi gnomAD.AC gnomAD.AF gnomAD.nhomalt gnomADexomes.AC gnomADexomes.AF gnomADexomes.nhomalt clinvar.CLNSIG clinvar.CLNDN clinvar.CLNHGVS clinvar.CLNSIGCONF clinvar.CLNSIGINCL dbNSFP_REVEL_rankscore  dbNSFP_MetaSVM_pred dbNSFP_CADD_phred  dbNSFP_DANN_rankscore dbNSFP_SIFT_pred  dbNSFP_SIFT4G_pred  dbNSFP_Polyphen2_HDIV_pred  dbNSFP_MutationTaster_pred dbNSFP_PrimateAI_pred dbNSFP_Polyphen2_HDIV_score SpliceAI.SpliceAI dbscSNV.ada_score dbscSNV.rf_score dbNSFP_GERP___NR  dbNSFP_GERP___RS dbNSFP_Interpro_domain pLI oe_mis pRec "LOF[*].GENE" "LOF[*].GENEID" "LOF[*].NUMTR" "LOF[*].PERC" "NMD[*].GENE" "NMD[*].GENEID" "NMD[*].NUMTR" "NMD[*].PERC"'
+    if [ -f ~{if defined(merged_sample_list) then merged_sample_list else "merged.sample_list"} ]; then
+      GENOTYPE_EXTRACTFIELDS=$(cat ~{merged_sample_list} | awk '{print "GEN["$1"].GT GEN["$1"].AD GEN["$1"].DP GEN["$1"].GQ"}' | tr "\\n" " ")
+    else
+      GENOTYPE_EXTRACTFIELDS=$(echo ~{sample_basename} | awk '{print "GEN["$1"].GT GEN["$1"].AD GEN["$1"].DP GEN["$1"].GQ"}' | tr "\\n" " ")
+    fi
+
+    SNPSIFT_EXTRACTFIELDS='/home/biodocker/bin/snpEff/scripts/vcfEffOnePerLine.pl | java -jar /home/biodocker/bin/snpEff/SnpSift.jar extractFields  - CHROM POS REF ALT QUAL '$GENOTYPE_EXTRACTFIELDS' "ANN[*].GENE" "Disease_name" "Categorization" Inheritance Age HPO "OMIM" "ANN[*].FEATUREID" "ANN[*].HGVS_C" "ANN[*].RANK" "ANN[*].HGVS_P" "ANN[*].IMPACT" "ANN[*].EFFECT"  SLOpopulation.AC_Het SLOpopulation.AC_Hom SLOpopulation.AC_Hemi gnomAD.AC gnomAD.AF gnomAD.nhomalt gnomADexomes.AC gnomADexomes.AF gnomADexomes.nhomalt clinvar.CLNSIG clinvar.CLNDN clinvar.CLNHGVS clinvar.CLNSIGCONF clinvar.CLNSIGINCL dbNSFP_REVEL_rankscore  dbNSFP_MetaSVM_pred dbNSFP_CADD_phred  dbNSFP_DANN_rankscore dbNSFP_SIFT_pred  dbNSFP_SIFT4G_pred  dbNSFP_Polyphen2_HDIV_pred  dbNSFP_MutationTaster_pred dbNSFP_PrimateAI_pred dbNSFP_Polyphen2_HDIV_score SpliceAI.SpliceAI dbscSNV.ada_score dbscSNV.rf_score dbNSFP_GERP___NR  dbNSFP_GERP___RS dbNSFP_Interpro_domain pLI oe_mis pRec "LOF[*].GENE" "LOF[*].GENEID" "LOF[*].NUMTR" "LOF[*].PERC" "NMD[*].GENE" "NMD[*].GENEID" "NMD[*].NUMTR" "NMD[*].PERC"'
 
     # Optional fields available in the VCF files, consider adding them later
     # dbNSFP_GTEx_V7_gene dbNSFP_GTEx_V7_tissue dbNSFP_Geuvadis_eQTL_target_gene dbNSFP_Aloft_Fraction_transcripts_affected  dbNSFP_Aloft_prob_Tolerant  dbNSFP_Aloft_prob_Recessive  dbNSFP_Aloft_prob_Dominant  dbNSFP_Aloft_pred dbNSFP_Aloft_Confidence 
@@ -106,9 +162,8 @@ task GenerateVariantTable {
 
       zcat ~{input_vcf} | java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter -s panel_gene_list.txt "ANN[*].GENE in SET[0]" | eval $SNPSIFT_EXTRACTFIELDS > ~{sample_basename}.PANEL_ALL.tab
     fi
+  >>>
 
-
-  }
   runtime {
     docker: docker
     requested_memory_mb_per_core: 6000
