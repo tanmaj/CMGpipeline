@@ -9,7 +9,7 @@ workflow CreateInterpretationTable {
 
     String input_vcf
     String? panel_gene_list
-    String? mitoResults_txt
+    File? mitoResults_txt
 
     String SnpEff_docker = "alesmaver/snpeff_v43:latest"
     String R_docker = "alesmaver/r-base"
@@ -167,11 +167,10 @@ task GenerateXLSX {
     File CLINVAR_ALL
     File? PANEL_FILTERED
     File? PANEL_ALL
-    String? mitoResults_txt
+    File? mitoResults_txt
     String sample_basename
 
     String GenerateXLSXscriptUrl
-    File makeXSLSXoutputs_Rscript
 
     # Runtime parameters
     String docker
@@ -179,9 +178,7 @@ task GenerateXLSX {
 
   command {
   wget ~{GenerateXLSXscriptUrl}
-  Rscript makeXLSXoutputs.R --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx 
-  #Rscript ~{makeXSLSXoutputs_Rscript} --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx 
-    
+  Rscript makeXLSXoutputs.R --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx     
   }
   runtime {
     docker: docker
