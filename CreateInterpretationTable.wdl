@@ -70,7 +70,7 @@ workflow CreateInterpretationTable {
 
       sample_basename = sample_basename,
 
-      makeXSLSXoutputs_Rscript = makeXSLSXoutputs_Rscript,
+      makeXSLSXoutputs_Rscript = GetGenerateXLSXscript.makeXSLSXoutputs_Rscript,
 
       docker = R_docker
   }
