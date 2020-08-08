@@ -39,12 +39,57 @@ if(!is.null(opt$PANEL_FILTERED)) reportList$PANEL_FILTERED <- read.table(opt$PAN
 if(!is.null(opt$PANEL_ALL)) reportList$PANEL_ALL <- read.table(opt$PANEL_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
 if(!is.null(opt$MITOMAP)) reportList$MITOMAP <- read.table(opt$MITOMAP, sep="\t", header=T, quote="", dec = ".", fill=NA)
 
-# Prepare outputs
-hs <- createStyle(fontColour = "#ffffff", fgFill = "#4F80BD",
-                  halign = "center", valign = "center", textDecoration = "Bold",
-                  border = "TopBottomLeftRight", textRotation = 45)
-bodyStyle <- createStyle(border="TopBottom", borderColour = "#4F81BD")
+wb <- openxlsx::createWorkbook()
+for(sheetName in names(reportList)){
+  openxlsx::addWorksheet(wb, sheetName, zoom=90)
+  openxlsx::writeData(wb, sheetName, reportList[[sheetName]])
+  openxlsx::addFilter(wb, sheetName, row = 1, cols = 1:ncol(reportList[[sheetName]]))
+  
+  # Set the widths of columns and hide selected columns
+  ColNames<-colnames(reportList[[sheetName]])
+  
+  ColWidths<-rep(8, ncol(reportList[[sheetName]]))
+  ColWidths[grepl("CHR",ColNames)]<-4
+  ColWidths[grepl("POS",ColNames)]<-12
+  ColWidths[grepl("REF",ColNames)]<-2
+  ColWidths[grepl("ALT",ColNames)]<-2
+  ColWidths[grepl("QUAL",ColNames)]<-5
+  ColWidths[grepl("..GT",ColNames)]<-3
+  ColWidths[grepl("..AD",ColNames)]<-5
+  ColWidths[grepl("..DP",ColNames)]<-4
+  ColWidths[grepl("..GQ",ColNames)]<-4
+  ColWidths[grepl("ANN....GENE",ColNames)]<-6
+  ColWidths[grepl("Disease_name",ColNames)]<-24
+  ColWidths[grepl("Categorization",ColNames)]<-14
+  ColWidths[grepl("Inheritance",ColNames)]<-6
+  ColWidths[grepl("HPO",ColNames)]<-20
+  ColWidths[grepl("OMIM",ColNames)]<-20
+  ColWidths[grepl("FEATUREID",ColNames)]<-12
+  ColWidths[grepl("HGVS_C",ColNames)]<-12
+  ColWidths[grepl("HGVS_P",ColNames)]<-12
+  ColWidths[grepl("EFFECT",ColNames)]<-12
+  ColWidths[grepl("SLOpopulation",ColNames)]<-4
+  ColWidths[grepl("gnomAD",ColNames)]<-4
+  ColWidths[grepl("CLNSIG",ColNames)]<-4
+  ColWidths[grepl("CLNDN",ColNames)]<-18
+  ColWidths[grepl("SpliceAI",ColNames)]<-18
+  
+  ColHide<-rep(FALSE, ncol(reportList[[sheetName]]))
+  ColHide[grepl("RANK",ColNames)]<-TRUE
+  
+  openxlsx::setColWidths(wb, sheetName, cols=1:length(ColWidths), widths = ColWidths, hidden = ColHide, ignoreMergedCells = FALSE)
+  
+  ## Styling the sheet
+  headerStyle <- createStyle(fontColour = "#636363", fgFill = "#9ecae1",
+                             halign = "center", valign = "center", textDecoration = "Bold",
+                             border = "TopBottom", textRotation = 25)
+  
+  addStyle(wb, sheet = sheetName, headerStyle, rows = 1, cols = 1:length(ColWidths), gridExpand = TRUE)
+  bodyStyle <- createStyle(border = "TopBottom", borderColour = "#4F81BD")
+  addStyle(wb, sheet = sheetName, bodyStyle, rows = 2:nrow(reportList[[sheetName]]), cols = 1:ncol(reportList[[sheetName]]), gridExpand = TRUE)
+}
 
-openxlsx::write.xlsx(reportList, file = opt$XLSX_OUTPUT, borders = "rows", headerStyle = hs, addFilter = T)
+openxlsx::saveWorkbook(wb, file = opt$XLSX_OUTPUT, overwrite = TRUE)
+
 
 
