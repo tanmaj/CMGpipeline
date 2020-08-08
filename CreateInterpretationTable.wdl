@@ -50,6 +50,7 @@ workflow CreateInterpretationTable {
     call GetGenerateXLSXscript {
     input:
       GenerateXLSXscriptUrl = GenerateXLSXscriptUrl,
+      timestamp = GenerateVariantTable.timestamp,
       docker = "davidsouthgate/alpine-bash-wget"
     }
 
@@ -69,7 +70,8 @@ workflow CreateInterpretationTable {
 
       sample_basename = sample_basename,
 
-      GenerateXLSXscriptUrl = GenerateXLSXscriptUrl,
+      makeXSLSXoutputs_Rscript = makeXSLSXoutputs_Rscript,
+
       docker = R_docker
   }
  
@@ -162,6 +164,8 @@ task GenerateVariantTable {
 
       zcat ~{input_vcf} | java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter -s panel_gene_list.txt "ANN[*].GENE in SET[0]" | eval $SNPSIFT_EXTRACTFIELDS > ~{sample_basename}.PANEL_ALL.tab
     fi
+
+    echo $(date +"%Y_%m_%d_%I_%M_%p") > timestamp
   >>>
 
   runtime {
@@ -180,12 +184,14 @@ task GenerateVariantTable {
     File CLINVAR_ALL = "~{sample_basename}.CLINVAR_ALL.tab"
     File? PANEL_FILTERED = "~{sample_basename}.PANEL_FILTERED.tab"
     File? PANEL_ALL = "~{sample_basename}.PANEL_ALL.tab"
+    File? timestamp = "timestamp"
   }
 }
 
 task GetGenerateXLSXscript {
   input {
     String GenerateXLSXscriptUrl
+    File? timestamp
 
     # Runtime parameters
     String docker
@@ -194,6 +200,7 @@ task GetGenerateXLSXscript {
   command {
     set -e
     wget ~{GenerateXLSXscriptUrl}
+    cat ~{timestamp}
   }
 
   runtime {
@@ -224,15 +231,14 @@ task GenerateXLSX {
     File? mitoResults_txt
     String sample_basename
 
-    String GenerateXLSXscriptUrl
+    File makeXSLSXoutputs_Rscript
 
     # Runtime parameters
     String docker
   }
 
   command {
-  wget ~{GenerateXLSXscriptUrl}
-  Rscript makeXLSXoutputs.R --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx     
+  Rscript ~{makeXSLSXoutputs_Rscript} --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx     
   }
   runtime {
     docker: docker
