@@ -49,10 +49,10 @@ for(sheetName in names(reportList)){
   ColNames<-colnames(reportList[[sheetName]])
   
   ColWidths<-rep(8, ncol(reportList[[sheetName]]))
-  ColWidths[grepl("CHR",ColNames)]<-4
+  ColWidths[grepl("CHR",ColNames)]<-6
   ColWidths[grepl("POS",ColNames)]<-12
-  ColWidths[grepl("REF",ColNames)]<-2
-  ColWidths[grepl("ALT",ColNames)]<-2
+  ColWidths[grepl("REF",ColNames)]<-5
+  ColWidths[grepl("ALT",ColNames)]<-5
   ColWidths[grepl("QUAL",ColNames)]<-5
   ColWidths[grepl("..GT",ColNames)]<-3
   ColWidths[grepl("..AD",ColNames)]<-5
