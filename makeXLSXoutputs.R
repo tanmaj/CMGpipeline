@@ -85,8 +85,8 @@ for(sheetName in names(reportList)){
                              border = "TopBottom", textRotation = 25)
   
   addStyle(wb, sheet = sheetName, headerStyle, rows = 1, cols = 1:length(ColWidths), gridExpand = TRUE)
-  bodyStyle <- createStyle(border = "TopBottom", borderColour = "#4F81BD")
-  addStyle(wb, sheet = sheetName, bodyStyle, rows = 2:nrow(reportList[[sheetName]]), cols = 1:ncol(reportList[[sheetName]]), gridExpand = TRUE)
+  #bodyStyle <- createStyle(border = "TopBottom", borderColour = "#4F81BD")
+  #addStyle(wb, sheet = sheetName, bodyStyle, rows = 2:nrow(reportList[[sheetName]]), cols = 1:ncol(reportList[[sheetName]]), gridExpand = TRUE)
 }
 
 openxlsx::saveWorkbook(wb, file = opt$XLSX_OUTPUT, overwrite = TRUE)
