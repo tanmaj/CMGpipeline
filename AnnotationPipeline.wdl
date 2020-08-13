@@ -44,7 +44,7 @@ workflow AnnotateVCF {
 
     #String bgzip_docker = "dockerbiotools/bcftools:latest"
     String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
-    String SnpEff_docker = "alesmaver/snpeff_v43:latest"
+    String SnpEff_docker = "alesmaver/snpeff_v50:latest"
     String gatk_docker = "broadinstitute/gatk:latest"
     String gatk_path = "/gatk/gatk"
     String vcfanno_docker = "clinicalgenomics/vcfanno:0.3.2"
