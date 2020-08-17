@@ -325,6 +325,10 @@ functionTags <- function(pLI, misZ, impact, effect, GT, gnomADexomes.AC, gnomAD.
     FUNC_TAGS <-c(FUNC_TAGS, "MAJORITY_PREDICTOR_PATHOGENIC")
   }
   
+  if( grepl("Splice", VariantPredictions, ignore.case = T) ) FUNC_TAGS <-c(FUNC_TAGS, "SPLICE_CANDIDATE")
+  
+  if( grepl("GERP", VariantPredictions, ignore.case = T) ) FUNC_TAGS <-c(FUNC_TAGS, "CONSERVED")
+  
   if( (gnomADexomes.AC < 1 || is.na(gnomADexomes.AC)) & (gnomAD.AC < 1 || is.na(gnomAD.AC)) & (SLOpopulation.AC_Het < 1 || is.na(SLOpopulation.AC_Het)) ) FUNC_TAGS <-c(FUNC_TAGS, "ULTRARARE")
   if( as.numeric(pLI) > 0.9 & impact=="HIGH" & (GT == "HET" | GT == "0/1" | GT == "1/0") & (gnomADexomes.AC < 2 || is.na(gnomADexomes.AC)) ) FUNC_TAGS <- c(FUNC_TAGS, "LOF_CANDIDATE")
   if( as.numeric(misZ) > 2 & effect=="missense_variant" & (GT == "HET" | GT == "0/1" | GT == "1/0") & (gnomADexomes.AC < 2 || is.na(gnomADexomes.AC)) ) FUNC_TAGS <- c(FUNC_TAGS, "MISSENSE_CANDIDATE")
