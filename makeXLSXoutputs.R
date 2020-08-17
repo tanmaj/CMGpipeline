@@ -254,7 +254,7 @@ genotypeProcessor <- function(genotype){
   genotype <- gsub("0/1", "HET", genotype)
   genotype <- gsub("1/1", "HOM", genotype)
   genotype <- gsub("NA", "NA", genotype)
-  genotype <- gsub("\\.\\/\\.", "NA", genotype)
+  #genotype <- gsub("\\.\\/\\.", "NA", genotype)
   genotype[genotype==0]<-"NA"
   return(genotype)
 }
