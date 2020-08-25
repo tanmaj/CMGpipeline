@@ -123,7 +123,7 @@ for(sheetName in names(reportList)){
 # SpliceAI field processor
 reportList[[sheetName]]$SpliceAI.SpliceAI
 SpliceAIprocessor <- function(SpliceAI){
-  if ( !exists(SpliceAI) ) return("")
+  if ( !exists("SpliceAI") ) return("")
   if ( SpliceAI == "" ) return("")
   if ( !is.character(SpliceAI) ) return("")
   
