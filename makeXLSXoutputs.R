@@ -67,12 +67,14 @@ if( !is.null(opt$MITOMAP) ) if ( file.exists(opt$MITOMAP) ) reportList$MITOMAP <
 
 # Find compound heterozygous candidates
 if("COMPHET_RECESSIVE" %in% names(reportList)){
+  if( nrow(reportList$COMPHET_RECESSIVE) > 1) {
   COMPHET_RECESSIVE_gene_entries_list <- lapply(strsplit(reportList$COMPHET_RECESSIVE$ANN....GENE, split = ","), FUN=unique)
   COMPHET_RECESSIVE_gene_list <- unlist(COMPHET_RECESSIVE_gene_entries_list)
   COMPHET_RECESSIVE_comphet_genes <- COMPHET_RECESSIVE_gene_list[duplicated( COMPHET_RECESSIVE_gene_list )]
   COMPHET_RECESSIVE_overlaps<-lapply(COMPHET_RECESSIVE_gene_entries_list, intersect, COMPHET_RECESSIVE_comphet_genes)
   COMPHET_RECESSIVE_overlaps<-lapply(COMPHET_RECESSIVE_overlaps, length)>0
   reportList$COMPHET_RECESSIVE <- reportList$COMPHET_RECESSIVE[COMPHET_RECESSIVE_overlaps,]
+  }
 }
 
 # Create a concatenated genome coordinate entry
