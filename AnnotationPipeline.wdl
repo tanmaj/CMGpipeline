@@ -391,14 +391,14 @@ task VCFANNO {
   echo ops=[\"self\",\"self\"] >> conf.toml
   echo names=[\"dbscSNV.ada_score\", \"dbscSNV.rf_score\"] >> conf.toml
 
-  vcfanno -p 10 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
+  vcfanno -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
   }
   
   runtime {
     docker: docker
     maxRetries: 3
     requested_memory_mb_per_core: 2000
-    cpu: 10
+    cpu: 4
     runtime_minutes: 120
   }
   output {
