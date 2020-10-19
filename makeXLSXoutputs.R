@@ -297,8 +297,13 @@ qualityProcessor <- function(AD, DP, GT, QUAL, GQ) {
   AD <- as.numeric(AD)
   if(length(AD)>2) { QUAL_TAGS<-c(QUAL_TAGS, "MULTIALLELIC"); return(paste0(QUAL_TAGS, collapse=",")) }
   
+  
   if(length(AD)==2) {
-    AD_RATIO <- AD[2]/(AD[1]+AD[2])
+    if ( (AD[1]+AD[2])>0 ) {
+      AD_RATIO <- AD[2]/(AD[1]+AD[2])
+    } else {
+      AD_RATIO <- 0
+    }
     if( (GT == "HET" | GT == "0/1" | GT == "1/0") & (AD_RATIO<0.25 || AD_RATIO>0.75) ) QUAL_TAGS<-c(QUAL_TAGS, "BAD_HET_RATIO")
   } 
   return(paste0(QUAL_TAGS, collapse=","))
