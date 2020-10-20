@@ -1051,7 +1051,7 @@ task HaplotypeCaller {
     maxRetries: 3
     requested_memory_mb_per_core: 6000
     cpu: 1
-    runtime_minutes: 500
+    runtime_minutes: 1200
   }
 }
 
