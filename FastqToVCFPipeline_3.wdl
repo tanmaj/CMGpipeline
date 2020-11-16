@@ -647,13 +647,13 @@ task CutAdapters {
   
   command {
   set -e
-     cutadapt -j 20 -a file:~{illuminaAdapters} --mask-adapter -o ~{sample_basename}.trimmed.fq.gz ~{input_fq}
+     cutadapt -j 4 -a file:~{illuminaAdapters} --mask-adapter -o ~{sample_basename}.trimmed.fq.gz ~{input_fq}
   }
   runtime {
     docker: docker
     requested_memory_mb_per_core: 1000
-    cpu: 7
-    runtime_minutes: 120
+    cpu: 4
+    runtime_minutes: 420
   }
   output {
     File output_fq_trimmed = "~{sample_basename}.trimmed.fq.gz"
@@ -1051,7 +1051,7 @@ task HaplotypeCaller {
     maxRetries: 3
     requested_memory_mb_per_core: 6000
     cpu: 1
-    runtime_minutes: 500
+    runtime_minutes: 1200
   }
 }
 
