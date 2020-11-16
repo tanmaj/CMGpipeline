@@ -38,8 +38,9 @@ if (is.null(opt$RARE_FUNCTIONAL) &
 }
 
 # Debugging code - import outputs from a directory
-# SAMPLE="RD0000"
-# snpSift_outputDir<-"/home/ales/call-GenerateXLSX/inputs/-760770099/"
+# opt <- list()
+# SAMPLE="PX5060"
+# snpSift_outputDir<-"/home/ales/cromwell-1/cromwell-executions/CreateInterpretationTable/bda13c81-32a7-421b-b481-9792e392b26c/call-GenerateVariantTable/cacheCopy/execution/"
 # opt$RARE_FUNCTIONAL<-paste0(snpSift_outputDir, SAMPLE, ".RARE_FUNCTIONAL.tab")
 # opt$HET_DOMINANT<-paste0(snpSift_outputDir, SAMPLE, ".HET_DOMINANT.tab")
 # opt$COMPHET_RECESSIVE<-paste0(snpSift_outputDir, SAMPLE, ".COMPHET_RECESSIVE.tab")
@@ -341,6 +342,8 @@ functionTags <- function(pLI, misZ, impact, effect, GT, gnomADexomes.AC, gnomAD.
   FUNC_TAGS<-c()
   if( is.na(pLI) ) pLI = 0
   if( is.na(misZ) ) misZ = 0
+  if( is.na(impact) ) impact = "NONE_RETURNED"
+  if( is.na(effect) ) effect = "NONE_RETURNED"
   
   Metapredictor_score <- 0
   for( Predictor in c("REVEL_PATHOGENIC", "METASVM_PATHOGENIC", "CADD_PATHOGENIC") ) {
