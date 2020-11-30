@@ -421,7 +421,7 @@ for(sheetName in names(reportList)){
                 "Predictions",
                 "FUNCTIONAL_TAGS",
                 "Disease_name", "OMIM", "HPO", "Categorization", "Inheritance", "Age",
-                "clinvar.CLNSIG", "clinvar.CLNDN", "clinvar.CLNSIGCONF", "clinvar.CLNHGVS",
+                "clinvar.ID", "clinvar.CLNSIG", "clinvar.CLNDN", "clinvar.CLNSIGCONF", "clinvar.CLNHGVS",
                 "SLOpopulation.AC_Het", "SLOpopulation.AC_Hom", "SLOpopulation.AC_Hemi",
                 "gnomAD.AC", "gnomAD.AF", "gnomAD.nhomalt",
                 "gnomADexomes.AC", "gnomADexomes.AF", "gnomADexomes.nhomalt",
