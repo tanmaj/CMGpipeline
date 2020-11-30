@@ -39,8 +39,8 @@ if (is.null(opt$RARE_FUNCTIONAL) &
 
 # Debugging code - import outputs from a directory
 # opt <- list()
-# SAMPLE="PX5060"
-# snpSift_outputDir<-"/home/ales/cromwell-1/cromwell-executions/CreateInterpretationTable/bda13c81-32a7-421b-b481-9792e392b26c/call-GenerateVariantTable/cacheCopy/execution/"
+# SAMPLE="PX5427"
+# snpSift_outputDir<-"/home/ales/cromwell-1/cromwell-executions/CreateInterpretationTable/9a300b7c-ec54-4286-b5bc-4f7cc4d2714d/call-GenerateVariantTable/execution/"
 # opt$RARE_FUNCTIONAL<-paste0(snpSift_outputDir, SAMPLE, ".RARE_FUNCTIONAL.tab")
 # opt$HET_DOMINANT<-paste0(snpSift_outputDir, SAMPLE, ".HET_DOMINANT.tab")
 # opt$COMPHET_RECESSIVE<-paste0(snpSift_outputDir, SAMPLE, ".COMPHET_RECESSIVE.tab")
@@ -437,6 +437,10 @@ for(sheetName in names(reportList)){
   columnsOrder <- unique(columnsOrder[columnsOrder %in% allColumns])
   reportList[[sheetName]] <- reportList[[sheetName]][,columnsOrder]
 }
+
+# Add the interpretation fields for adding interpretations to the Excel file - sheet Panel filtered
+INTERPRETATION_FIELDS<-c("Classification", "ACMG", "Report", "InterpretationSI", "InterpretationEN", "Condition", "Origin", "Interpretation_date")
+for (i in INTERPRETATION_FIELDS) reportList$PANEL_FILTERED[[i]]<-""
 
 # Create a novel work book 
 wb <- openxlsx::createWorkbook()
