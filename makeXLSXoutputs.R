@@ -440,7 +440,7 @@ for(sheetName in names(reportList)){
 
 # Add the interpretation fields for adding interpretations to the Excel file - sheet Panel filtered
 INTERPRETATION_FIELDS<-c("Classification", "ACMG", "Report", "InterpretationSI", "InterpretationEN", "Condition", "Origin", "Interpretation_date")
-if( nrow(reportList$PANEL_FILTERED)>0 ) for (i in INTERPRETATION_FIELDS) reportList$PANEL_FILTERED[[i]]<-""
+if( nrow(reportList[["PANEL_FILTERED"]])>0 ) for (i in INTERPRETATION_FIELDS) reportList$PANEL_FILTERED[[i]]<-""
 
 # Create a novel work book 
 wb <- openxlsx::createWorkbook()
