@@ -39,8 +39,8 @@ if (is.null(opt$RARE_FUNCTIONAL) &
 
 # Debugging code - import outputs from a directory
 # opt <- list()
-# SAMPLE="PX6061"
-# snpSift_outputDir<-"/home/ales/-1872031698/"
+# SAMPLE="SAMPLE"
+# snpSift_outputDir<-"/home/ales/pipeline_debug/"
 # opt$RARE_FUNCTIONAL<-paste0(snpSift_outputDir, SAMPLE, ".RARE_FUNCTIONAL.tab")
 # opt$HET_DOMINANT<-paste0(snpSift_outputDir, SAMPLE, ".HET_DOMINANT.tab")
 # opt$COMPHET_RECESSIVE<-paste0(snpSift_outputDir, SAMPLE, ".COMPHET_RECESSIVE.tab")
@@ -440,7 +440,7 @@ for(sheetName in names(reportList)){
 
 # Add the interpretation fields for adding interpretations to the Excel file - sheet Panel filtered
 INTERPRETATION_FIELDS<-c("Classification", "ACMG", "Report", "InterpretationSI", "InterpretationEN", "Condition", "Origin", "Interpretation_date")
-if( nrow(reportList[["PANEL_FILTERED"]])>0 ) for (i in INTERPRETATION_FIELDS) reportList$PANEL_FILTERED[[i]]<-""
+if( !is.null(reportList[["PANEL_FILTERED"]]) ) if( nrow(reportList[["PANEL_FILTERED"]])>0 ) for (i in INTERPRETATION_FIELDS) reportList$PANEL_FILTERED[[i]]<-""
 
 # Create a novel work book 
 wb <- openxlsx::createWorkbook()
