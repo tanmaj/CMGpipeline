@@ -130,7 +130,7 @@ task CONIFER_Analyze {
     requested_memory_mb_per_core: 3000
     cpu: 2
     runtime_minutes: 120
-    docker_user: root
+    docker_user: "root"
   }
   output {
     File output_hdf5 = "~{sample_basename}.analysis.hdf5"
@@ -172,7 +172,7 @@ task CONIFER_Call {
     requested_memory_mb_per_core: 3000
     cpu: 2
     runtime_minutes: 120
-    docker_user: root
+    docker_user: "root"
   }
   output {
     File output_conifer_calls = "~{sample_basename}.CONIFER_CALLS.txt"
@@ -233,7 +233,7 @@ task CONIFER_Export {
     requested_memory_mb_per_core: 4000
     cpu: 1
     runtime_minutes: 60
-    docker_user: root
+    docker_user: "root"
   }
   output {
     File CNV_bed = "~{enrichment}_~{sample_basename}.bed" 
