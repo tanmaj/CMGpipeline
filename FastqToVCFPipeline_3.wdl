@@ -653,7 +653,7 @@ task CutAdapters {
     docker: docker
     requested_memory_mb_per_core: 1000
     cpu: 4
-    runtime_minutes: 420
+    runtime_minutes: 800
   }
   output {
     File output_fq_trimmed = "~{sample_basename}.trimmed.fq.gz"
@@ -700,7 +700,7 @@ task Align {
     maxRetries: 3
     requested_memory_mb_per_core: 2000
     cpu: 8
-    runtime_minutes: 180
+    runtime_minutes: 300
   }
 }
 
