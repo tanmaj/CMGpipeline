@@ -37,7 +37,7 @@ if (is.null(opt$RARE_FUNCTIONAL) &
   stop("At least one input must be supplied. Exiting with error...", call.=FALSE)
 }
 
-# Debugging code - import outputs from a directory
+# #Debugging code - import outputs from a directory
 # opt <- list()
 # SAMPLE="SAMPLE"
 # snpSift_outputDir<-"/home/ales/pipeline_debug/"
@@ -338,12 +338,16 @@ for(sheetName in names(reportList)){
 }
 
 # Add functional candidate tags to simplify interpretation
-functionTags <- function(pLI, misZ, impact, effect, GT, gnomADexomes.AC, gnomAD.AC, SLOpopulation.AC_Het, VariantPredictions="") {
+functionTags <- function(pLI, misZ, impact, effect, GT, gnomADexomes.AC, gnomAD.AC, SLOpopulation.AC_Het, VariantPredictions="", Quality="") {
   FUNC_TAGS<-c()
   if( is.na(pLI) ) pLI = 0
   if( is.na(misZ) ) misZ = 0
   if( is.na(impact) ) impact = "NONE_RETURNED"
   if( is.na(effect) ) effect = "NONE_RETURNED"
+  
+  isQualityOK <- function(Quality=Quality){
+    return( !grepl("BAD_VARIANT_QUALITY|BAD_HET_RATIO", Quality, ignore.case = T) )
+  }
   
   Metapredictor_score <- 0
   for( Predictor in c("REVEL_PATHOGENIC", "METASVM_PATHOGENIC", "CADD_PATHOGENIC") ) {
@@ -361,13 +365,14 @@ functionTags <- function(pLI, misZ, impact, effect, GT, gnomADexomes.AC, gnomAD.
     FUNC_TAGS <-c(FUNC_TAGS, "MAJORITY_PREDICTOR_PATHOGENIC")
   }
   
-  if( grepl("Splice", VariantPredictions, ignore.case = T) ) FUNC_TAGS <-c(FUNC_TAGS, "SPLICE_CANDIDATE")
+  if(  isQualityOK(Quality) & (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) & (gnomAD.AC < 3 || is.na(gnomAD.AC)) & (SLOpopulation.AC_Het < 3 || is.na(SLOpopulation.AC_Het)) & grepl("Splice", VariantPredictions, ignore.case = T) ) FUNC_TAGS <-c(FUNC_TAGS, "SPLICE_CANDIDATE")
   
   if( grepl("GERP", VariantPredictions, ignore.case = T) ) FUNC_TAGS <-c(FUNC_TAGS, "CONSERVED")
   
-  if( (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) & (gnomAD.AC < 3 || is.na(gnomAD.AC)) & (SLOpopulation.AC_Het < 3 || is.na(SLOpopulation.AC_Het)) ) FUNC_TAGS <-c(FUNC_TAGS, "ULTRARARE")
-  if( as.numeric(pLI) > 0.9 & impact=="HIGH" & (GT == "HET" | GT == "0/1" | GT == "1/0") & (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) ) FUNC_TAGS <- c(FUNC_TAGS, "LOF_CANDIDATE")
-  if( as.numeric(misZ) > 2 & effect=="missense_variant" & (GT == "HET" | GT == "0/1" | GT == "1/0") & (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) ) FUNC_TAGS <- c(FUNC_TAGS, "MISSENSE_CANDIDATE")
+  if( isQualityOK(Quality) & grepl("BAD_VARIANT_QUALITY|BAD_HET_RATIO", Quality, ignore.case = T) & (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) & (gnomAD.AC < 3 || is.na(gnomAD.AC)) & (SLOpopulation.AC_Het < 3 || is.na(SLOpopulation.AC_Het)) ) FUNC_TAGS <-c(FUNC_TAGS, "ULTRARARE_CANDIDATE")
+  if( isQualityOK(Quality) & as.numeric(pLI) > 0.9 & impact=="HIGH" & (GT == "HET" | GT == "0/1" | GT == "1/0") & (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) ) FUNC_TAGS <- c(FUNC_TAGS, "LOF_CANDIDATE")
+  if( isQualityOK(Quality) & as.numeric(misZ) > 2 & effect=="missense_variant" & (GT == "HET" | GT == "0/1" | GT == "1/0") & (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) ) FUNC_TAGS <- c(FUNC_TAGS, "MISSENSE_CANDIDATE")
+  if( isQualityOK(Quality) & (gnomADexomes.AC < 3 || is.na(gnomADexomes.AC)) & (gnomAD.AC < 3 || is.na(gnomAD.AC)) & (SLOpopulation.AC_Het < 3 || is.na(SLOpopulation.AC_Het)) & impact=="HIGH" ) FUNC_TAGS <- c(FUNC_TAGS, "RARE_LOF_CANDIDATE")
   return(paste0(FUNC_TAGS, collapse=","))
 }
 # Tests
@@ -392,6 +397,7 @@ for(sheetName in names(reportList)){
                                              gnomAD.AC = reportList[[sheetName]]$gnomAD.AC,
                                              SLOpopulation.AC_Het = reportList[[sheetName]]$SLOpopulation.AC_Het,
                                              VariantPredictions = reportList[[sheetName]]$Predictions,
+                                             Quality = reportList[[sheetName]]$QUALITY,
                                              GT = reportList[[sheetName]][,genotypeColumns[1]])
 }
 
