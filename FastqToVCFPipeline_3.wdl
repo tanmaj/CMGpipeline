@@ -1337,7 +1337,7 @@ task PairedFastQsToUnmappedBAM {
     maxRetries: 3
     requested_memory_mb_per_core: 6000
     cpu: 1
-    runtime_minutes: 180
+    runtime_minutes: 700
   }
   output {
     File output_unmapped_bam = "~{readgroup_name}.unmapped.bam"
@@ -1380,7 +1380,7 @@ task SamSplitter {
     disks: "local-disk " + disk_size + " HDD"
     requested_memory_mb_per_core: 6000
     cpu: 1
-    runtime_minutes: 180
+    runtime_minutes: 600
   }
 }
 
@@ -1408,7 +1408,7 @@ task GatherUnsortedBamFiles {
     maxRetries: 3
     requested_memory_mb_per_core: 6000
     cpu: 1
-    runtime_minutes: 120
+    runtime_minutes: 400
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -1448,7 +1448,7 @@ task SortSam {
     maxRetries: 3
     requested_memory_mb_per_core: 6000
     cpu: 1
-    runtime_minutes: 180
+    runtime_minutes: 900
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
