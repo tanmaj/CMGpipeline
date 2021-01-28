@@ -37,20 +37,20 @@ if (is.null(opt$RARE_FUNCTIONAL) &
   stop("At least one input must be supplied. Exiting with error...", call.=FALSE)
 }
 
-#Debugging code - import outputs from a directory
-opt <- list()
-SAMPLE="PX5816"
-snpSift_outputDir<-"/home/ales/pipeline_debug/"
-opt$RARE_FUNCTIONAL<-paste0(snpSift_outputDir, SAMPLE, ".RARE_FUNCTIONAL.tab")
-opt$HET_DOMINANT<-paste0(snpSift_outputDir, SAMPLE, ".HET_DOMINANT.tab")
-opt$COMPHET_RECESSIVE<-paste0(snpSift_outputDir, SAMPLE, ".COMPHET_RECESSIVE.tab")
-opt$HOM_RECESSIVE<-paste0(snpSift_outputDir, SAMPLE, ".HOM_RECESSIVE.tab")
-opt$CLINVAR_PATHOGENIC<-paste0(snpSift_outputDir, SAMPLE, ".CLINVAR_PATHOGENIC.tab")
-opt$CLINVAR_FILTERED<-paste0(snpSift_outputDir, SAMPLE, ".CLINVAR_FILTERED.tab")
-opt$CLINVAR_ALL<-paste0(snpSift_outputDir, SAMPLE, ".CLINVAR_ALL.tab")
-opt$PANEL_FILTERED<-paste0(snpSift_outputDir, SAMPLE, ".PANEL_FILTERED.tab")
-opt$PANEL_ALL<-paste0(snpSift_outputDir, SAMPLE, ".PANEL_ALL.tab")
-opt$MITOMAP<-paste0(snpSift_outputDir, SAMPLE, ".MITOMAP.tab")
+# #Debugging code - import outputs from a directory
+# opt <- list()
+# SAMPLE="SAMPLE"
+# snpSift_outputDir<-"/home/ales/pipeline_debug/"
+# opt$RARE_FUNCTIONAL<-paste0(snpSift_outputDir, SAMPLE, ".RARE_FUNCTIONAL.tab")
+# opt$HET_DOMINANT<-paste0(snpSift_outputDir, SAMPLE, ".HET_DOMINANT.tab")
+# opt$COMPHET_RECESSIVE<-paste0(snpSift_outputDir, SAMPLE, ".COMPHET_RECESSIVE.tab")
+# opt$HOM_RECESSIVE<-paste0(snpSift_outputDir, SAMPLE, ".HOM_RECESSIVE.tab")
+# opt$CLINVAR_PATHOGENIC<-paste0(snpSift_outputDir, SAMPLE, ".CLINVAR_PATHOGENIC.tab")
+# opt$CLINVAR_FILTERED<-paste0(snpSift_outputDir, SAMPLE, ".CLINVAR_FILTERED.tab")
+# opt$CLINVAR_ALL<-paste0(snpSift_outputDir, SAMPLE, ".CLINVAR_ALL.tab")
+# opt$PANEL_FILTERED<-paste0(snpSift_outputDir, SAMPLE, ".PANEL_FILTERED.tab")
+# opt$PANEL_ALL<-paste0(snpSift_outputDir, SAMPLE, ".PANEL_ALL.tab")
+# opt$MITOMAP<-paste0(snpSift_outputDir, SAMPLE, ".MITOMAP.tab")
 
 
 # Make a list of reports
