@@ -55,16 +55,16 @@ if (is.null(opt$RARE_FUNCTIONAL) &
 
 # Make a list of reports
 reportList<-list()
-if( !is.null(opt$RARE_FUNCTIONAL) & file.exists(opt$RARE_FUNCTIONAL) ) reportList$RARE_FUNCTIONAL <- read.table(opt$RARE_FUNCTIONAL, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$HET_DOMINANT) & file.exists(opt$HET_DOMINANT) ) reportList$HET_DOMINANT <- read.table(opt$HET_DOMINANT, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$COMPHET_RECESSIVE) & file.exists(opt$COMPHET_RECESSIVE) ) reportList$COMPHET_RECESSIVE <- read.table(opt$COMPHET_RECESSIVE, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$HOM_RECESSIVE) & file.exists(opt$HOM_RECESSIVE) ) reportList$HOM_RECESSIVE <- read.table(opt$HOM_RECESSIVE, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$CLINVAR_PATHOGENIC) & file.exists(opt$CLINVAR_PATHOGENIC) ) reportList$CLINVAR_PATHOGENIC <- read.table(opt$CLINVAR_PATHOGENIC, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$CLINVAR_FILTERED) & file.exists(opt$CLINVAR_FILTERED) ) reportList$CLINVAR_FILTERED <- read.table(opt$CLINVAR_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$CLINVAR_ALL) & file.exists(opt$CLINVAR_ALL) ) reportList$CLINVAR_ALL <- read.table(opt$CLINVAR_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$PANEL_FILTERED) ) if ( file.exists(opt$PANEL_FILTERED) ) reportList$PANEL_FILTERED <- read.table(opt$PANEL_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$PANEL_ALL) ) if ( file.exists(opt$PANEL_ALL) ) reportList$PANEL_ALL <- read.table(opt$PANEL_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
-if( !is.null(opt$MITOMAP) ) if ( file.exists(opt$MITOMAP) ) reportList$MITOMAP <- read.table(opt$MITOMAP, sep="\t", header=T, quote="", dec = ".", fill=NA, colClasses = c("character"))
+if( !is.null(opt$RARE_FUNCTIONAL) & file.exists(opt$RARE_FUNCTIONAL) ) reportList$RARE_FUNCTIONAL <- read.table(opt$RARE_FUNCTIONAL, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$HET_DOMINANT) & file.exists(opt$HET_DOMINANT) ) reportList$HET_DOMINANT <- read.table(opt$HET_DOMINANT, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$COMPHET_RECESSIVE) & file.exists(opt$COMPHET_RECESSIVE) ) reportList$COMPHET_RECESSIVE <- read.table(opt$COMPHET_RECESSIVE, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$HOM_RECESSIVE) & file.exists(opt$HOM_RECESSIVE) ) reportList$HOM_RECESSIVE <- read.table(opt$HOM_RECESSIVE, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$CLINVAR_PATHOGENIC) & file.exists(opt$CLINVAR_PATHOGENIC) ) reportList$CLINVAR_PATHOGENIC <- read.table(opt$CLINVAR_PATHOGENIC, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$CLINVAR_FILTERED) & file.exists(opt$CLINVAR_FILTERED) ) reportList$CLINVAR_FILTERED <- read.table(opt$CLINVAR_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$CLINVAR_ALL) & file.exists(opt$CLINVAR_ALL) ) reportList$CLINVAR_ALL <- read.table(opt$CLINVAR_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$PANEL_FILTERED) ) if ( file.exists(opt$PANEL_FILTERED) ) reportList$PANEL_FILTERED <- read.table(opt$PANEL_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$PANEL_ALL) ) if ( file.exists(opt$PANEL_ALL) ) reportList$PANEL_ALL <- read.table(opt$PANEL_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$MITOMAP) ) if ( file.exists(opt$MITOMAP) ) reportList$MITOMAP <- read.table(opt$MITOMAP, sep="\t", header=T, quote="", dec = ".", fill=NA)
 
 # Convert logical columns to single letters - this is to disable T letters being read as logicals
 convertLogicalsBackToCharacters <- function(df){
