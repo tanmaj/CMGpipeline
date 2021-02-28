@@ -203,6 +203,7 @@ task CONIFER_Plotcalls {
     requested_memory_mb_per_core: 3000
     cpu: 2
     runtime_minutes: 120
+    docker_user: "root"    
   }
   output {
     Array[File] output_plotcalls = glob("*.png")
