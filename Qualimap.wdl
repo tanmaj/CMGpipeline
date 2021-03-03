@@ -25,6 +25,8 @@ task bamqc {
     command {
         set -euo pipefail
         
+        unset DISPLAY
+        
         qualimap bamqc -bam ~{bam} \
             ~{if defined(enrichment_bed) then "-gff " + enrichment_bed else ""} \
             -outdir ~{out_directory} \
