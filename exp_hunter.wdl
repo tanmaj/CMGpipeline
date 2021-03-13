@@ -6,20 +6,14 @@ workflow ExpansionHunter {
     File bam_file
     File bai_file
     File reference_fasta
-    File variant_catalog_file
     String expansion_hunter_docker
-
-    File repeats_file
   }
 
   parameter_meta {
     sample_id: "sample name"
     bam_file: ".bam file to search for repeat expansions"
     reference_fasta: ".fasta file with reference used to align bam file"
-    variant_catalog_file: "JSON array whose entries specify individual loci that the program will analyze"
     expansion_hunter_docker: "expansion hunter docker including annotation software"
-
-    repeats_file: "Repats file used for annotation with 'stranger'"
   }
 
   meta {
@@ -33,14 +27,12 @@ workflow ExpansionHunter {
         bam_file = bam_file,
         bai_file = bai_file,
         reference_fasta = reference_fasta,
-        variant_catalog_file = variant_catalog_file,
         expansion_hunter_docker = expansion_hunter_docker
     }
 
   call AnnotateExpansionHunter {
       input:
         sample_id = sample_id,
-        repeats_file = repeats_file,
         expansion_hunter_docker = expansion_hunter_docker,
         expansion_hunter_vcf = RunExpansionHunter.expansion_hunter_vcf
     }
@@ -57,7 +49,6 @@ task RunExpansionHunter {
     File bam_file
     File bai_file
     File reference_fasta
-    File variant_catalog_file
     String expansion_hunter_docker
   }
 
@@ -66,12 +57,19 @@ task RunExpansionHunter {
   }
 
   command <<<
+    echo "[ PREPARATION ] Downloading variant catalog JSON"
+    wget "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ExpansionHunter_configuration/variant_catalog.json"
+
+    echo "[ PREPARATION ] Fixing BAI file ending to BAM.BAI as required for the ExpansionHunter"
+    BAIFILE=~{bai_file}
+    BAMBAIFILE=${BAIFILE%.bai}.bam.bai
+    cp "$BAIFILE" "$BAMBAIFILE"
 
     echo "[ RUNNING ] expansion hunter on sample ~{sample_id}"
     ExpansionHunter \
       --reads ~{bam_file} \
       --reference ~{reference_fasta} \
-      --variant-catalog ~{variant_catalog_file} \
+      --variant-catalog variant_catalog.json \
       --output-prefix ~{sample_id}
 
   >>>
@@ -89,7 +87,6 @@ task RunExpansionHunter {
 task AnnotateExpansionHunter {
   input {
     String sample_id
-    File repeats_file
     String expansion_hunter_docker
     File expansion_hunter_vcf
   }
@@ -104,9 +101,12 @@ task AnnotateExpansionHunter {
     export LANG=C.UTF-8
     # annotated_vcf = "${sample_id}.annotated.vcf"
 
+    echo "[ PREPARATION ] Downloading repeats file JSON"
+    wget "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ExpansionHunter_configuration/variant_catalog_hg19.json"
+
     echo "[ RUNNING ] expansion hunter vcf annotation on sample ~{sample_id}"
     stranger \
-      --repeats-file ~{repeats_file} \
+      --repeats-file variant_catalog_hg19.json \
       ~{expansion_hunter_vcf} > ~{sample_id}.annotated.vcf
 
   >>>
