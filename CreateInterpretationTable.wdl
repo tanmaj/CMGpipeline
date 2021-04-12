@@ -16,7 +16,7 @@ workflow CreateInterpretationTable {
     String? panel_gene_list
     File? mitoResults_txt
 
-    String SnpEff_docker = "alesmaver/snpeff_v43:latest"
+    String SnpEff_docker = "alesmaver/snpeff_v50:latest"
     String R_docker = "alesmaver/r-base"
   }  
 
