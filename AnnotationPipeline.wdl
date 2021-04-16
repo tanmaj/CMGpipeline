@@ -43,7 +43,8 @@ workflow AnnotateVCF {
     File dbNSFP_index
 
     #String bgzip_docker = "dockerbiotools/bcftools:latest"
-    String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
+    String bcftools_docker = "dceoy/bcftools:latest"
+    #String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
     String SnpEff_docker = "alesmaver/snpeff_v50:latest"
     String gatk_docker = "broadinstitute/gatk:latest"
     String gatk_path = "/gatk/gatk"
@@ -305,7 +306,7 @@ task bcftoolsAnnotate {
     set -e
     bcftools view -r ~{chromosome} ~{input_vcf} | \
     bcftools annotate -a ~{HPO} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,HPO | \
-    bcftools annotate -a ~{OMIM}  -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,OMIM | \
+    bcftools annotate -a ~{OMIM}  -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,OMIM --merge-logic OMIM:unique | \
     bcftools annotate -a ~{gnomadConstraints} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,oe_mis,pLI,pRec | \
     bcftools annotate -a ~{CGD} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,-,Disease_name,Inheritance,Age,Categorization -Oz -o ~{output_filename}
     
