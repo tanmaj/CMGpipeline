@@ -305,7 +305,7 @@ task bcftoolsAnnotate {
     set -e
     bcftools view -r ~{chromosome} ~{input_vcf} | \
     bcftools annotate -a ~{HPO} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,HPO | \
-    bcftools annotate -a ~{OMIM}  -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,OMIM --merge-logic OMIM:unique | \
+    bcftools annotate -a ~{OMIM}  -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,OMIM | \
     bcftools annotate -a ~{gnomadConstraints} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,oe_mis,pLI,pRec | \
     bcftools annotate -a ~{CGD} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,-,Disease_name,Inheritance,Age,Categorization -Oz -o ~{output_filename}
     
