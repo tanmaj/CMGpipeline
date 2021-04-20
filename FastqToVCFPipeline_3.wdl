@@ -462,8 +462,8 @@ workflow FastqToVCF {
       dbNSFP = dbNSFP,
       dbNSFP_index = dbNSFP_index,
 
-      bcftools_docker = bcftools_docker,
-      SnpEff_docker = SnpEff_docker,
+      #bcftools_docker = bcftools_docker,
+      #SnpEff_docker = SnpEff_docker,
       gatk_docker = gatk_docker,
       gatk_path = gatk_path,
       vcfanno_docker = vcfanno_docker
