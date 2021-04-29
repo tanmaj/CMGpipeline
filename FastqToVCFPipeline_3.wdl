@@ -1264,8 +1264,8 @@ task VariantFiltrationSNP {
       -O ~{sample_basename}.filtered.snp.vcf \
       --filter-expression "DP < 5" --filter-name "LowCoverage" \
       --filter-expression "QUAL < 30.0" --filter-name "VeryLowQual" \
-      --filter-expression "FS > 60.0" --filter-name "StrandBias" \
-      --filter-expression "SOR>5.0" --filter-name "HighStrandsOR"
+      --filter-expression "FS > 100.0" --filter-name "StrandBias" \
+      --filter-expression "SOR>10.0" --filter-name "HighStrandsOR"
   }
 
   output {
