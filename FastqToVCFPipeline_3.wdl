@@ -660,6 +660,8 @@ workflow FastqToVCF {
 
     File? mitoResults_xls = MitoMap.mitoResults_xls
     File? mitoResults_txt = MitoMap.mitoResults_txt
+
+    File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
   }
 }
 
