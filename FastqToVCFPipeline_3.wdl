@@ -13,6 +13,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" as ROH
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -29,6 +30,8 @@ workflow FastqToVCF {
     File illuminaAdapters
 
     File chromosome_list
+
+    String? targetRegions
 
     Int bwa_threads
     Int threads
@@ -117,6 +120,7 @@ workflow FastqToVCF {
     String vcfanno_docker = "clinicalgenomics/vcfanno:0.3.2"
     String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
     String SnpEff_docker = "alesmaver/snpeff_v43:latest"
+    String expansion_hunter_docker = "gbergant/expansionhunter:latest"
   }  
 
   # Terminate workflow in case neither input_fq1 or input_bam or input_cram is provided
@@ -187,19 +191,41 @@ workflow FastqToVCF {
       compression_level = 2
   }
 
+  if ( defined(targetRegions) ) {
+    call PrepareMaskedGenomeFasta {
+      input:
+        reference_fixed_fa=reference_fixed_fa,
+        reference_fixed_fai=reference_fixed_fai,
+        targetRegions=targetRegions,
+
+        # Runtime 
+        docker = "pegi3s/bedtools"
+    }
+
+    String enrichment_bed = PrepareMaskedGenomeFasta.targetRegions_bed
+
+    call PrepareMaskedBWAIndex {
+      input:
+        reference_masked_fa=PrepareMaskedGenomeFasta.reference_masked_fa,
+
+        # Runtime 
+        docker="alesmaver/bwa_samtools_picard"
+    }
+  }
+
   scatter(unmapped_bam in SamSplitter.split_bams) {
     call Align {
       input:
        input_bam=unmapped_bam,
        sample_basename=sample_basename,
 
-       reference_fixed_fa=reference_fixed_fa,
+       reference_fixed_fa=select_first([PrepareMaskedBWAIndex.reference_masked_fasta, reference_fixed_fa]),
        reference_fixed_fai=reference_fixed_fai,
-       reference_fixed_amb=reference_fixed_amb,
-       reference_fixed_ann=reference_fixed_ann,
-       reference_fixed_bwt=reference_fixed_bwt,
-       reference_fixed_pac=reference_fixed_pac,
-       reference_fixed_sa=reference_fixed_sa,
+       reference_fixed_amb=select_first([PrepareMaskedBWAIndex.reference_masked_amb, reference_fixed_amb]),
+       reference_fixed_ann=select_first([PrepareMaskedBWAIndex.reference_masked_ann, reference_fixed_ann]),
+       reference_fixed_bwt=select_first([PrepareMaskedBWAIndex.reference_masked_bwt, reference_fixed_bwt]),
+       reference_fixed_pac=select_first([PrepareMaskedBWAIndex.reference_masked_pac, reference_fixed_pac]),
+       reference_fixed_sa=select_first([PrepareMaskedBWAIndex.reference_masked_sa, reference_fixed_sa]),
 
        reference_fa=reference_fa,
        reference_dict=reference_dict,
@@ -580,6 +606,15 @@ workflow FastqToVCF {
     docker = bcftools_docker
   }
 
+  call ExpansionHunter.ExpansionHunter as ExpansionHunter {
+    input:
+      sample_id = sample_basename,
+      bam_file = SortSam.output_bam,
+      bai_file = SortSam.output_bam_index,
+      reference_fasta = reference_fa,
+      expansion_hunter_docker = expansion_hunter_docker
+  }
+
   #call ROH.CallPlink as CallPlink {
   #input:
   #  input_vcf = CallROH.BAF_vcf,
@@ -657,6 +692,74 @@ task CutAdapters {
   }
   output {
     File output_fq_trimmed = "~{sample_basename}.trimmed.fq.gz"
+  }
+}
+
+task PrepareMaskedGenomeFasta {
+  input {
+    # Command parameters
+    File reference_fixed_fa
+    File reference_fixed_fai
+
+    String? targetRegions # FORMAT "chr1:123033-130000;chrX:1-1000"
+
+    # Runtime parameters
+    String docker
+  }
+  
+  command <<<
+    set -e
+
+    echo "~{targetRegions}"  | tr ';' '\n' | tr ':' '\t' | tr '-' '\t' > targetRegions.bed
+
+    awk -v OFS='\t' {'print $1,$2'} ~{reference_fixed_fai} > ~{reference_fixed_fa}.genome
+
+    bedtools complement  -i targetRegions.bed -g ~{reference_fixed_fa}.genome > targetRegions.complement.bed
+
+    bedtools maskfasta -fi ~{reference_fixed_fa} -bed targetRegions.complement.bed -fo reference.masked.fa
+  >>>
+
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 4000
+    cpu: 4
+    runtime_minutes: 800
+  }
+  output {
+    File reference_masked_fa = "reference.masked.fa"
+    File targetRegions_bed = "targetRegions.bed"
+  }
+}
+
+task PrepareMaskedBWAIndex {
+  input {
+    # Command parameters
+    File reference_masked_fa
+    String reference_masked_fa_filename = basename(reference_masked_fa)
+    # Runtime parameters
+    String docker
+  }
+  
+  command {
+    set -e
+
+    cp ~{reference_masked_fa} ./
+
+    bwa index ~{reference_masked_fa_filename}
+  }
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 5000
+    cpu: 4
+    runtime_minutes: 800
+  }
+  output {
+    File reference_masked_fasta = "~{reference_masked_fa_filename}"
+    File reference_masked_sa = "~{reference_masked_fa_filename}.sa"
+    File reference_masked_amb = "~{reference_masked_fa_filename}.amb"
+    File reference_masked_ann = "~{reference_masked_fa_filename}.ann"
+    File reference_masked_bwt = "~{reference_masked_fa_filename}.bwt"
+    File reference_masked_pac = "~{reference_masked_fa_filename}.pac"
   }
 }
 
