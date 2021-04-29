@@ -422,7 +422,6 @@ task runSnpEff {
   }
 
   command { 
-  set -e 
   wget -t 1 -T 20 https://raw.githubusercontent.com/AstraZeneca-NGS/reference_data/master/transcripts/canon_transcripts_hg19_refseq.txt
   unset https_proxy
   wget  -t 1 -T 20 https://raw.githubusercontent.com/AstraZeneca-NGS/reference_data/master/transcripts/canon_transcripts_hg19_refseq.txt
