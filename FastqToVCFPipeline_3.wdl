@@ -544,7 +544,7 @@ workflow FastqToVCF {
       bam = SortSam.output_bam,
       sample_basename=sample_basename,
 
-      enrichment_bed = select_first(PrepareMaskedGenomeFasta.targetRegions_bed, enrichment_bed)
+      enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, enrichment_bed]),
 
       ncpu = 8
     }
