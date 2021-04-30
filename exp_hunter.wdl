@@ -112,7 +112,7 @@ task AnnotateExpansionHunter {
     echo "[ RUNNING ] expansion hunter vcf annotation on sample ~{sample_id}"
     stranger \
       --repeats-file variant_catalog_hg19.json \
-      ~{expansion_hunter_vcf} > ~{sample_id}.annotated.vcf
+      ~{expansion_hunter_vcf} > ~{sample_id}.ExpansionHunter.annotated.vcf
 
   >>>
 
