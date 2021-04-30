@@ -551,7 +551,7 @@ workflow FastqToVCF {
   }
 
   # Merge per-interval GVCFs
-  if( defined(enrichment_bed) ){
+  if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
     call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
       input:
         input_bam = SortSam.output_bam,
@@ -562,7 +562,7 @@ workflow FastqToVCF {
         reference_fai=reference_fai,
         reference_dict=reference_dict,
 
-        enrichment_bed = enrichment_bed,
+        enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, enrichment_bed]),
 
         refSeqFile = refSeqFile,
 
