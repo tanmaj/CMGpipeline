@@ -95,7 +95,7 @@ task AnnotateExpansionHunter {
   }
   
   output {
-    File expansion_hunter_vcf_annotated = "~{sample_id}.annotated.vcf"
+    File expansion_hunter_vcf_annotated = "~{sample_id}.ExpansionHunter.annotated.vcf"
   }
   
   command <<<
