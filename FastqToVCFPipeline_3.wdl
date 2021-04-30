@@ -538,13 +538,13 @@ workflow FastqToVCF {
     }
   }
 
-  if( defined(enrichment_bed) ){
+  if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
     call Qualimap.bamqc as Qualimap {
     input:
       bam = SortSam.output_bam,
       sample_basename=sample_basename,
 
-      enrichment_bed = enrichment_bed,
+      enrichment_bed = select_first(PrepareMaskedGenomeFasta.targetRegions_bed, enrichment_bed)
 
       ncpu = 8
     }
