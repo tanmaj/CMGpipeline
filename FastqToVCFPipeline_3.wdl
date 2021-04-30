@@ -202,7 +202,7 @@ workflow FastqToVCF {
         docker = "pegi3s/bedtools"
     }
 
-    String enrichment_bed = PrepareMaskedGenomeFasta.targetRegions_bed
+    #String enrichment_bed = PrepareMaskedGenomeFasta.targetRegions_bed
 
     call PrepareMaskedBWAIndex {
       input:
