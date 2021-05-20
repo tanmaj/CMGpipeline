@@ -1041,8 +1041,12 @@ task GatherSortedBamFiles {
       GatherBamFiles \
       INPUT=~{sep=' INPUT=' input_bams} \
       OUTPUT=~{output_bam_basename}.bam \
-      CREATE_INDEX=true \
+      CREATE_INDEX=false \
       CREATE_MD5_FILE=true
+      
+    samtools index ~{output_bam_basename}.bam
+    
+    cp ~{output_bam_basename}.bam.bai ~{output_bam_basename}.bai
     }
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
