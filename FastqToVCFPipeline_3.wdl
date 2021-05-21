@@ -1538,14 +1538,14 @@ task SortSam {
   Int disk_size = ceil(sort_sam_disk_multiplier * size(input_bam, "GiB")) + 20
 
   command {
-    java -Dsamjdk.compression_level=~{compression_level} -Xms4000m -jar /usr/gitc/picard.jar \
+    java -Dsamjdk.compression_level=~{compression_level} -Xms8000m -jar /usr/gitc/picard.jar \
       SortSam \
       INPUT=~{input_bam} \
       OUTPUT=~{output_bam_basename}.bam \
       SORT_ORDER="coordinate" \
-      CREATE_INDEX=true \
+      CREATE_INDEX=false \
       CREATE_MD5_FILE=true \
-      MAX_RECORDS_IN_RAM=300000
+      MAX_RECORDS_IN_RAM=1000000
     
     samtools index ~{output_bam_basename}.bam
     
