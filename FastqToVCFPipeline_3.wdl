@@ -575,7 +575,7 @@ workflow FastqToVCF {
   # Calculate WGS coverage if neither enrichment_bed nor target regions parameter is defined
   if( !defined(enrichment_bed) && !defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
   
-    call Qualimap.bamqc as Qualimap {
+    call Qualimap.bamqc as QualimapWGS {
       input:
         bam = SortSam.output_bam,
         sample_basename=sample_basename,
@@ -583,7 +583,7 @@ workflow FastqToVCF {
         ncpu = 8
     }
   
-    call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
+    call Qualimap.DepthOfCoverage34 as DepthOfCoverageWGS {
       input:
         input_bam = SortSam.output_bam,
         input_bam_index = SortSam.output_bam_index,
@@ -677,8 +677,10 @@ workflow FastqToVCF {
     File? CNV_wig = Conifer.CNV_wig
 
     File? Qualimap_results = Qualimap.results
+    File? QualimapWGS_results = QualimapWGS.results
 
     File? DepthOfCoverage_output = DepthOfCoverage.DepthOfCoverage_output
+    File? DepthOfCoverageWGS_output = DepthOfCoverageWGS.DepthOfCoverage_output
 
     File output_BAF = calculateBAF.output_BAF
     File ROH_calls_qual = CallROH.ROH_calls_qual
