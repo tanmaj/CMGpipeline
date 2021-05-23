@@ -571,6 +571,35 @@ workflow FastqToVCF {
         gatk_path = "/usr/GenomeAnalysisTK.jar"
     }
   }
+  
+  # Calculate WGS coverage if neither enrichment_bed nor target regions parameter is defined
+  if( !defined(enrichment_bed) && !defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
+  
+    call Qualimap.bamqc as Qualimap {
+      input:
+        bam = SortSam.output_bam,
+        sample_basename=sample_basename,
+
+        ncpu = 8
+    }
+  
+    call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
+      input:
+        input_bam = SortSam.output_bam,
+        input_bam_index = SortSam.output_bam_index,
+        sample_basename = sample_basename,
+
+        reference_fa=reference_fa,
+        reference_fai=reference_fai,
+        reference_dict=reference_dict,
+
+        refSeqFile = refSeqFile,
+
+        threads = threads,
+        docker = "broadinstitute/gatk3:3.8-1",
+        gatk_path = "/usr/GenomeAnalysisTK.jar"
+    }
+  }
 
   call ROH.calculateBAF as calculateBAF {
   input:
