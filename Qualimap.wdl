@@ -9,9 +9,9 @@ task bamqc {
         File bam
         File? enrichment_bed
         String sample_basename
-        Int ncpu = 1
+        Int ncpu = 5
         Int max_retries = 1
-        Int memory_gb = 8
+        Int memory_gb = 25
         Int? disk_size_gb
     }
 
@@ -47,8 +47,8 @@ task bamqc {
         disk: disk_size + " GB"
         docker: 'stjudecloud/qualimap:1.0.0'
         maxRetries: max_retries
-        requested_memory_mb_per_core: 9000
-        cpu: 1
+        requested_memory_mb_per_core: 5000
+        cpu: 5
         runtime_minutes: 180
     }
 
