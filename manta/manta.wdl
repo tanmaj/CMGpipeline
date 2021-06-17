@@ -35,8 +35,8 @@ task Germline {
         File? callRegions
         File? callRegionsIndex
 
-        Int cores = 1
-        Int memoryGb = 4
+        Int cores = 10
+        Int memoryGb = 40
         Int timeMinutes = 60
         String dockerImage = "quay.io/biocontainers/manta:1.4.0--py27_1"
     }
