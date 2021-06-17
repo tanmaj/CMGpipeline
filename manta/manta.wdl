@@ -60,8 +60,8 @@ task Germline {
     }
 
     output {
-        File mantaVCF = runDir + "~{sample}.manta.vcf.gz"
-        File mantaVCFindex = runDir + "~{sample}.manta.vcf.gz.tbi"
+        File mantaVCF = "~{sample}.manta.vcf.gz"
+        File mantaVCFindex = "~{sample}.manta.vcf.gz.tbi"
     }
 
     runtime {
