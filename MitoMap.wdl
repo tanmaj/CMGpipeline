@@ -47,7 +47,7 @@ task MitoMap {
     }
 
     command <<<
-    set -e
+    
     #cp /usr/src/app/mitomap.py ./
     wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/mitomap/mitomap.py
     cp ~{mtDNA_fasta} ./
