@@ -178,3 +178,4 @@ task AnnotateMantaVCF {
   output {
     File output_sv_table = "~{sample_basename}.mantaSVs.txt"
   }
+}
