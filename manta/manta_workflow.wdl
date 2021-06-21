@@ -96,6 +96,7 @@ workflow SVcalling {
     output {
         File mantaVcf = manta.mantaVCF
         File mantaVcfindex = manta.mantaVCFindex
+        File output_sv_table = AnnotateMantaVCF.output_sv_table
     }
 
     parameter_meta {
@@ -139,7 +140,7 @@ task MergeMantaFiles {
   ls -d ./*manta.filtered.vcf > fileList
 
   SURVIVOR merge fileList 500 1 1 0 0 20 ./merged.vcf
- >>>
+  >>>
 
   runtime {
     docker: "quay.io/biocontainers/survivor:1.0.6--h6bb024c_0"
@@ -175,7 +176,7 @@ task AnnotateMantaVCF {
     runtime_minutes: 120
   }
   output {
-    File output_vcf = "~{sample_basename}.merged.annotated.vcf "
+    File output_sv_table = "~{sample_basename}.mantaSVs.txt"
   }
 
 # Annotate SVs
