@@ -89,7 +89,7 @@ workflow SVcalling {
 
     call AnnotateMantaVCF {
         input:
-            input_manta_vcf = MergeMantaFiles.merged_vcf,
+            input_vcf = MergeMantaFiles.merged_vcf,
             sample_basename = sample
     }
 
