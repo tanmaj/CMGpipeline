@@ -131,6 +131,7 @@ task MergeMantaFiles {
   MANTA_VCFS_DIR=$(dirname ~{input_manta_reference_vcfs[0]})
   cp ~{input_manta_vcf} $MANTA_VCFS_DIR
   cp $MANTA_VCFS_DIR/*.vcf ./
+  cp $MANTA_VCFS_DIR/*.vcf.gz ./
 
   gunzip ./*manta.vcf.gz
   for file in *manta.vcf; do
