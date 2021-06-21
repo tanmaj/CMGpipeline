@@ -64,7 +64,12 @@ if( !is.null(opt$CLINVAR_FILTERED) & file.exists(opt$CLINVAR_FILTERED) ) reportL
 if( !is.null(opt$CLINVAR_ALL) & file.exists(opt$CLINVAR_ALL) ) reportList$CLINVAR_ALL <- read.table(opt$CLINVAR_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
 if( !is.null(opt$PANEL_FILTERED) ) if ( file.exists(opt$PANEL_FILTERED) ) reportList$PANEL_FILTERED <- read.table(opt$PANEL_FILTERED, sep="\t", header=T, quote="", dec = ".", fill=NA)
 if( !is.null(opt$PANEL_ALL) ) if ( file.exists(opt$PANEL_ALL) ) reportList$PANEL_ALL <- read.table(opt$PANEL_ALL, sep="\t", header=T, quote="", dec = ".", fill=NA)
-if( !is.null(opt$MITOMAP) ) if ( file.exists(opt$MITOMAP) ) reportList$MITOMAP <- read.table(opt$MITOMAP, sep="\t", header=T, quote="", dec = ".", fill=NA)
+if( !is.null(opt$MITOMAP) ) {
+  if ( file.exists(opt$MITOMAP) ) {
+    tryCatch({reportList$MITOMAP <- read.table(opt$MITOMAP, sep="\t", header=T, quote="", dec = ".", fill=NA)},
+             error=function(e){print("Problem reading MITOMAP file - most likely the file is empty!")})
+  }
+}
 
 # Convert logical columns to single letters - this is to disable T letters being read as logicals
 convertLogicalsBackToCharacters <- function(df){
