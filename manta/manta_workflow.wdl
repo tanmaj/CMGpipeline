@@ -83,7 +83,7 @@ workflow SVcalling {
     call MergeMantaFiles {
         input:
             input_manta_vcf = manta.mantaVCF,
-            Array[File] input_manta_reference_vcfs = input_manta_reference_vcfs,
+            input_manta_reference_vcfs = input_manta_reference_vcfs,
             sample_basename = sample
     }
 
