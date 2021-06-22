@@ -22,14 +22,14 @@ workflow MitoMapWorkflow {
 
   call MitoMap.CreateMitoFasta as CreateMitoFasta {
     input:
-    input_vcf = SelectFinalVariants.output_vcf,
-    sample_basename = sample_basename,
+      input_vcf = SelectFinalVariants.output_vcf,
+      sample_basename = sample_basename,
 
-    reference_fa = reference_fa,
-    reference_fai = reference_fai,
-    reference_dict = reference_dict,
+      reference_fa = reference_fa,
+      reference_fai = reference_fai,
+      reference_dict = reference_dict,
 
-    docker = "broadinstitute/gatk3:3.8-1"
+      docker = "broadinstitute/gatk3:3.8-1"
   }
 
   call MitoMap.MitoMap as MitoMap {
