@@ -10,7 +10,7 @@ version 1.0
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
 
 # WORKFLOW DEFINITION 
-workflow FastqToVCF {
+workflow MitoMapWorkflow {
   input {
     File input_vcf
     String sample_basename
