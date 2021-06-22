@@ -22,7 +22,7 @@ workflow MitoMapWorkflow {
 
   call MitoMap.CreateMitoFasta as CreateMitoFasta {
     input:
-      input_vcf = SelectFinalVariants.output_vcf,
+      input_vcf = input_vcf,
       sample_basename = sample_basename,
 
       reference_fa = reference_fa,
