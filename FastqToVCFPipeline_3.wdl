@@ -113,7 +113,9 @@ workflow FastqToVCF {
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
-    String gatk_docker = "broadinstitute/gatk:latest"
+    # Uncommenting because the latest gatk docker might be causing problem with the HC genotyping step, forcing 4.2.0.0 temporarily
+    # String gatk_docker = "broadinstitute/gatk:latest"
+    String gatk_docker = "broadinstitute/gatk:4.2.0.0"
     String gatk_path = "/gatk/gatk"
     String gitc_docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817"
     String samtools_path = "samtools" # Path to samtools command within GITC docker
