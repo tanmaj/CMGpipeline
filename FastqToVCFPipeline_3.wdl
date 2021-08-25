@@ -546,8 +546,8 @@ workflow FastqToVCF {
   if( defined(input_manta_reference_vcfs) ){
     call Manta.SVcalling as Manta{
     input:
-      input_bam = SortSam.output_bam,
-      input_bam_index = SortSam.output_bam_index,
+      bamFile = SortSam.output_bam,
+      bamIndex = SortSam.output_bam_index,
 
       referenceFasta=reference_fa,
       referenceFastaFai=reference_fai,
