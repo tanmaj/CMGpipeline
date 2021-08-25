@@ -48,7 +48,7 @@ workflow SVcalling {
         Boolean excludeFpDupDel = false
         String outputDir = "."
 
-        Array[File] input_manta_reference_vcfs
+        Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
 
         Map[String, String] dockerImages = {
             "bcftools": "quay.io/biocontainers/bcftools:1.10.2--h4f4756c_2",
