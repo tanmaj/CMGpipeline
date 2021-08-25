@@ -42,7 +42,6 @@ workflow SVcalling {
         File referenceFasta
         File referenceFastaFai
         File referenceFastaDict
-        BwaIndex bwaIndex
         String sample
         String newId = "\'%CHROM\\_%POS\'"
         Boolean excludeMisHomRef = false
@@ -106,7 +105,6 @@ workflow SVcalling {
         referenceFastaDict: { description: "Sequence dictionary (.dict) file of the reference", category: "required" }
         bamFile: {description: "sorted BAM file", category: "required"}
         bamIndex: {description: "BAM index(.bai) file", category: "required"}
-        bwaIndex: {description: "Struct containing the BWA reference files", category: "required"}
         sample: {description: "The name of the sample", category: "required"}
         newId: {description: "Assign ID on the fly (e.g. --set-id +'%CHROM\_%POS').", category: "advanced"}
         excludeMisHomRef: {description: "Option to exclude missing and homozygous reference genotypes.", category: "advanced"}
