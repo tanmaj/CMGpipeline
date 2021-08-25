@@ -14,6 +14,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" 
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -539,6 +540,22 @@ workflow FastqToVCF {
 
       enrichment = enrichment,
       enrichment_bed = enrichment_bed
+    }
+  }
+
+  if( defined(input_manta_reference_vcfs) ){
+    call Manta.SVcalling as Manta{
+    input:
+      input_bam = SortSam.output_bam,
+      input_bam_index = SortSam.output_bam_index,
+
+      referenceFasta=reference_fa,
+      referenceFastaFai=reference_fai,
+      referenceFastaDict=reference_dict,  
+
+      sample = sample_basename, 
+
+      input_manta_reference_vcfs = input_manta_reference_vcfs
     }
   }
 
