@@ -102,6 +102,8 @@ workflow FastqToVCF {
     Int? CONIFER_svd
     Float? CONIFER_threshold
 
+    Array[File]? input_manta_reference_vcfs
+
     Boolean GenerateCRAM = false
 
     Boolean GVCFmode = false
