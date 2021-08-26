@@ -5,6 +5,8 @@ version 1.0
 # This workflow accepts three types of inputs: Illumina FASTQ files, a BAM file, or CRAM files
 # Currently, the input CRAM files should be aligned to the hg19 reference genome assembly, we will implement support for other genome formats in the future
 # The CRAM output is optional and disabled by default at the moment, until production switches to CRAM
+# Manta is for genome analysis
+
 
 # Subworkflows
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
