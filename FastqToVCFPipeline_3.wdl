@@ -699,6 +699,10 @@ workflow FastqToVCF {
     #File CNV_bed = Conifer.CNV_bed
     File? CNV_wig = Conifer.CNV_wig
 
+    File? mantaVCF = Manta.mantaVcf
+    File? mantaVCFindex = Manta.mantaVcfindex
+    File? mantaSVs = Manta.output_sv_table
+
     File? Qualimap_results = Qualimap.results
     File? QualimapWGS_results = QualimapWGS.results
 
