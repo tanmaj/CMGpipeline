@@ -79,13 +79,14 @@ workflow CreateInterpretationTable {
       input:
         XLSX_INPUT=GenerateXLSX.XLSX_OUTPUT,
         sample_basename = sample_basename,
-        
+
         docker = R_docker
     }
  
   # Outputs that will be retained when execution is complete
   output {
     File XLSX_OUTPUT = GenerateXLSX.XLSX_OUTPUT
+    File SimulConsult_input = GenerateSimulConsultInputs.SimulConsult_input
   }
 }
 
@@ -297,6 +298,6 @@ task GenerateSimulConsultInputs {
     runtime_minutes: 30
   }
   output {
-    File SIMULCONSULT_OUTPUT = "~{sample_basename}.SimulConsult.input.txt"
+    File SimulConsult_input = "~{sample_basename}.SimulConsult.input.txt"
   }
 }
