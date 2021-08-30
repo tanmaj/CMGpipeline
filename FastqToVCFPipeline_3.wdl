@@ -5,6 +5,8 @@ version 1.0
 # This workflow accepts three types of inputs: Illumina FASTQ files, a BAM file, or CRAM files
 # Currently, the input CRAM files should be aligned to the hg19 reference genome assembly, we will implement support for other genome formats in the future
 # The CRAM output is optional and disabled by default at the moment, until production switches to CRAM
+# Manta is for genome analysis
+
 
 # Subworkflows
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
@@ -14,6 +16,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" 
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -102,6 +105,8 @@ workflow FastqToVCF {
     Int? CONIFER_svd
     Float? CONIFER_threshold
 
+    Array[File]? input_manta_reference_vcfs
+
     Boolean GenerateCRAM = false
 
     Boolean GVCFmode = false
@@ -113,7 +118,9 @@ workflow FastqToVCF {
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
-    String gatk_docker = "broadinstitute/gatk:latest"
+    # Uncommenting because the latest gatk docker might be causing problem with the HC genotyping step, forcing 4.2.0.0 temporarily
+    # String gatk_docker = "broadinstitute/gatk:latest"
+    String gatk_docker = "broadinstitute/gatk:4.2.0.0"
     String gatk_path = "/gatk/gatk"
     String gitc_docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817"
     String samtools_path = "samtools" # Path to samtools command within GITC docker
@@ -538,6 +545,22 @@ workflow FastqToVCF {
     }
   }
 
+  if( defined(input_manta_reference_vcfs) ){
+    call Manta.SVcalling as Manta{
+    input:
+      bamFile = SortSam.output_bam,
+      bamIndex = SortSam.output_bam_index,
+
+      referenceFasta=reference_fa,
+      referenceFastaFai=reference_fai,
+      referenceFastaDict=reference_dict,  
+
+      sample = sample_basename, 
+
+      input_manta_reference_vcfs = input_manta_reference_vcfs
+    }
+  }
+
   if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
     call Qualimap.bamqc as Qualimap {
     input:
@@ -675,6 +698,10 @@ workflow FastqToVCF {
     File? output_conifer_calls_wig = Conifer.output_conifer_calls_wig
     #File CNV_bed = Conifer.CNV_bed
     File? CNV_wig = Conifer.CNV_wig
+
+    File? mantaVCF = Manta.mantaVcf
+    File? mantaVCFindex = Manta.mantaVcfindex
+    File? mantaSVs = Manta.output_sv_table
 
     File? Qualimap_results = Qualimap.results
     File? QualimapWGS_results = QualimapWGS.results

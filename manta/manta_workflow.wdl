@@ -42,14 +42,13 @@ workflow SVcalling {
         File referenceFasta
         File referenceFastaFai
         File referenceFastaDict
-        BwaIndex bwaIndex
         String sample
         String newId = "\'%CHROM\\_%POS\'"
         Boolean excludeMisHomRef = false
         Boolean excludeFpDupDel = false
         String outputDir = "."
 
-        Array[File] input_manta_reference_vcfs
+        Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
 
         Map[String, String] dockerImages = {
             "bcftools": "quay.io/biocontainers/bcftools:1.10.2--h4f4756c_2",
@@ -106,7 +105,6 @@ workflow SVcalling {
         referenceFastaDict: { description: "Sequence dictionary (.dict) file of the reference", category: "required" }
         bamFile: {description: "sorted BAM file", category: "required"}
         bamIndex: {description: "BAM index(.bai) file", category: "required"}
-        bwaIndex: {description: "Struct containing the BWA reference files", category: "required"}
         sample: {description: "The name of the sample", category: "required"}
         newId: {description: "Assign ID on the fly (e.g. --set-id +'%CHROM\_%POS').", category: "advanced"}
         excludeMisHomRef: {description: "Option to exclude missing and homozygous reference genotypes.", category: "advanced"}
