@@ -73,13 +73,21 @@ workflow CreateInterpretationTable {
       makeXSLSXoutputs_Rscript = GetGenerateXLSXscript.makeXSLSXoutputs_Rscript,
 
       docker = R_docker
-  }
+    }
+
+    call GenerateSimulConsultInputs {
+      input:
+        XLSX_INPUT=GenerateXLSX.XLSX_OUTPUT,
+        docker = R_docker
+    }
  
   # Outputs that will be retained when execution is complete
   output {
     File XLSX_OUTPUT = GenerateXLSX.XLSX_OUTPUT
   }
 }
+
+
 
 ##################
 # TASK DEFINITIONS
@@ -260,3 +268,32 @@ task GenerateXLSX {
   }
 }
 
+# Output SimulConsult compatible outputs
+task GenerateSimulConsultInputs {
+  input {
+    # Command parameters
+    File XLSX_INPUT
+    String SimulConsult_Rscript = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/R_scripts/SCRIPTS_convertRareFunctional_to_SimulConsult.R"
+
+    # Runtime parameters
+    String docker
+  }
+
+  command {
+  wget -t 1 -T 20 ~{SimulConsult_Rscript}
+  # Repeat in case the proxy defined in the docker image would case problems accessing the GitHub repo
+  unset https_proxy
+  wget -t 1 -T 20 ~{SimulConsult_Rscript}
+
+  Rscript SCRIPTS_convertRareFunctional_to_SimulConsult.R --INPUT_XLSX=~{XLSX_INPUT}      
+  }
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 3000
+    cpu: 1
+    runtime_minutes: 30
+  }
+  output {
+    File SIMULCONSULT_OUTPUT = "~{sample_basename}.SimulConsult.input.txt"
+  }
+}
