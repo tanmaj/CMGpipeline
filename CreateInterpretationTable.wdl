@@ -78,6 +78,8 @@ workflow CreateInterpretationTable {
     call GenerateSimulConsultInputs {
       input:
         XLSX_INPUT=GenerateXLSX.XLSX_OUTPUT,
+        sample_basename = sample_basename,
+        
         docker = R_docker
     }
  
@@ -274,6 +276,7 @@ task GenerateSimulConsultInputs {
     # Command parameters
     File XLSX_INPUT
     String SimulConsult_Rscript = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/R_scripts/SCRIPTS_convertRareFunctional_to_SimulConsult.R"
+    String sample_basename
 
     # Runtime parameters
     String docker
