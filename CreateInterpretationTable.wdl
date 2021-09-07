@@ -289,7 +289,7 @@ task GenerateSimulConsultInputs {
   unset https_proxy
   wget -t 1 -T 20 ~{SimulConsult_Rscript}
 
-  Rscript SCRIPTS_convertRareFunctional_to_SimulConsult.R --XLSX_INPUT=~{XLSX_INPUT}      
+  Rscript SCRIPTS_convertRareFunctional_to_SimulConsult.R --XLSX_INPUT=~{XLSX_INPUT} --sample_name=~{sample_basename}      
   }
   runtime {
     docker: docker

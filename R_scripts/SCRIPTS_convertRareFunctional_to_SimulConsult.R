@@ -7,7 +7,8 @@ options(stringsAsFactors = F)
 
 # Parse input options
 option_list = list(
-  make_option(c("--XLSX_INPUT"), type="character", default=NULL, help="Annotated XLSX, containing the RARE_FUNCTIONAL sheet", metavar="character")
+  make_option(c("--XLSX_INPUT"), type="character", default=NULL, help="Annotated XLSX, containing the RARE_FUNCTIONAL sheet", metavar="character"),
+  make_option(c("--sample_name"), type="character", default=NULL, help="Sample name", metavar="character")
 );
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
@@ -20,7 +21,8 @@ opt = parse_args(opt_parser);
 if(is.null(opt$XLSX_INPUT)) {print("No input XLSX file defined! Exiting..."); quit(save = "no", status = 1, runLast = FALSE)}
 
 # Get EXOME id from the file name
-EXOME = gsub(".*\\/([A-Za-z0-9]*)\\..*", "\\1", opt$XLSX_INPUT)
+# Currently disabling this option in favor of a variable passed to the R script
+# EXOME = gsub(".*\\/([A-Za-z0-9]*)\\..*", "\\1", opt$XLSX_INPUT)
 
 # Headers required by the SimulConsult software
 headers<-"hgncSymbol	geneNameLong	chrPos	cSeqAnnotation	cPosition	cRef	cAlt	pSeqAnnotation	pPosition	pRef	pAlt	rsid	zygProband	zygMother	zygFather	effect	freq1	freq2	homoShares	heteroShares	omimNumber	omimDiseaseNames	variantAccession	variantPathogenicity	polyPhen	mutationTaster	sift	gerp	grantham	phat	phast	phyloP	strandBias	knownSplice	totDepthProband	varDepthProband	qualProband	totDepthMother	varDepthMother	qualMother	totDepthFather	varDepthFather	qualFather"
@@ -43,4 +45,4 @@ df$effect <- RARE_FUNCTIONAL$ANN....EFFECT_SELECTED
 df$freq1 <- format(RARE_FUNCTIONAL$gnomAD.AF, scientific = F)
 
 # Write out the text file containing the SimulConsult inputs
-write.table(df, file=paste0(EXOME, ".SimulConsult.input.txt"), sep="\t", quote = F, row.names = F)
+write.table(df, file=paste0(opt$sample_name, ".SimulConsult.input.txt"), sep="\t", quote = F, row.names = F)
