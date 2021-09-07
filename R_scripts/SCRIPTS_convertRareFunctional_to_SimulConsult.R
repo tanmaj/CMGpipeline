@@ -30,6 +30,7 @@ headers<-strsplit(headers, split = "\t")[[1]]
 
 # Read the rare functional variants from the annotated XLSX file
 RARE_FUNCTIONAL <- openxlsx::read.xlsx(opt$XLSX_INPUT, sheet = "RARE_FUNCTIONAL")
+RARE_FUNCTIONAL <- RARE_FUNCTIONAL[grep("BAD_HET_RATIO|BAD_VARIANT_QUALITY|BAD_COVERAGE", RARE_FUNCTIONAL$QUALITY, invert = T),]
 
 # Create a data.frame, with columns in compatibility with SimulConsult
 df <- data.frame(matrix(nrow = nrow(RARE_FUNCTIONAL), ncol=length(headers)))
