@@ -745,7 +745,7 @@ workflow FastqToVCF {
 # TASK DEFINITIONS
 ##################
 
-tasks MergeFastqFiles {
+task MergeFastqFiles {
   input {
     Array[File]? input_fq
     String sample_basename
