@@ -21,8 +21,8 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/man
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
   input {
-    File? input_fq1
-    File? input_fq2
+    Array[File]? input_fq1
+    Array[File]? input_fq2
 
     File? input_bam
 
@@ -141,9 +141,26 @@ workflow FastqToVCF {
 
   # Run adaptor trimming and create uBAM, but only when input FASTQ is provided
   if ( defined(input_fq1) ) {
-    call CutAdapters as CutAdapters_fq1 {
+
+    call MergeFastqFiles as MergeFastqFiles_fq1 {
       input:
         input_fq=input_fq1,
+        sample_basename=sample_basename,
+        read = "R1",
+        docker = gatk_docker
+    }
+
+    call MergeFastqFiles as MergeFastqFiles_fq2 {
+      input:
+        input_fq=input_fq2,
+        sample_basename=sample_basename,
+        read = "R2",
+        docker = gatk_docker
+    }
+
+    call CutAdapters as CutAdapters_fq1 {
+      input:
+        input_fq=MergeFastqFiles_fq1.output_fq_merged,
         sample_basename=sample_basename,
         illuminaAdapters=illuminaAdapters,
 
@@ -151,30 +168,30 @@ workflow FastqToVCF {
         docker = cutadapt_docker
     }
 
-  call CutAdapters as CutAdapters_fq2 {
-    input:
-      input_fq=input_fq2,
-      sample_basename=sample_basename,
-      illuminaAdapters=illuminaAdapters,
-
-      # Runtime 
-      docker = cutadapt_docker
-  }
-
-  call PairedFastQsToUnmappedBAM {
+    call CutAdapters as CutAdapters_fq2 {
       input:
-        sample_name = sample_basename,
-        fastq_1 = CutAdapters_fq1.output_fq_trimmed,
-        fastq_2 = CutAdapters_fq2.output_fq_trimmed,
-        readgroup_name = sample_basename,
-        library_name = sample_basename,
-        platform_unit = "NextSeq550",
-        run_date = "2020-01-01",
-        platform_name = "illumina",
-        sequencing_center = "KIGM",
-        gatk_path = gatk_path,
-        docker = gatk_docker
+        input_fq=MergeFastqFiles_fq2.output_fq_merged,
+        sample_basename=sample_basename,
+        illuminaAdapters=illuminaAdapters,
+
+        # Runtime 
+        docker = cutadapt_docker
     }
+
+    call PairedFastQsToUnmappedBAM {
+        input:
+          sample_name = sample_basename,
+          fastq_1 = CutAdapters_fq1.output_fq_trimmed,
+          fastq_2 = CutAdapters_fq2.output_fq_trimmed,
+          readgroup_name = sample_basename,
+          library_name = sample_basename,
+          platform_unit = "NextSeq550",
+          run_date = "2020-01-01",
+          platform_name = "illumina",
+          sequencing_center = "KIGM",
+          gatk_path = gatk_path,
+          docker = gatk_docker
+      }
   }
 
   if ( defined(input_cram) ) {
@@ -727,6 +744,31 @@ workflow FastqToVCF {
 ##################
 # TASK DEFINITIONS
 ##################
+
+tasks MergeFastqFiles {
+  input {
+    Array[File]? input_fq
+    String sample_basename
+    String read
+
+    # Runtime parameters
+    String docker
+  }
+
+  command {
+  set -e
+     cat ${sep = ' ' input_fq} > ~{sample_basename}_~{read}.fq.gz
+  }
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 1000
+    cpu: 4
+    runtime_minutes: 800
+  }
+  output {
+    File output_fq_merged = "~{sample_basename}_~{read}.fq.gz"
+  }
+}
 
 task CutAdapters {
   input {
