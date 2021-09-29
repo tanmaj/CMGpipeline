@@ -25,8 +25,10 @@ workflow FastqToVCF {
     Array[File]? input_fq2
 
     File? input_bam
+    File? input_bam_index
 
     File? input_cram
+    File? input_cram_index
 
     String sample_basename
     
