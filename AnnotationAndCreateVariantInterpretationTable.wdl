@@ -8,6 +8,8 @@ workflow AnnotateAndTable {
   input {
     File input_variant_string
 
+    String sample_basename
+
     File chromosome_list
     
     File gnomAD_vcf
@@ -38,9 +40,9 @@ workflow AnnotateAndTable {
     File CGD_index
     File bcftools_annotation_header
 
-    File fasta_reference
-    File fasta_reference_index
-    File fasta_reference_dict
+    File reference_fa
+    File reference_fai
+    File reference_dict
 
     File dbNSFP
     File dbNSFP_index
@@ -52,6 +54,7 @@ workflow AnnotateAndTable {
     String gatk_docker = "broadinstitute/gatk:latest"
     String gatk_path = "/gatk/gatk"
     String vcfanno_docker = "clinicalgenomics/vcfanno:0.3.2"
+    String R_docker = "alesmaver/r-base"
   }
 
   call CreateVCFfromString {
