@@ -121,7 +121,7 @@ workflow AnnotateAndTable {
   }
 }
 
-# Output SimulConsult compatible outputs
+# Output VCF from string
 task CreateVCFfromString {
   input {
     # Command parameters
@@ -134,10 +134,10 @@ task CreateVCFfromString {
   }
 
   command {
-  wget -t 1 -T 20 ~{SimulConsult_Rscript}
+  wget -t 1 -T 20 ~{CreateVCFfromString_Rscript}
   # Repeat in case the proxy defined in the docker image would case problems accessing the GitHub repo
   unset https_proxy
-  wget -t 1 -T 20 ~{SimulConsult_Rscript}
+  wget -t 1 -T 20 ~{CreateVCFfromString_Rscript}
 
   Rscript SCRIPTS_createVCFfromVariantString.R --variant=~{input_variant_string} --sample=~{sample_basename}      
   }
