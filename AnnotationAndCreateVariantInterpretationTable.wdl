@@ -112,16 +112,47 @@ workflow AnnotateAndTable {
       vcfanno_docker = vcfanno_docker
   }
 
+  # Get snpEff and dbNSFP annotations
+  call GetGeneListFromVCF {
+    input:
+      input_vcf = AnnotateVCF.output_vcf,
+      docker = SnpEff_docker
+    }
+
   call CreateInterpretationTable.CreateInterpretationTable as CreateInterpretationTable {
     input:
       input_vcf = AnnotateVCF.output_vcf,
-      input_vcf_index = AnnotateVCF.output_vcf_index
+      input_vcf_index = AnnotateVCF.output_vcf_index,
+      panel_gene_list = GetGeneListFromVCF.panel_gene_list
   }
 
   # Outputs that will be retained when execution is complete
   output {
     File XLSX_OUTPUT = CreateInterpretationTable.XLSX_OUTPUT
   }
+}
+
+task GetGeneListFromVCF {
+	input { 
+		File input_vcf
+
+		String docker
+	}
+
+	command {
+		SNPSIFT_EXTRACTFIELDS='java -jar /home/biodocker/bin/snpEff/SnpSift.jar extractFields -s "," - "ANN[*].GENE" | uniq '
+		zcat ~{input_vcf} | eval $SNPSIFT_EXTRACTFIELDS | tail -n +2 | paste -sd "," - 
+	}
+
+	runtime {
+	    docker: docker
+	    requested_memory_mb_per_core: 3000
+	    cpu: 1
+	    runtime_minutes: 180
+	}
+	output {
+		String panel_gene_list = read_string(stdout())
+	}
 }
 
 # Output VCF from string
