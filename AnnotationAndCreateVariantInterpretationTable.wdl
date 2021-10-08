@@ -142,7 +142,7 @@ task CreateVCFfromString {
   unset https_proxy
   wget -t 1 -T 20 ~{CreateVCFfromString_Rscript}
 
-  Rscript SCRIPTS_createVCFfromVariantString.R --variant=~{input_variant_string} --sample=~{sample_basename}      
+  Rscript SCRIPTS_createVCFfromVariantString.R --variant="~{input_variant_string}" --sample="~{sample_basename}"    
   }
   runtime {
     docker: docker
