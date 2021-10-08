@@ -59,7 +59,7 @@ workflow AnnotateAndTable {
 
   call CreateVCFfromString {
       input:
-        XLSX_INPUT=input_variant_string,
+        input_variant_string = input_variant_string,
         sample_basename = sample_basename,
 
         docker = R_docker
