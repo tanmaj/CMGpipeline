@@ -5,6 +5,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Annotatio
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
 
 workflow AnnotateAndTable {
+  input {
     File input_variant_string
 
     File chromosome_list
@@ -61,7 +62,7 @@ workflow AnnotateAndTable {
         docker = R_docker
     }
 
-  call Annotation.AnnotateVCF as AnnotateVCF{
+  call Annotation.AnnotateVCF as AnnotateVCF {
     input:
       input_vcf = CreateVCFfromString.output_vcf,
       chromosome_list = chromosome_list,
