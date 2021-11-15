@@ -123,7 +123,8 @@ task CONIFER_Analyze {
   cp ~{input_rpkm} $RPKM_DIR
 
   # Removed this parameter from the analyze command as it was causing issues with python module loads --plot_scree ~{sample_basename}.screeplot.png
-  python /home/bio/conifer_v0.2.2/conifer.py analyze --probes ~{enrichment_bed} --rpkm_dir $RPKM_DIR --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals ~{sample_basename}.singular_values.txt --write_sd ~{sample_basename}.sd_values.txt
+  # Need to prefix the python command with HOME= to make home writable in a rootless container
+  HOME=$(dirname ~{input_rpkm}) python /home/bio/conifer_v0.2.2/conifer.py analyze --probes ~{enrichment_bed} --rpkm_dir $RPKM_DIR --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals ~{sample_basename}.singular_values.txt --plot_scree ~{sample_basename}.screeplot.png --write_sd ~{sample_basename}.sd_values.txt
   >>>
 
   runtime {
@@ -196,7 +197,8 @@ task CONIFER_Plotcalls {
   set -e
   export LC_ALL="C.UTF-8"
   export LC_CTYPE="C.UTF-8"
-  python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
+  # Need to prefix the python command to make home writable in a rootless container
+  HOME=$(dirname ~{input_hdf5}) python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
   }
 
   runtime {
