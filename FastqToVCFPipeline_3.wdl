@@ -107,7 +107,8 @@ workflow FastqToVCF {
 
     Array[File]? input_manta_reference_vcfs
 
-    Boolean GenerateCRAM = false
+    ## Boolean GenerateCRAM = false
+    Boolean? GenerateCRAM
 
     Boolean GVCFmode = false
 
@@ -338,7 +339,8 @@ workflow FastqToVCF {
       preemptible_tries = 3
   }
 
-  if ( GenerateCRAM ) {
+  ## if ( GenerateCRAM ) {
+  if ( select_first(GenerateCRAM, "false")) {
   call ConvertToCram {
       input:
         input_bam = SortSam.output_bam,
