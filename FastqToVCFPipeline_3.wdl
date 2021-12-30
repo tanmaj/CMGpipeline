@@ -340,7 +340,7 @@ workflow FastqToVCF {
   }
 
   ## if ( GenerateCRAM ) {
-  if ( select_first(GenerateCRAM, false)) {
+  if ( select_first([GenerateCRAM, false])) {
   call ConvertToCram {
       input:
         input_bam = SortSam.output_bam,
