@@ -350,7 +350,7 @@ workflow FastqToVCF {
           sample_basename = sample_basename
       }
 
-      call od.optitypeDna as optitype {
+      call optitype.optitypeDna as optitype {
         input:
           reference=reference_fa,
           reference_fai=reference_fai,
