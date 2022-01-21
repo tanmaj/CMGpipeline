@@ -354,8 +354,8 @@ workflow FastqToVCF {
         input:
           reference=reference_fa,
           reference_fai=reference_fai,
-          cram=GenerateCRAM.output_cram,
-          cram_crai=GenerateCRAM.output_cram_index,
+          cram=ConvertToCram.output_cram,
+          cram_crai=ConvertToCram.output_cram_index,
           optitype_name=sample_basename
       }
   }
