@@ -7,7 +7,6 @@ version 1.0
 # The CRAM output is optional and disabled by default at the moment, until production switches to CRAM
 # Manta is for genome analysis
 
-
 # Subworkflows
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
@@ -17,6 +16,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInt
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -358,14 +358,23 @@ workflow FastqToVCF {
       preemptible_tries = 3
   }
 
-  if ( GenerateCRAM ) {
-  call ConvertToCram {
+  ## if ( GenerateCRAM ) {
+  if ( select_first([GenerateCRAM, false])) {
+    call ConvertToCram {
       input:
         input_bam = SortSam.output_bam,
         ref_fasta = reference_fa,
         ref_fasta_index = reference_fai,
         sample_basename = sample_basename
     }
+    call Optitype.optitypeDna as Optitype {
+      input:
+        reference=reference_fa,
+        reference_fai=reference_fai,
+        cram=ConvertToCram.output_cram,
+        cram_crai=ConvertToCram.output_cram_index,
+        optitype_name=sample_basename
+    }    
   }
 
   scatter (chromosome in chromosomes) {
@@ -738,6 +747,9 @@ workflow FastqToVCF {
 
     File? mitoResults_xls = MitoMap.mitoResults_xls
     File? mitoResults_txt = MitoMap.mitoResults_txt
+    
+    File? optitype_tsv = Optitype.optitype_tsv
+    File? optitype_plot = Optitype.optitype_plot
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
   }
