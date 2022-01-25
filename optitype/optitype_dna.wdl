@@ -23,8 +23,8 @@ task optitypeDna {
   >>>
 
   output {
-    File optitype_tsv = optitype_name + "_optitype_result.tsv"
-    File optitype_plot = optitype_name + "_optitype_coverage_plot.pdf"
+    File optitype_tsv = optitype_name + ".optitype_result.tsv"
+    File optitype_plot = optitype_name + ".optitype_coverage_plot.pdf"
   }
 }
 
