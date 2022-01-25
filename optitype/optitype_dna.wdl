@@ -20,6 +20,8 @@ task optitypeDna {
   command <<<
     /bin/bash /usr/bin/optitype_script.sh /tmp . \
     ~{optitype_name} ~{cram} ~{reference}
+    mv ~{optitype_name}_result.tsv ~{optitype_name}.optitype_result.tsv
+    mv ~{optitype_name}_coverage_plot.pdf ~{optitype_name}.optitype_coverage_plot.pdf
   >>>
 
   output {
