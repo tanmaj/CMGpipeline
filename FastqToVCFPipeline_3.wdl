@@ -109,7 +109,8 @@ workflow FastqToVCF {
 
     Array[File]? input_manta_reference_vcfs
 
-    Boolean GenerateCRAM = false
+    ## Boolean GenerateCRAM = false
+    Boolean? GenerateCRAM
 
     Boolean GVCFmode = false
 
