@@ -1752,7 +1752,7 @@ task ConvertToCram {
     maxRetries: 3
     requested_memory_mb_per_core: 5000
     cpu: 1
-    runtime_minutes: 180
+    runtime_minutes: 360
   }
   output {
     File output_cram = "~{sample_basename}.cram"
