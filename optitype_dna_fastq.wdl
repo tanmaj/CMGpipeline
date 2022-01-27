@@ -41,9 +41,10 @@ task OptitypeDnafromFastq {
     echo step 5: run Optitype
     # run optitype 
     /usr/bin/python /usr/local/bin/OptiType/OptiTypePipeline.py -i $name.hla.fwd.fastq $name.hla.rev.fastq --dna -v -p $name -o .
-    echo pwd
-    echo ls -ls *.tsv
-    echo ls -ls *.pdf
+    echo ----------
+    pwd
+    ls -ls *$name*
+
     mv $name_result.tsv $name.optitype_result.tsv
     mv $name_coverage_plot.pdf $name.optitype_coverage_plot.pdf
   >>>
