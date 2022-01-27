@@ -63,7 +63,3 @@ workflow OptitypeDnafromFastq {
     input_fq2 = input_fq2,
   }
 }
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Sec
