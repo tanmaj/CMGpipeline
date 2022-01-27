@@ -20,7 +20,7 @@ task OptitypeDnafromFastq {
     dnaref="/ref_data/optitype_ref/hla_reference_dna.fasta"    # Optitype DNA reference file
     name=~{optitype_name}
     echo $name
-    echo pwd
+
     echo Aligning forward reads to reference HLA locus sequence
     /usr/local/bin/bwa mem -t 4 $dnaref ~{input_fq1} > $name.aln.fwd.sam      # use bwa mem, store output IN TEMP, and skip samse step
     echo Aligning reverse reads to reference HLA locus sequence
@@ -29,24 +29,21 @@ task OptitypeDnafromFastq {
     echo Select only the mapped reads from the sam files:
     /opt/samtools/bin/samtools view -S -F 4 $name.aln.fwd.sam > $name.aln.map.fwd.sam
     /opt/samtools/bin/samtools view -S -F 4 $name.aln.rev.sam > $name.aln.map.rev.sam
-    # rm -f  $name.aln.fwd.sam
-    # rm -f  $name.aln.rev.sam
+    rm -f  $name.aln.fwd.sam
+    rm -f  $name.aln.rev.sam
 
     echo Convert sam files to fastq files, also stored in temp dir
     cat $name.aln.map.fwd.sam | grep -v ^@ | /usr/bin/awk '{print "@"$1"\n"$10"\n+\n"$11}' > $name.hla.fwd.fastq
     cat $name.aln.map.rev.sam | grep -v ^@ | /usr/bin/awk '{print "@"$1"\n"$10"\n+\n"$11}' > $name.hla.rev.fastq
-    # rm -f $name.aln.map.fwd.sam
-    # rm -f $name.aln.map.rev.sam
+    rm -f $name.aln.map.fwd.sam
+    rm -f $name.aln.map.rev.sam
 
     echo step 5: run Optitype
     # run optitype 
     /usr/bin/python /usr/local/bin/OptiType/OptiTypePipeline.py -i $name.hla.fwd.fastq $name.hla.rev.fastq --dna -v -p $name -o .
-    echo ----------
-    pwd
-    ls -ls *$name*
 
-    mv ./$name_result.tsv ./$name.optitype_result.tsv
-    mv ./$name_coverage_plot.pdf ./$name.optitype_coverage_plot.pdf
+    mv ./${name}_result.tsv ./${name}.optitype_result.tsv
+    mv ./${name}_coverage_plot.pdf ./${name}.optitype_coverage_plot.pdf
   >>>
 
   output {
