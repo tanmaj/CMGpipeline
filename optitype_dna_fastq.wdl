@@ -45,8 +45,8 @@ task OptitypeDnafromFastq {
     pwd
     ls -ls *$name*
 
-    mv $name_result.tsv $name.optitype_result.tsv
-    mv $name_coverage_plot.pdf $name.optitype_coverage_plot.pdf
+    mv ./$name_result.tsv ./$name.optitype_result.tsv
+    mv ./$name_coverage_plot.pdf ./$name.optitype_coverage_plot.pdf
   >>>
 
   output {
