@@ -7,7 +7,7 @@ task OptitypeDnafromBam {
 #    File input_bai
   }
 
-  Int space_needed_gb = 10 + round(5*size([input_fq1, input_fq2], "GB"))
+  Int space_needed_gb = 10 + round(5*size([input_bam], "GB"))
   runtime {
     memory: "64GB"
     docker: "mgibio/immuno_tools-cwl:1.0.1"
