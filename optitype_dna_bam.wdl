@@ -1,6 +1,6 @@
 version 1.0
 
-task OptitypeDnafromFastq {
+task OptitypeDnafromBam {
   input {
     String optitype_name = "optitype"
     File input_bam
@@ -58,7 +58,7 @@ task OptitypeDnafromFastq {
   }
 }
 
-workflow OptitypeDnafromFastq {
+workflow OptitypeDnafromBam {
   input {
     String? optitype_name
     File input_bam
