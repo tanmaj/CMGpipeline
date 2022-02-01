@@ -26,7 +26,7 @@ task OptitypeDnafromBam {
     #rm -f $TEMPDIR/$name.unsorted.bam
 
     echo Running bedtools bamtofastq
-    /usr/bin/bedtools bamtofastq -fq  $name.q.fwd.fastq -fq2  $name.q.rev.fastq -i $name.unsorted.bam    2>/dev/null;
+    /usr/bin/bedtools bamtofastq -fq  $name.q.fwd.fastq -fq2  $name.q.rev.fastq -i $$name.qsorted.bam 2>/dev/null;
    
     echo Aligning forward reads to reference HLA locus sequence
     /usr/local/bin/bwa mem -t 4 $dnaref $name.q.fwd.fastq > $name.aln.fwd.sam      # use bwa mem, store output IN TEMP, and skip samse step
