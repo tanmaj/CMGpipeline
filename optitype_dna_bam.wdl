@@ -4,7 +4,6 @@ task OptitypeDnafromBam {
   input {
     String optitype_name = "optitype"
     File input_bam
-#    File input_bai
   }
 
   Int space_needed_gb = 10 + round(5*size([input_bam], "GB"))
@@ -23,30 +22,30 @@ task OptitypeDnafromBam {
 
     echo Sorting bam
     sambamba sort  -n -t 4 -m 8G -o $name.qsorted.bam  ~{input_bam}                ## 4-threaded replacement sorting with sambamba:
-    #rm -f $TEMPDIR/$name.unsorted.bam
-
+    
     echo Running bedtools bamtofastq
     /usr/bin/bedtools bamtofastq -fq  $name.q.fwd.fastq -fq2  $name.q.rev.fastq -i $name.qsorted.bam 2>/dev/null;
-   
+    rm $name.qsorted.bam
+    
     echo Aligning forward reads to reference HLA locus sequence
     /usr/local/bin/bwa mem -t 4 $dnaref $name.q.fwd.fastq > $name.aln.fwd.sam      # use bwa mem, store output IN TEMP, and skip samse step
-    #rm -f $name.q.fwd.fastq
+    rm -f $name.q.fwd.fastq
     
     echo Aligning reverse reads to reference HLA locus sequence
     /usr/local/bin/bwa mem -t 4 $dnaref $name.q.rev.fastq > $name.aln.rev.sam      # use bwa mem, store output IN TEMP, and skip samse step
-    #rm -f $name.q.rev.fastq
+    rm -f $name.q.rev.fastq
 
     echo Select only the mapped reads from the sam files:
     /opt/samtools/bin/samtools view -S -F 4 $name.aln.fwd.sam > $name.aln.map.fwd.sam
     /opt/samtools/bin/samtools view -S -F 4 $name.aln.rev.sam > $name.aln.map.rev.sam
-    #rm -f  $name.aln.fwd.sam
-    #rm -f  $name.aln.rev.sam
+    rm -f  $name.aln.fwd.sam
+    rm -f  $name.aln.rev.sam
 
     echo Convert sam files to fastq files, also stored in temp dir
     cat $name.aln.map.fwd.sam | grep -v ^@ | /usr/bin/awk '{print "@"$1"\n"$10"\n+\n"$11}' > $name.hla.fwd.fastq
     cat $name.aln.map.rev.sam | grep -v ^@ | /usr/bin/awk '{print "@"$1"\n"$10"\n+\n"$11}' > $name.hla.rev.fastq
-    #rm -f $name.aln.map.fwd.sam
-    #rm -f $name.aln.map.rev.sam
+    rm -f $name.aln.map.fwd.sam
+    rm -f $name.aln.map.rev.sam
 
     echo step 5: run Optitype
     # run optitype 
@@ -66,12 +65,10 @@ workflow OptitypeDnafromBam {
   input {
     String? optitype_name
     File input_bam
-#    File input_bai
   }
   call OptitypeDnafromBam {
     input:
     optitype_name=optitype_name,
     input_bam = input_bam,
-#    input_bai = input_bai,
   }
 }
