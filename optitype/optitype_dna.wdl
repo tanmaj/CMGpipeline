@@ -15,6 +15,7 @@ task optitypeDna {
     docker: "mgibio/immuno_tools-cwl:1.0.1"
     disks: "local-disk ~{space_needed_gb} SSD"
     bootDiskSizeGb: 3*space_needed_gb
+    runtime_minutes: 360
   }
 
   command <<<
