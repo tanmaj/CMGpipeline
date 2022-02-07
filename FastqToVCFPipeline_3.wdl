@@ -16,7 +16,8 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInt
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
+## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
+import "https://github.com/AlesMaver/CMGpipeline/blob/origin/direct_inputs/optitype_dna_bam.wdl" as Optitype
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -359,23 +360,39 @@ workflow FastqToVCF {
   }
 
   ## if ( GenerateCRAM ) {
+  # if ( select_first([GenerateCRAM, false])) {
+  #   call ConvertToCram {
+  #     input:
+  #       input_bam = SortSam.output_bam,
+  #       ref_fasta = reference_fa,
+  #       ref_fasta_index = reference_fai,
+  #       sample_basename = sample_basename
+  #   }
+  #   call Optitype.optitypeDna as Optitype {
+  #     input:
+  #       reference=reference_fa,
+  #       reference_fai=reference_fai,
+  #       cram=ConvertToCram.output_cram,
+  #       cram_crai=ConvertToCram.output_cram_index,
+  #       optitype_name=sample_basename
+  #   }    
+  # }
+  
   if ( select_first([GenerateCRAM, false])) {
-    call ConvertToCram {
-      input:
-        input_bam = SortSam.output_bam,
-        ref_fasta = reference_fa,
-        ref_fasta_index = reference_fai,
-        sample_basename = sample_basename
-    }
-    call Optitype.optitypeDna as Optitype {
-      input:
-        reference=reference_fa,
-        reference_fai=reference_fai,
-        cram=ConvertToCram.output_cram,
-        cram_crai=ConvertToCram.output_cram_index,
-        optitype_name=sample_basename
-    }    
+	  call ConvertToCram {
+	    input:
+	      input_bam = SortSam.output_bam,
+	      ref_fasta = reference_fa,
+	      ref_fasta_index = reference_fai,
+	      sample_basename = sample_basename
+  	}
   }
+
+  call Optitype.OptitypeDnafromBam as Optitype {
+    input:
+      optitype_name=sample_basename,
+      input_bam=SortSam.output_bam
+  } 
 
   scatter (chromosome in chromosomes) {
     call HaplotypeCaller {
