@@ -62,7 +62,7 @@ task OptitypeDnafromBam {
   }
 }
 
-workflow OptitypeDnafromBam {
+workflow OptitypeDna_fromBam {
   input {
     String? optitype_name
     File input_bam
