@@ -30,6 +30,9 @@ workflow FastqToVCF {
 
     File? input_cram
     File? input_cram_index
+    
+    File? input_cram_hg38
+    File? input_cram_hg38_index
 
     String sample_basename
     
@@ -54,6 +57,10 @@ workflow FastqToVCF {
     File reference_fa
     File reference_fai
     File reference_dict
+    
+    File reference_hg38_fa
+    File reference_hg38_fai
+    File reference_hg38_dict
     
     File gnomAD_vcf
     File gnomAD_vcf_index
@@ -211,6 +218,19 @@ workflow FastqToVCF {
     }
   }
 
+  if ( defined(input_cram_hg38) ) {
+    call CramToBam {
+      input:
+        input_cram = input_cram_hg38,
+        sample_name = sample_basename,
+        ref_dict = reference_hg38_dict,
+        ref_fasta = reference_hg38_fa,
+        ref_fasta_index = reference_hg38_fai,
+        docker = gitc_docker,
+        samtools_path = samtools_path
+    }
+  }
+  
   call SamSplitter {
     input :
       input_bam = select_first([CramToBam.output_bam, input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam]),
