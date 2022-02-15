@@ -219,6 +219,19 @@ workflow FastqToVCF {
     }
   }
 
+  if ( defined(input_cram_hg38) ) {
+    call CramToBam {
+      input:
+        input_cram = input_cram_hg38,
+        sample_name = sample_basename,
+        ref_dict = reference_hg38_dict,
+        ref_fasta = reference_hg38_fa,
+        ref_fasta_index = reference_hg38_fai,
+        docker = gitc_docker,
+        samtools_path = samtools_path
+    }
+  }
+  
   call SamSplitter {
     input :
       input_bam = select_first([CramToBam.output_bam, input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam]),
