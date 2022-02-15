@@ -142,7 +142,8 @@ workflow FastqToVCF {
   }  
 
   # Terminate workflow in case neither input_fq1 or input_bam or input_cram is provided
-  Float fileSize = size(select_first([input_cram, input_bam, input_fq1, ""]))
+  # Float fileSize = size(select_first([input_cram, input_bam, input_fq1, ""]))
+  Float fileSize = size(select_first([input_cram_hg38, input_cram, input_bam, input_fq1, ""]))
 
   # Get sample name from either an input FASTQ R1 file or from the input BAM file - this causes problems with optional inputs, so it is left disabled and the input variable sample_basename is now a workflow input
   # String sample_basename = select_first([sub(basename(input_fq1), "[\_,\.].*", "" ), sub(basename(input_bam), "[\_,\.].*", "" )])
