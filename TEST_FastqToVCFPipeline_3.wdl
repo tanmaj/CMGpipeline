@@ -20,7 +20,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/man
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/origin/direct_inputs/optitype_dna_bam.wdl" as Optitype
 
 # WORKFLOW DEFINITION 
-workflow TEST_FastqToVCF {
+workflow FastqToVCF {
   input {
     Array[File]? input_fq1
     Array[File]? input_fq2
