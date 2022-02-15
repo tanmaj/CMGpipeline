@@ -206,21 +206,21 @@ workflow FastqToVCF {
       }
   }
 
-  #if ( defined(input_cram) ) {
-  #  call CramToBam {
-  #    input:
-  #      input_cram = input_cram,
-  #      sample_name = sample_basename,
-  #      ref_dict = reference_dict,
-  #      ref_fasta = reference_fa,
-  #      ref_fasta_index = reference_fai,
-  #      docker = gitc_docker,
-  #      samtools_path = samtools_path
-  #  }
-  #}
+  if ( defined(input_cram) ) {
+    call CramToBam as Cram_hg19_ToBam {
+      input:
+        input_cram = input_cram,
+        sample_name = sample_basename,
+        ref_dict = reference_dict,
+        ref_fasta = reference_fa,
+        ref_fasta_index = reference_fai,
+        docker = gitc_docker,
+        samtools_path = samtools_path
+    }
+  }
 
   if ( defined(input_cram_hg38) ) {
-    call CramToBam {
+    call CramToBam as Cram_hg38_ToBam {
       input:
         input_cram = input_cram_hg38,
         sample_name = sample_basename,
@@ -234,7 +234,7 @@ workflow FastqToVCF {
   
   call SamSplitter {
     input :
-      input_bam = select_first([CramToBam.output_bam, input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam]),
+      input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam]),
       n_reads = split_reads_num,
       preemptible_tries = 3,
       compression_level = 2
