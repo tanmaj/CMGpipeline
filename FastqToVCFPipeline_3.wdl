@@ -1780,7 +1780,7 @@ task ConvertToCram {
   }
   output {
     File output_cram = "~{sample_basename}.hg19.cram"
-    File output_cram_index = "~{sample_basename}.hg19cram.crai"
+    File output_cram_index = "~{sample_basename}.hg19.cram.crai"
     File output_cram_md5 = "~{sample_basename}.hg19.cram.md5"
   }
 }
