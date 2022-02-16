@@ -1766,6 +1766,10 @@ task ConvertToCram {
     export REF_CACHE=./ref/cache/%2s/%2s/%s
 
     samtools index ~{sample_basename}.cram
+    
+    mv ~{sample_basename}.cram ~{sample_basename}.hg19.cram
+    mv ~{sample_basename}.cram.crai ~{sample_basename}.hg19.cram.crai
+    mv ~{sample_basename}.cram.md5 ~{sample_basename}.hg19.cram.md5
   >>>
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
@@ -1775,9 +1779,9 @@ task ConvertToCram {
     runtime_minutes: 360
   }
   output {
-    File output_cram = "~{sample_basename}.cram"
-    File output_cram_index = "~{sample_basename}.cram.crai"
-    File output_cram_md5 = "~{sample_basename}.cram.md5"
+    File output_cram = "~{sample_basename}.hg19.cram"
+    File output_cram_index = "~{sample_basename}.hg19cram.crai"
+    File output_cram_md5 = "~{sample_basename}.hg19.cram.md5"
   }
 }
 
