@@ -30,6 +30,9 @@ workflow FastqToVCF {
 
     File? input_cram
     File? input_cram_index
+    
+    File? input_cram_hg38
+    File? input_cram_hg38_index
 
     String sample_basename
     
@@ -54,6 +57,10 @@ workflow FastqToVCF {
     File reference_fa
     File reference_fai
     File reference_dict
+        
+    File reference_hg38_fa
+    File reference_hg38_fai
+    File reference_hg38_dict
     
     File gnomAD_vcf
     File gnomAD_vcf_index
@@ -135,7 +142,8 @@ workflow FastqToVCF {
   }  
 
   # Terminate workflow in case neither input_fq1 or input_bam or input_cram is provided
-  Float fileSize = size(select_first([input_cram, input_bam, input_fq1, ""]))
+  # Float fileSize = size(select_first([input_cram, input_bam, input_fq1, ""]))
+  Float fileSize = size(select_first([input_cram_hg38, input_cram, input_bam, input_fq1, ""]))
 
   # Get sample name from either an input FASTQ R1 file or from the input BAM file - this causes problems with optional inputs, so it is left disabled and the input variable sample_basename is now a workflow input
   # String sample_basename = select_first([sub(basename(input_fq1), "[\_,\.].*", "" ), sub(basename(input_bam), "[\_,\.].*", "" )])
@@ -199,7 +207,7 @@ workflow FastqToVCF {
   }
 
   if ( defined(input_cram) ) {
-    call CramToBam {
+    call CramToBam as Cram_hg19_ToBam {
       input:
         input_cram = input_cram,
         sample_name = sample_basename,
@@ -211,6 +219,19 @@ workflow FastqToVCF {
     }
   }
 
+  if ( defined(input_cram_hg38) ) {
+    call CramToBam as Cram_hg38_ToBam {
+      input:
+        input_cram = input_cram_hg38,
+        sample_name = sample_basename,
+        ref_dict = reference_hg38_dict,
+        ref_fasta = reference_hg38_fa,
+        ref_fasta_index = reference_hg38_fai,
+        docker = gitc_docker,
+        samtools_path = samtools_path
+    }
+  }
+  
   call SamSplitter {
     input :
       input_bam = select_first([CramToBam.output_bam, input_bam, PairedFastQsToUnmappedBAM.output_unmapped_bam]),
@@ -359,25 +380,6 @@ workflow FastqToVCF {
       preemptible_tries = 3
   }
 
-  ## if ( GenerateCRAM ) {
-  # if ( select_first([GenerateCRAM, false])) {
-  #   call ConvertToCram {
-  #     input:
-  #       input_bam = SortSam.output_bam,
-  #       ref_fasta = reference_fa,
-  #       ref_fasta_index = reference_fai,
-  #       sample_basename = sample_basename
-  #   }
-  #   call Optitype.optitypeDna as Optitype {
-  #     input:
-  #       reference=reference_fa,
-  #       reference_fai=reference_fai,
-  #       cram=ConvertToCram.output_cram,
-  #       cram_crai=ConvertToCram.output_cram_index,
-  #       optitype_name=sample_basename
-  #   }    
-  # }
-  
   if ( select_first([GenerateCRAM, false])) {
 	  call ConvertToCram {
 	    input:
