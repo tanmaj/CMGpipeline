@@ -38,7 +38,9 @@ task SMN_caller_task {
 
   command {
     echo ~{input_bam} > manifest.txt
-    python3 /SMNCopyNumberCaller/smn_caller.py --manifest manifest.txt --genome 19 --prefix ~{sample_basename}.smn_caller --outDir output --threads 6
+    python3 /SMNCopyNumberCaller/smn_caller.py --manifest manifest.txt --genome 19 --prefix ~{sample_basename}.smn_caller --outDir . --threads 6
+    python3 /SMNCopyNumberCaller/smn_charts.py --sample-data ~{sample_basename}.smn_caller.json --out-dir .
+    mv   smn_~{sample_basename}.marked.pdf   ~{sample_basename}.smn_caller.pdf
   }
   runtime {
     docker: docker
@@ -47,7 +49,8 @@ task SMN_caller_task {
     runtime_minutes: 60
   }
   output {
-    File output_tsv = "output/~{sample_basename}.smn_caller.tsv"
-    File output_json = "output/~{sample_basename}.smn_caller.json"
+    File output_tsv = "~{sample_basename}.smn_caller.tsv"
+    File output_json = "~{sample_basename}.smn_caller.json"
+    File output_json = "~{sample_basename}.smn_caller.pdf"
   }
 }
