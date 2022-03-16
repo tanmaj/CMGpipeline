@@ -18,9 +18,9 @@ workflow SMN_caller_workflow {
   }
 
   output {
-    File output_tsv = SMN_caller.output_tsv
-    File output_json = SMN_caller.output_json
-    File output_pdf = SMN_caller.output_pdf
+    File? output_tsv = SMN_caller.output_tsv
+    File? output_json = SMN_caller.output_json
+    File? output_pdf = SMN_caller.output_pdf
   }
 }
 
@@ -48,10 +48,11 @@ task SMN_caller {
     requested_memory_mb_per_core: 2000
     cpu: 6
     runtime_minutes: 60
+    continueOnReturnCode: true
   }
   output {
-    File output_tsv = "~{sample_basename}.smn_caller.tsv"
-    File output_json = "~{sample_basename}.smn_caller.json"
-    File output_pdf = "~{sample_basename}.smn_caller.pdf"
+    File? output_tsv = "~{sample_basename}.smn_caller.tsv"
+    File? output_json = "~{sample_basename}.smn_caller.json"
+    File? output_pdf = "~{sample_basename}.smn_caller.pdf"
   }
 }
