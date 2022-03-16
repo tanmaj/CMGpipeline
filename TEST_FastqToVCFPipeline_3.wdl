@@ -15,7 +15,8 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" 
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
+##import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/origin/direct_inputs/manta/manta_workflow.wdl" as Manta
 ## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/origin/direct_inputs/optitype_dna_bam.wdl" as Optitype
 
@@ -115,8 +116,10 @@ workflow FastqToVCF {
     Int? CONIFER_svd
     Float? CONIFER_threshold
 
+    # Manta
     Array[File]? input_manta_reference_vcfs
-
+    Boolean exome = false
+    
     ## Boolean GenerateCRAM = false
     Boolean? GenerateCRAM
 
@@ -125,7 +128,8 @@ workflow FastqToVCF {
     String? panel_gene_list
     Array[File]? relative_vcfs
     Array[File]? relative_vcf_indexes
-
+    
+   
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
@@ -399,6 +403,14 @@ workflow FastqToVCF {
     } 
   }
   
+  # Calculate SMN only if targetRegions are not present
+  ## if( !defined(targetRegions) ) {
+  ##  call xxx as xxx {
+  ##    input:
+
+  ##  } 
+  ## }
+  
   scatter (chromosome in chromosomes) {
     call HaplotypeCaller {
       input:
@@ -597,7 +609,7 @@ workflow FastqToVCF {
   }
 
   if( defined(input_manta_reference_vcfs) ){
-    call Manta.SVcalling as Manta{
+    call Manta.SVcalling as Manta {
     input:
       bamFile = SortSam.output_bam,
       bamIndex = SortSam.output_bam_index,
@@ -607,6 +619,7 @@ workflow FastqToVCF {
       referenceFastaDict=reference_dict,  
 
       sample = sample_basename, 
+      exome = false,
 
       input_manta_reference_vcfs = input_manta_reference_vcfs
     }
@@ -772,6 +785,10 @@ workflow FastqToVCF {
     
     File? optitype_tsv = Optitype.optitype_tsv
     File? optitype_plot = Optitype.optitype_plot
+    
+    # File? output_tsv = SMN_caller.output_tsv
+    # File? output_json = SMN_caller.output_json
+    # File? output_pdf = SMN_caller.output_pdf
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
   }
