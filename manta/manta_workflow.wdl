@@ -22,18 +22,9 @@ version 1.0
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/bcftools.wdl" as bcftools
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/bwa.wdl" as bwa
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/clever.wdl" as clever
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/common.wdl" as common
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/delly.wdl" as delly
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/duphold.wdl" as duphold
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/gridss.wdl" as gridss
+
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta.wdl" as manta
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/picard.wdl" as picard
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/samtools.wdl" as samtools
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/smoove.wdl" as smoove
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/survivor.wdl" as survivor
+
 
 workflow SVcalling {
     input {
@@ -47,21 +38,12 @@ workflow SVcalling {
         Boolean excludeMisHomRef = false
         Boolean excludeFpDupDel = false
         String outputDir = "."
+        
+        # when calling manta germline: genome (exome=false), exome (exome=true)
+        Boolean exome = false
 
         Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
 
-        Map[String, String] dockerImages = {
-            "bcftools": "quay.io/biocontainers/bcftools:1.10.2--h4f4756c_2",
-            "clever": "quay.io/biocontainers/clever-toolkit:2.4--py36hcfe0e84_6",
-            "delly": "quay.io/biocontainers/delly:0.8.1--h4037b6b_1",
-            "gridss": "quay.io/biocontainers/gridss:2.9.4--0",
-            "manta": "quay.io/biocontainers/manta:1.4.0--py27_1",
-            "picard":"quay.io/biocontainers/picard:2.23.2--0",
-            "samtools": "quay.io/biocontainers/samtools:1.10--h9402c20_2",
-            "survivor": "quay.io/biocontainers/survivor:1.0.6--h6bb024c_0",
-            "smoove": "quay.io/biocontainers/smoove:0.2.5--0",
-            "duphold": "quay.io/biocontainers/duphold:0.2.1--h516909a_1"
-        }
     }
 
     meta {allowNestedInputs: true}
@@ -76,7 +58,8 @@ workflow SVcalling {
             sample = sample,
             referenceFasta = referenceFasta,
             referenceFastaFai = referenceFastaFai,
-            runDir = SVdir + 'manta/'
+            runDir = SVdir + 'manta/',
+            exome = exome
     }
 
     call MergeMantaFiles {
