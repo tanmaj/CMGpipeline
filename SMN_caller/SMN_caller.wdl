@@ -2,7 +2,7 @@ version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
 # WORKFLOW DEFINITION
-workflow SMN_caller {
+workflow SMN_caller_workflow {
   input {
     File input_bam
     File input_bam_index
@@ -10,7 +10,7 @@ workflow SMN_caller {
 
   String sample_basename = sub(basename(input_bam), "[\_,\.].*", "" )
 
-  call SMN_caller_task {
+  call SMN_caller {
       input:
         input_bam=input_bam,
         input_bam_index=input_bam_index,
@@ -18,14 +18,15 @@ workflow SMN_caller {
   }
 
   output {
-    File output_tsv = SMN_caller_task.output_tsv
-    File output_json = SMN_caller_task.output_json
+    File output_tsv = SMN_caller.output_tsv
+    File output_json = SMN_caller.output_json
+    File output_pdf = SMN_caller.output_pdf
   }
 }
 
 
 
-task SMN_caller_task {
+task SMN_caller {
   input {
     # Command parameters
     File input_bam
@@ -51,6 +52,6 @@ task SMN_caller_task {
   output {
     File output_tsv = "~{sample_basename}.smn_caller.tsv"
     File output_json = "~{sample_basename}.smn_caller.json"
-    File output_json = "~{sample_basename}.smn_caller.pdf"
+    File output_pdf = "~{sample_basename}.smn_caller.pdf"
   }
 }
