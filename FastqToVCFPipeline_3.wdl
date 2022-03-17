@@ -1284,7 +1284,8 @@ task HaplotypeCaller {
       -stand-call-conf 50.0 \
       -L ~{chromosome_intervals} \
       -I ~{input_bam} \
-      -O ~{sample_basename}.raw.vcf.gz
+      -O ~{sample_basename}.raw.vcf.gz \
+      -bamout ~{sample_basename}.bamout.bam
   }
 
   output {
