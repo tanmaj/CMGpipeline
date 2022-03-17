@@ -44,6 +44,18 @@ workflow SVcalling {
 
         Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
 
+        Map[String, String] dockerImages = {
+            "bcftools": "quay.io/biocontainers/bcftools:1.10.2--h4f4756c_2",
+            "clever": "quay.io/biocontainers/clever-toolkit:2.4--py36hcfe0e84_6",
+            "delly": "quay.io/biocontainers/delly:0.8.1--h4037b6b_1",
+            "gridss": "quay.io/biocontainers/gridss:2.9.4--0",
+            "manta": "quay.io/biocontainers/manta:1.4.0--py27_1",
+            "picard":"quay.io/biocontainers/picard:2.23.2--0",
+            "samtools": "quay.io/biocontainers/samtools:1.10--h9402c20_2",
+            "survivor": "quay.io/biocontainers/survivor:1.0.6--h6bb024c_0",
+            "smoove": "quay.io/biocontainers/smoove:0.2.5--0",
+            "duphold": "quay.io/biocontainers/duphold:0.2.1--h516909a_1"
+        }
     }
 
     meta {allowNestedInputs: true}
