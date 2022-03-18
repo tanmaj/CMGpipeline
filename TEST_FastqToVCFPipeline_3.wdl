@@ -19,6 +19,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunte
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/origin/direct_inputs/manta/manta_workflow.wdl" as Manta
 ## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/origin/direct_inputs/optitype_dna_bam.wdl" as Optitype
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/SMN_caller/SMN_caller.wdl" as SMN
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -404,12 +405,14 @@ workflow FastqToVCF {
   }
   
   # Calculate SMN only if targetRegions are not present
-  ## if( !defined(targetRegions) ) {
-  ##  call xxx as xxx {
-  ##    input:
-
-  ##  } 
-  ## }
+  if( !defined(targetRegions) ) {
+     call SMN.SMN_caller as SMN_caller {
+     input:
+       input_bam=SortSam.output_bam,
+       input_bam_index=SortSam.output_bam_index,
+       sample_basename=sample_basename
+     }
+  }
   
   scatter (chromosome in chromosomes) {
     call HaplotypeCaller {
