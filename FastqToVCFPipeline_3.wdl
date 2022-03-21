@@ -116,6 +116,7 @@ workflow FastqToVCF {
     Int? CONIFER_svd
     Float? CONIFER_threshold
 
+    Boolean exome = false
     Array[File]? input_manta_reference_vcfs
 
     ## Boolean GenerateCRAM = false
@@ -617,6 +618,7 @@ workflow FastqToVCF {
       referenceFastaFai=reference_fai,
       referenceFastaDict=reference_dict,  
 
+      exome = false,
       sample = sample_basename, 
 
       input_manta_reference_vcfs = input_manta_reference_vcfs
