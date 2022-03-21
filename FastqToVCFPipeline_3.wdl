@@ -116,8 +116,9 @@ workflow FastqToVCF {
     Int? CONIFER_svd
     Float? CONIFER_threshold
 
-    Boolean exome = false
+    # Manta
     Array[File]? input_manta_reference_vcfs
+    Boolean exome = false
 
     ## Boolean GenerateCRAM = false
     Boolean? GenerateCRAM
