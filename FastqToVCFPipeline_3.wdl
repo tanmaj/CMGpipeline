@@ -399,6 +399,16 @@ workflow FastqToVCF {
         input_bam=SortSam.output_bam
     } 
   }
+
+  # Calculate SMN only if targetRegions are not present
+  if( !defined(targetRegions) ) {
+     call SMN.SMN_caller as SMN_caller {
+     input:
+       input_bam=SortSam.output_bam,
+       input_bam_index=SortSam.output_bam_index,
+       sample_basename=sample_basename
+     }
+  }
   
   scatter (chromosome in chromosomes) {
     call HaplotypeCaller {
@@ -776,6 +786,10 @@ workflow FastqToVCF {
 
     File? optitype_tsv = Optitype.optitype_tsv
     File? optitype_plot = Optitype.optitype_plot
+
+    File? output_tsv = SMN_caller.output_tsv
+    File? output_json = SMN_caller.output_json
+    File? output_pdf = SMN_caller.output_pdf
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
   }
