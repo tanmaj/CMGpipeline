@@ -789,9 +789,9 @@ workflow FastqToVCF {
     File? optitype_tsv = Optitype.optitype_tsv
     File? optitype_plot = Optitype.optitype_plot
     
-    # File? output_tsv = SMN_caller.output_tsv
-    # File? output_json = SMN_caller.output_json
-    # File? output_pdf = SMN_caller.output_pdf
+    File? output_tsv = SMN_caller.output_tsv
+    File? output_json = SMN_caller.output_json
+    File? output_pdf = SMN_caller.output_pdf
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
   }
