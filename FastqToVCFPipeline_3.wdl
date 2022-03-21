@@ -18,7 +18,6 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunte
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
 
-
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
   input {
@@ -340,7 +339,6 @@ workflow FastqToVCF {
       preemptible_tries = 3
   }
 
-  ## if ( GenerateCRAM ) {
   if ( select_first([GenerateCRAM, false])) {
     call ConvertToCram {
         input:
