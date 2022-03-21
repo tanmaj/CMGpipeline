@@ -22,18 +22,9 @@ version 1.0
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/bcftools.wdl" as bcftools
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/bwa.wdl" as bwa
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/clever.wdl" as clever
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/common.wdl" as common
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/delly.wdl" as delly
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/duphold.wdl" as duphold
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/gridss.wdl" as gridss
+
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta.wdl" as manta
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/picard.wdl" as picard
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/samtools.wdl" as samtools
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/smoove.wdl" as smoove
-import "https://raw.githubusercontent.com/biowdl/tasks/2b158fa89c1541bfa8604a855607a135e26906d3/survivor.wdl" as survivor
+
 
 workflow SVcalling {
     input {
@@ -47,6 +38,9 @@ workflow SVcalling {
         Boolean excludeMisHomRef = false
         Boolean excludeFpDupDel = false
         String outputDir = "."
+        
+        # when calling manta germline: genome (exome=false), exome (exome=true)
+        Boolean exome = false
 
         Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
 
@@ -76,7 +70,8 @@ workflow SVcalling {
             sample = sample,
             referenceFasta = referenceFasta,
             referenceFastaFai = referenceFastaFai,
-            runDir = SVdir + 'manta/'
+            runDir = SVdir + 'manta/',
+            exome = exome
     }
 
     call MergeMantaFiles {

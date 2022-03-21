@@ -1,18 +1,18 @@
 version 1.0
 
-task OptitypeDnafromFastq {
+task OptitypeDnafromBam {
   input {
     String optitype_name = "optitype"
-    File input_fq1
-    File input_fq2
+    File input_bam
   }
 
-  Int space_needed_gb = 10 + round(5*size([input_fq1, input_fq2], "GB"))
+  Int space_needed_gb = 10 + round(5*size([input_bam], "GB"))
   runtime {
     memory: "64GB"
     docker: "mgibio/immuno_tools-cwl:1.0.1"
     disks: "local-disk ~{space_needed_gb} SSD"
     bootDiskSizeGb: 3*space_needed_gb
+    runtime_minutes: 2400
   }
 
   command <<<
@@ -21,10 +21,20 @@ task OptitypeDnafromFastq {
     name=~{optitype_name}
     echo $name
 
+    echo Sorting bam
+    sambamba sort  -n -t 4 -m 8G -o $name.qsorted.bam  ~{input_bam}                ## 4-threaded replacement sorting with sambamba:
+    
+    echo Running bedtools bamtofastq
+    /usr/bin/bedtools bamtofastq -fq  $name.q.fwd.fastq -fq2  $name.q.rev.fastq -i $name.qsorted.bam 2>/dev/null;
+    rm $name.qsorted.bam
+    
     echo Aligning forward reads to reference HLA locus sequence
-    /usr/local/bin/bwa mem -t 4 $dnaref ~{input_fq1} > $name.aln.fwd.sam      # use bwa mem, store output IN TEMP, and skip samse step
+    /usr/local/bin/bwa mem -t 4 $dnaref $name.q.fwd.fastq > $name.aln.fwd.sam      # use bwa mem, store output IN TEMP, and skip samse step
+    rm -f $name.q.fwd.fastq
+    
     echo Aligning reverse reads to reference HLA locus sequence
-    /usr/local/bin/bwa mem -t 4 $dnaref ~{input_fq2} > $name.aln.rev.sam      # use bwa mem, store output IN TEMP, and skip samse step
+    /usr/local/bin/bwa mem -t 4 $dnaref $name.q.rev.fastq > $name.aln.rev.sam      # use bwa mem, store output IN TEMP, and skip samse step
+    rm -f $name.q.rev.fastq
 
     echo Select only the mapped reads from the sam files:
     /opt/samtools/bin/samtools view -S -F 4 $name.aln.fwd.sam > $name.aln.map.fwd.sam
@@ -52,16 +62,14 @@ task OptitypeDnafromFastq {
   }
 }
 
-workflow OptitypeDnafromFastq {
+workflow OptitypeDna_fromBam {
   input {
     String? optitype_name
-    File input_fq1
-    File input_fq2
+    File input_bam
   }
-  call OptitypeDnafromFastq {
+  call OptitypeDnafromBam {
     input:
     optitype_name=optitype_name,
-    input_fq1 = input_fq1,
-    input_fq2 = input_fq2,
+    input_bam = input_bam,
   }
 }
