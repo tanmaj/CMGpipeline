@@ -1,5 +1,5 @@
 version 1.0
-## Copyright CMG@KIGM, Ales Maver
+## Copyright CMG@KIGM, Ales Maver and Tanja Majnik
 
 ## Usage
 # This workflow accepts three types of inputs: Illumina FASTQ files, a BAM file, or CRAM files
@@ -18,6 +18,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunte
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
 ## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/origin/direct_inputs/optitype_dna_bam.wdl" as Optitype
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/SMN_caller/SMN_caller.wdl" as SMN
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
