@@ -17,7 +17,7 @@ import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.w
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
 ## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/origin/direct_inputs/optitype_dna_bam.wdl" as Optitype
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype_dna_bam.wdl" as Optitype
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/SMN_caller/SMN_caller.wdl" as SMN
 
 # WORKFLOW DEFINITION 
