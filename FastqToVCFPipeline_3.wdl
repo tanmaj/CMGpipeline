@@ -11,7 +11,7 @@ version 1.0
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" as ROH
+import "./ROH.wdl" as ROH
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
@@ -689,6 +689,15 @@ workflow FastqToVCF {
     }
   }
 
+  # Downsample dbSNP bed file if this is a WGS analysis
+  if( !defined(enrichment_bed) && !defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
+     call ROH.Downsample_dbSNP as Downsample_dbSNP {
+      input:
+        dbSNPcommon_bed = dbSNPcommon_bed,
+        dbSNPcommon_bed_index = dbSNPcommon_bed_index
+    }
+  }
+
   call ROH.calculateBAF as calculateBAF {
   input:
     input_bam = SortSam.output_bam,
@@ -697,8 +706,8 @@ workflow FastqToVCF {
 
     reference_fa=reference_fa,
 
-    dbSNPcommon_bed = dbSNPcommon_bed,
-    dbSNPcommon_bed_index = dbSNPcommon_bed_index,
+    dbSNPcommon_bed = select_first([Downsample_dbSNP.dbSNPcommon_bed, dbSNPcommon_bed]),
+    dbSNPcommon_bed_index = select_first([Downsample_dbSNP.dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
 
     docker = "alesmaver/bwa_samtools_picard"
   }

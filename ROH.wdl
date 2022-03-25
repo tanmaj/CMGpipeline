@@ -147,3 +147,29 @@ task CallPlink {
     File ROHplink_calls_summary = "~{sample_basename}.hom.indiv"
   }
 }
+
+task Downsample_dbSNP {
+  input {
+    File dbSNPcommon_bed
+    File dbSNPcommon_bed_index
+
+    String docker = biocontainers/tabix:v1.9-11-deb_cv1
+  }
+  
+  command <<<
+  set -e
+  zcat ~{dbSNPcommon_bed} | awk 'NR % 10 == 0' | gzip > downsampled_~{dbSNPcommon_bed}
+  tabix downsampled_~{dbSNPcommon_bed}
+  >>>
+
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 2000
+    cpu: 1
+    runtime_minutes: 60
+  }
+  output {
+    File dbSNPcommon_bed = "downsampled_~{dbSNPcommon_bed}"
+    File dbSNPcommon_bed_index = "downsampled_~{dbSNPcommon_bed}.tbi"
+  }
+}
