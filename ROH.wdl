@@ -153,7 +153,7 @@ task Downsample_dbSNP {
     File dbSNPcommon_bed
     File dbSNPcommon_bed_index
 
-    String docker = biocontainers/tabix:v1.9-11-deb_cv1
+    String docker = "biocontainers/tabix:v1.9-11-deb_cv1"
   }
   
   command <<<
