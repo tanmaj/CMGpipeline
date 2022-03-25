@@ -43,7 +43,8 @@ workflow AnnotateVCF {
     File dbNSFP_index
 
     #String bgzip_docker = "dockerbiotools/bcftools:latest"
-    String bcftools_docker = "dceoy/bcftools:latest"
+    ##String bcftools_docker = "dceoy/bcftools:latest"
+    String bcftools_docker = "dceoy/bcftools"
     #String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
     String SnpEff_docker = "alesmaver/snpeff_v50:latest"
     String gatk_docker = "broadinstitute/gatk:latest"
