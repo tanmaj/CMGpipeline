@@ -720,8 +720,8 @@ workflow FastqToVCF {
   
     reference_fa=reference_fa,
   
-    dbSNPcommon_bed = dbSNPcommon_bed,
-    dbSNPcommon_bed_index = dbSNPcommon_bed_index,
+    dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
+    dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
   
     gnomAD_maf01_vcf = gnomAD_maf01_vcf,
     gnomAD_maf01_vcf_index = gnomAD_maf01_vcf_index,
