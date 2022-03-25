@@ -153,13 +153,15 @@ task Downsample_dbSNP {
     File dbSNPcommon_bed
     File dbSNPcommon_bed_index
 
+    String dbSNPcommon_bed_filename = basename(dbSNPcommon_bed)
+
     String docker = "biocontainers/tabix:v1.9-11-deb_cv1"
   }
   
   command <<<
   set -e
-  zcat ~{dbSNPcommon_bed} | awk 'NR % 10 == 0' | gzip > downsampled_~{dbSNPcommon_bed}
-  tabix downsampled_~{dbSNPcommon_bed}
+  zcat ~{dbSNPcommon_bed} | awk 'NR % 10 == 0' | gzip > downsampled_~{dbSNPcommon_bed_filename}
+  tabix downsampled_~{dbSNPcommon_bed_filename}
   >>>
 
   runtime {
