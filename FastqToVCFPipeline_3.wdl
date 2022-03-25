@@ -706,8 +706,11 @@ workflow FastqToVCF {
 
     reference_fa=reference_fa,
 
-    dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
-    dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
+    dbSNPcommon_bed = Downsample_dbSNP.downsampled_dbSNPcommon_bed,
+    dbSNPcommon_bed_index = Downsample_dbSNP.downsampled_dbSNPcommon_bed_index,
+
+    #dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
+    #dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
 
     docker = "alesmaver/bwa_samtools_picard"
   }
