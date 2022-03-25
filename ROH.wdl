@@ -160,7 +160,7 @@ task Downsample_dbSNP {
   
   command <<<
   set -e
-  zcat ~{dbSNPcommon_bed} | awk 'NR % 10 == 0' | gzip > downsampled_~{dbSNPcommon_bed_filename}
+  zcat ~{dbSNPcommon_bed} | awk 'NR % 10 == 0' | bgzip > downsampled_~{dbSNPcommon_bed_filename}
   tabix downsampled_~{dbSNPcommon_bed_filename}
   >>>
 
