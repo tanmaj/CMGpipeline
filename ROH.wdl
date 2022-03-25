@@ -171,7 +171,7 @@ task Downsample_dbSNP {
     runtime_minutes: 60
   }
   output {
-    File downsampled_dbSNPcommon_bed = "downsampled_~{dbSNPcommon_bed}"
-    File downsampled_dbSNPcommon_bed_index = "downsampled_~{dbSNPcommon_bed}.tbi"
+    File downsampled_dbSNPcommon_bed = "downsampled_~{dbSNPcommon_bed_filename}"
+    File downsampled_dbSNPcommon_bed_index = "downsampled_~{dbSNPcommon_bed_filename}.tbi"
   }
 }
