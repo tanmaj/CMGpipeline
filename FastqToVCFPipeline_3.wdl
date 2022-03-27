@@ -639,6 +639,16 @@ workflow FastqToVCF {
       sample = sample_basename, 
 
       input_manta_reference_vcfs = input_manta_reference_vcfs
+
+      HPO = HPO,
+      HPO_index = HPO_index,
+      OMIM = OMIM,
+      OMIM_index = OMIM_index,
+      gnomadConstraints = gnomadConstraints,
+      gnomadConstraints_index = gnomadConstraints_index,
+      CGD = CGD,
+      CGD_index = CGD_index,
+      bcftools_annotation_header = bcftools_annotation_header     
     }
 
     call Annotation.bcftoolsAnnotate as MantaAnnotation {

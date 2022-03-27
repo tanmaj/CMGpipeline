@@ -24,6 +24,7 @@ version 1.0
 
 
 import "./manta.wdl" as manta
+import "../AnnotationPipeline.wdl" as Annotation
 
 
 workflow SVcalling {
@@ -43,6 +44,17 @@ workflow SVcalling {
         Boolean exome = false
 
         Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
+
+        # Annotation data
+        File? HPO
+        File? HPO_index
+        File? OMIM
+        File? OMIM_index
+        File? gnomadConstraints
+        File? gnomadConstraints_index
+        File? CGD
+        File? CGD_index
+        File? bcftools_annotation_header
 
         Map[String, String] dockerImages = {
             "bcftools": "quay.io/biocontainers/bcftools:1.10.2--h4f4756c_2",
@@ -79,6 +91,30 @@ workflow SVcalling {
             input_manta_vcf = manta.mantaVCF,
             input_manta_reference_vcfs = input_manta_reference_vcfs,
             sample_basename = sample
+    }
+
+    if (defined(HPO)) {
+        call Annotation.bcftoolsAnnotate as MantaAnnotation {
+          input:
+            input_vcf = Manta.output_manta_filtered_vcf,
+            input_vcf_index = Manta.mantaVcfindex,
+
+            sample_basename=sample_basename,
+
+            HPO = HPO,
+            HPO_index = HPO_index,
+            OMIM = OMIM,
+            OMIM_index = OMIM_index,
+            gnomadConstraints = gnomadConstraints,
+            gnomadConstraints_index = gnomadConstraints_index,
+            CGD = CGD,
+            CGD_index = CGD_index,
+
+            bcftools_annotation_header = bcftools_annotation_header,
+            
+            output_filename = sample_basename + ".manta.annotated.vcf.gz",
+            docker = "dceoy/bcftools"
+        }
     }
 
     call AnnotateMantaVCF {
