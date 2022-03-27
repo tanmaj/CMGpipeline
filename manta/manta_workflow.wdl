@@ -105,7 +105,7 @@ workflow SVcalling {
 
             bcftools_annotation_header = bcftools_annotation_header,
             
-            output_filename = sample + ".manta.annotated.vcf.gz",
+            output_filename = sample + ".manta.vcf.gz",
             docker = "dceoy/bcftools"
         }
 
