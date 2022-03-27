@@ -295,7 +295,7 @@ task bcftoolsAnnotate {
 
     File bcftools_annotation_header
 
-    String chromosome
+    String? chromosome
 
     String output_filename
 
@@ -305,7 +305,7 @@ task bcftoolsAnnotate {
 
   command {
     set -e
-    bcftools view -r ~{chromosome} ~{input_vcf} | \
+    bcftools view ~{ if defined(chromosome) then " -r " + chromosome else " "} ~{input_vcf} | \
     bcftools annotate -a ~{HPO} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,HPO | \
     bcftools annotate -a ~{OMIM}  -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,OMIM --merge-logic OMIM:unique | \
     bcftools annotate -a ~{gnomadConstraints} -h ~{bcftools_annotation_header} -c CHROM,POS,TO,-,oe_mis,pLI,pRec | \
