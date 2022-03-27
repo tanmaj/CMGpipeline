@@ -96,10 +96,10 @@ workflow SVcalling {
     if (defined(HPO)) {
         call Annotation.bcftoolsAnnotate as MantaAnnotation {
           input:
-            input_vcf = Manta.output_manta_filtered_vcf,
-            input_vcf_index = Manta.mantaVcfindex,
+            input_vcf = MergeMantaFiles.merged_vcf,
+            input_vcf_index = MergeMantaFiles.merged_vcf,
 
-            sample_basename=sample_basename,
+            sample_basename=sample,
 
             HPO = HPO,
             HPO_index = HPO_index,
