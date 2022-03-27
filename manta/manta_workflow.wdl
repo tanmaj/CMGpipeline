@@ -46,15 +46,15 @@ workflow SVcalling {
         Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
 
         # Annotation data
-        File? HPO
-        File? HPO_index
-        File? OMIM
-        File? OMIM_index
-        File? gnomadConstraints
-        File? gnomadConstraints_index
-        File? CGD
-        File? CGD_index
-        File? bcftools_annotation_header
+        File HPO
+        File HPO_index
+        File OMIM
+        File OMIM_index
+        File gnomadConstraints
+        File gnomadConstraints_index
+        File CGD
+        File CGD_index
+        File bcftools_annotation_header
 
         Map[String, String] dockerImages = {
             "bcftools": "quay.io/biocontainers/bcftools:1.10.2--h4f4756c_2",
