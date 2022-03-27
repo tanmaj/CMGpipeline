@@ -638,7 +638,7 @@ workflow FastqToVCF {
       exome = false,
       sample = sample_basename, 
 
-      input_manta_reference_vcfs = input_manta_reference_vcfs
+      input_manta_reference_vcfs = input_manta_reference_vcfs,
 
       HPO = HPO,
       HPO_index = HPO_index,
