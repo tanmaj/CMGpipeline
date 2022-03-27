@@ -8,7 +8,7 @@ version 1.0
 # Manta is for genome analysis
 
 # Subworkflows
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
+import "./AnnotationPipeline.wdl" as Annotation
 import "./Conifer.wdl" as Conifer
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
 import "./ROH.wdl" as ROH
