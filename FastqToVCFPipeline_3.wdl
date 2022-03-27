@@ -643,7 +643,7 @@ workflow FastqToVCF {
 
     call Annotation.bcftoolsAnnotate as MantaAnnotation {
       input:
-        input_vcf = Manta.mantaVcf,
+        input_vcf = Manta.output_manta_filtered_vcf,
         input_vcf_index = Manta.mantaVcfindex,
 
         sample_basename=sample_basename,
