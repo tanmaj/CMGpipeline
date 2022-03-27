@@ -23,7 +23,7 @@ version 1.0
 # SOFTWARE.
 
 
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta.wdl" as manta
+import "./manta.wdl" as manta
 
 
 workflow SVcalling {
@@ -91,6 +91,7 @@ workflow SVcalling {
         File mantaVcf = manta.mantaVCF
         File mantaVcfindex = manta.mantaVCFindex
         File output_sv_table = AnnotateMantaVCF.output_sv_table
+        File output_manta_filtered_vcf = AnnotateMantaVCF.output_manta_filtered_vcf
     }
 
     parameter_meta {
@@ -171,5 +172,6 @@ task AnnotateMantaVCF {
   }
   output {
     File output_sv_table = "~{sample_basename}.mantaSVs.txt"
+    File output_manta_filtered_vcf = "~{sample_basename}.merged.annotated.filtered.vcf"
   }
 }
