@@ -87,8 +87,7 @@ workflow SVcalling {
     }
 
 
-    if (defined(HPO)) {
-        call Annotation.bcftoolsAnnotate as MantaAnnotation {
+    call Annotation.bcftoolsAnnotate as MantaAnnotation {
           input:
             input_vcf = manta.mantaVCF,
             input_vcf_index = manta.mantaVCFindex,
@@ -109,7 +108,6 @@ workflow SVcalling {
             output_filename = sample + ".manta.annotated.vcf.gz",
             docker = "dceoy/bcftools"
         }
-    }
 
     call MergeMantaFiles {
         input:
