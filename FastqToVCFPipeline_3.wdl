@@ -660,7 +660,7 @@ workflow FastqToVCF {
         bcftools_annotation_header = bcftools_annotation_header,
         
         output_filename = sample_basename + ".manta.annotated.vcf.gz",
-        docker = bcftools_docker
+        docker = "dceoy/bcftools"
     }
   }
 
