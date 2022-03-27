@@ -95,7 +95,7 @@ task MakeRPKM {
     docker: docker
     requested_memory_mb_per_core: 3000
     cpu: 2
-    runtime_minutes: 120
+    runtime_minutes: 500
   }
   output {
     File output_rpkm = "~{enrichment}_~{sample_basename}.txt"
