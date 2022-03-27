@@ -9,7 +9,7 @@ version 1.0
 
 # Subworkflows
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
+import "./Conifer.wdl" as Conifer
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
 import "./ROH.wdl" as ROH
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
@@ -607,6 +607,22 @@ workflow FastqToVCF {
       enrichment = enrichment,
       enrichment_bed = enrichment_bed
     }
+
+    call Conifer.CONIFER_Annotate as CONIFER_Annotate{
+    input:
+      conifer_calls_wig = Conifer.output_conifer_calls_wig,
+      
+      sample_basename = sample_basename,
+
+      HPO = HPO,
+      HPO_index = HPO_index,
+      OMIM = OMIM,
+      OMIM_index = OMIM_index,
+      gnomadConstraints = gnomadConstraints,
+      gnomadConstraints_index = gnomadConstraints_index,
+      CGD = CGD,
+      CGD_index = CGD_index
+    }    
   }
 
   if( defined(input_manta_reference_vcfs) ){

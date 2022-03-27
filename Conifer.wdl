@@ -246,3 +246,39 @@ task CONIFER_Export {
     File CNV_wig = "~{sample_basename}.CNV.genome.wig"
   }
 }
+
+task CONIFER_Annotate {
+  input {
+    # Command parameters
+    File conifer_calls_wig
+
+    String sample_basename
+
+    File HPO
+    File HPO_index
+    File OMIM
+    File OMIM_index
+    File gnomadConstraints
+    File gnomadConstraints_index
+    File CGD
+    File CGD_index
+
+    # Runtime parameters
+    String docker = "pegi3s/bedtools"
+  }
+  
+  command <<<
+  set -e
+  bcftools intersect -a ~{conifer_calls_wig} -b ~{HPO} ~{OMIM} ~{gnomadConstraints} ~{CGD} -wa -wb -loj | awk '{print $1,$2,$3,$4,$9,$10}' OFS='\t' > ~{sample_basename}.CONIFER.ANNOTATED.txt
+  >>>
+
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 4000
+    cpu: 1
+    runtime_minutes: 60
+  }
+  output {
+    File conifer_calls_annotated = "~{sample_basename}.CONIFER.ANNOTATED.txt"
+  }
+}
