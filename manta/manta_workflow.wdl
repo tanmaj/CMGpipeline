@@ -86,18 +86,12 @@ workflow SVcalling {
             exome = exome
     }
 
-    call MergeMantaFiles {
-        input:
-            input_manta_vcf = manta.mantaVCF,
-            input_manta_reference_vcfs = input_manta_reference_vcfs,
-            sample_basename = sample
-    }
 
     if (defined(HPO)) {
         call Annotation.bcftoolsAnnotate as MantaAnnotation {
           input:
-            input_vcf = MergeMantaFiles.merged_vcf,
-            input_vcf_index = MergeMantaFiles.merged_vcf,
+            input_vcf = manta.mantaVCF,
+            input_vcf_index = manta.mantaVCFindex,
 
             sample_basename=sample,
 
@@ -116,6 +110,13 @@ workflow SVcalling {
             docker = "dceoy/bcftools"
         }
     }
+
+    call MergeMantaFiles {
+        input:
+            input_manta_vcf = MantaAnnotation.output_vcf,
+            input_manta_reference_vcfs = input_manta_reference_vcfs,
+            sample_basename = sample
+    }    
 
     call AnnotateMantaVCF {
         input:
