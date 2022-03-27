@@ -640,6 +640,28 @@ workflow FastqToVCF {
 
       input_manta_reference_vcfs = input_manta_reference_vcfs
     }
+
+    call Annotation.bcftoolsAnnotate as MantaAnnotation {
+      input:
+        input_vcf = Manta.mantaVcf,
+        input_vcf_index = mantaVcfindex,
+
+        sample_basename=sample_basename,
+
+        HPO = HPO,
+        HPO_index = HPO_index,
+        OMIM = OMIM,
+        OMIM_index = OMIM_index,
+        gnomadConstraints = gnomadConstraints,
+        gnomadConstraints_index = gnomadConstraints_index,
+        CGD = CGD,
+        CGD_index = CGD_index,
+
+        bcftools_annotation_header = bcftools_annotation_header,
+        
+        output_filename = sample_basename + ".manta.annotated.vcf.gz",
+        docker = bcftools_docker
+    }
   }
 
   if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
