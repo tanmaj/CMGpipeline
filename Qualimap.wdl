@@ -254,7 +254,7 @@ task DepthOfCoverage34 {
 
 task DownsampleBED {
   input {
-    File bed_file
+    File? bed_file
     Int select_every_nth_line = 2
 
     String docker = "biocontainers/tabix:v1.9-11-deb_cv1"
@@ -274,6 +274,6 @@ task DownsampleBED {
     runtime_minutes: 60
   }
   output {
-    File downsampled_bed_file = "downsampled_~{bed_filename}"
+    File? downsampled_bed_file = "downsampled_~{bed_filename}"
   }
 }
