@@ -10,15 +10,15 @@ version 1.0
 # Subworkflows
 import "./AnnotationPipeline.wdl" as Annotation
 import "./Conifer.wdl" as Conifer
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
+import "./Qualimap.wdl" as Qualimap
 import "./ROH.wdl" as ROH
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
+import "./CreateInterpretationTable.wdl" as CreateInterpretationTable
+import "./MitoMap.wdl" as MitoMap
+import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
 ## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype_dna_bam.wdl" as Optitype
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/SMN_caller/SMN_caller.wdl" as SMN
+import "./optitype_dna_bam.wdl" as Optitype
+import "./SMN_caller/SMN_caller.wdl" as SMN
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
