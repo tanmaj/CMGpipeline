@@ -260,7 +260,7 @@ task DownsampleBED {
     String docker = "biocontainers/tabix:v1.9-11-deb_cv1"
   }
   
-  String bed_filename = basename(bed_file)
+  String bed_filename = basename(select_first([bed_file, ""]))
 
   command <<<
   set -e
