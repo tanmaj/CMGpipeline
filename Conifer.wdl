@@ -269,7 +269,7 @@ task CONIFER_Annotate {
   
   command <<<
   set -e
-  bcftools intersect -a ~{conifer_calls_wig} -b ~{HPO} ~{OMIM} ~{gnomadConstraints} ~{CGD} -wa -wb -loj | awk '{print $1,$2,$3,$4,$9,$10}' OFS='\t' > ~{sample_basename}.CONIFER.ANNOTATED.txt
+  bedtools intersect -a ~{conifer_calls_wig} -b ~{HPO} ~{OMIM} ~{gnomadConstraints} ~{CGD} -wa -wb -loj | awk '{print $1,$2,$3,$4,$9,$10}' OFS='\t' > ~{sample_basename}.CONIFER.ANNOTATED.txt
   >>>
 
   runtime {
