@@ -88,7 +88,7 @@ workflow SVcalling {
             sample_basename = sample
     }
 
-    call AnnotSV {
+    call annotSV {
         input:
             genome_build = "GRCh37",
             input_vcf = AnnotateMantaVCF.output_manta_filtered_vcf,
