@@ -204,7 +204,7 @@ task DepthOfCoverage34 {
       ~{if defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
        -omitBaseOutput \
        -ip 2 \
-        -allowPotentiallyMisencodedQuals \
+       -allowPotentiallyMisencodedQuals \
        -ct 5 \
        -ct 10 \
        -ct 20 \
@@ -249,4 +249,31 @@ task DepthOfCoverage34 {
         cpu: 1
         runtime_minutes: 2400
     }
+}
+
+
+task DownsampleBED {
+  input {
+    File bed_file
+    Int select_every_nth_line = 2
+
+    String docker = "biocontainers/tabix:v1.9-11-deb_cv1"
+  }
+  
+  String bed_filename = basename(bed_file)
+
+  command <<<
+  set -e
+  cat ~{bed_file} | awk 'NR % ~{select_every_nth_line} == 0' > downsampled_~{bed_filename}
+  >>>
+
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 2000
+    cpu: 1
+    runtime_minutes: 60
+  }
+  output {
+    File downsampled_bed_file = "downsampled_~{bed_filename}"
+  }
 }
