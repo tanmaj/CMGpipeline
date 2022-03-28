@@ -12,29 +12,31 @@ workflow Optimised_OptitypeDna {
     File? input_bam
   }
   
-  call BamToFastq {
-    input:
-       sample_basename = sample_basename,
-       input_bam = input_bam
+  if ( defined(input_bam) ) {
+     call BamToFastq {
+       input:
+          sample_basename = sample_basename,
+          input_bam = input_bam
+     }
   }
   
     call PrepareHLA as PrepareHLA_fwd {
     input:
        optitype_name = sample_basename,
-       input_fq = select_first([ input_fq1, BamToFastq.fwd_fastq ])
+       input_fq = select_first([input_fq1, BamToFastq.fwd_fastq])
   }
   
     call PrepareHLA as PrepareHLA_rev {
     input:
        optitype_name = sample_basename,
-       input_fq = select_first([ input_fq2, BamToFastq.rev_fastq ])
+       input_fq = select_first([input_fq2, BamToFastq.rev_fastq])
   }
   
-    call OptitypeDna_ {
+    call OptitypeDnaPipeline {
     input:
        sample_basename=sample_basename,
-       hla_fwd_fastq = PrepareHLA_fwd.,
-       hla_rev_fastq = PrepareHLA_rev.,
+       hla_fwd_fastq = PrepareHLA_fwd.hla_fwd_fastq,
+       hla_rev_fastq = PrepareHLA_rev.hla_rev_fastq
   }
 }
 
@@ -122,7 +124,7 @@ task OptitypeDna_PrepareHLA {
   }
 }
 
-task OptitypeDna {
+task OptitypeDnaPipeline {
   input {
     String optitype_name = sample_basename
     File hla.fwd.fastq
