@@ -810,10 +810,12 @@ workflow FastqToVCF {
     File? output_conifer_calls_wig = Conifer.output_conifer_calls_wig
     #File CNV_bed = Conifer.CNV_bed
     File? CNV_wig = Conifer.CNV_wig
+    File? conifer_calls_annotated = CONIFER_Annotate.conifer_calls_annotated
 
     File? mantaVCF = Manta.mantaVcf
     File? mantaVCFindex = Manta.mantaVcfindex
     File? mantaSVs = Manta.output_sv_table
+    File? mantaSVs_annotSV_tsv = Manta.annotSV_tsv
 
     File? Qualimap_results = Qualimap.results
     File? QualimapWGS_results = QualimapWGS.results
