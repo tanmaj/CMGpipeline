@@ -770,7 +770,7 @@ workflow FastqToVCF {
     docker = bcftools_docker
   }
 
-  call manta.annotSV as ROH_annotSV {
+  call Manta.annotSV as ROH_annotSV {
       input:
         genome_build = "GRCh37",
         input_vcf = CallROH.ROH_calls_annotSV_input_bed,
