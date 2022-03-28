@@ -12,25 +12,29 @@ workflow Optimised_OptitypeDna {
     File? input_bam
   }
   
-  call OptitypeDnafromFastq {
+  call BamToFastq {
     input:
-       sample_basename=sample_basename,
-       input_fq1 = input_fq1,
-       input_fq2 = input_fq2,
+       sample_basename = sample_basename,
+       input_bam = input_bam
   }
   
-    call OptitypeDnafromFastq {
+    call PrepareHLA as PrepareHLA_fwd {
     input:
-       sample_basename=sample_basename,
-       input_fq1 = input_fq1,
-       input_fq2 = input_fq2,
+       optitype_name = sample_basename,
+       input_fq = select_first([ input_fq1, BamToFastq.fwd_fastq ])
   }
   
-    call OptitypeDnafromFastq {
+    call PrepareHLA as PrepareHLA_rev {
+    input:
+       optitype_name = sample_basename,
+       input_fq = select_first([ input_fq2, BamToFastq.rev_fastq ])
+  }
+  
+    call OptitypeDna_ {
     input:
        sample_basename=sample_basename,
-       input_fq1 = input_fq1,
-       input_fq2 = input_fq2,
+       hla_fwd_fastq = PrepareHLA_fwd.,
+       hla_rev_fastq = PrepareHLA_rev.,
   }
 }
 
@@ -66,9 +70,9 @@ task BamToFastq {
 
 
 
-task OptitypeDna {
+task OptitypeDna_PrepareHLA {
   input {
-    String optitype_name = "optitype"
+    String optitype_name
     File input_fq1
     File input_fq2
   }
@@ -113,8 +117,8 @@ task OptitypeDna {
   >>>
 
   output {
-    File optitype_tsv = optitype_name + ".optitype_result.tsv"
-    File optitype_plot = optitype_name + ".optitype_coverage_plot.pdf"
+    File hla_fwd_fastq = optitype_name + ".hla.fwd.fastq"
+    File hla_rev_fastq = optitype_name + ".hla.rev.fastq"
   }
 }
 
