@@ -728,7 +728,7 @@ workflow FastqToVCF {
   }
 
   # Downsample dbSNP bed file if this is a WGS analysis
-  if( !defined(enrichment_bed) && !defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
+  if( enrichment=="WGS" ){
      call ROH.Downsample_dbSNP as Downsample_dbSNP {
       input:
         dbSNPcommon_bed = dbSNPcommon_bed,
