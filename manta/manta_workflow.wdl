@@ -45,17 +45,6 @@ workflow SVcalling {
 
         Array[File] input_manta_reference_vcfs = select_first([input_manta_reference_vcfs, [""]])
 
-        # Annotation data
-        File HPO
-        File HPO_index
-        File OMIM
-        File OMIM_index
-        File gnomadConstraints
-        File gnomadConstraints_index
-        File CGD
-        File CGD_index
-        File bcftools_annotation_header
-
         Map[String, String] dockerImages = {
             "bcftools": "quay.io/biocontainers/bcftools:1.10.2--h4f4756c_2",
             "clever": "quay.io/biocontainers/clever-toolkit:2.4--py36hcfe0e84_6",
@@ -86,32 +75,9 @@ workflow SVcalling {
             exome = exome
     }
 
-
-    call Annotation.bcftoolsAnnotate as MantaAnnotation {
-          input:
-            input_vcf = manta.mantaVCF,
-            input_vcf_index = manta.mantaVCFindex,
-
-            sample_basename=sample,
-
-            HPO = HPO,
-            HPO_index = HPO_index,
-            OMIM = OMIM,
-            OMIM_index = OMIM_index,
-            gnomadConstraints = gnomadConstraints,
-            gnomadConstraints_index = gnomadConstraints_index,
-            CGD = CGD,
-            CGD_index = CGD_index,
-
-            bcftools_annotation_header = bcftools_annotation_header,
-            
-            output_filename = sample + ".manta.vcf.gz",
-            docker = "dceoy/bcftools"
-        }
-
     call MergeMantaFiles {
         input:
-            input_manta_vcf = MantaAnnotation.output_vcf,
+            input_manta_vcf = manta.mantaVCF,
             input_manta_reference_vcfs = input_manta_reference_vcfs,
             sample_basename = sample
     }    
@@ -120,6 +86,13 @@ workflow SVcalling {
         input:
             input_vcf = MergeMantaFiles.merged_vcf,
             sample_basename = sample
+    }
+
+    call AnnotSV {
+        input:
+            genome_build = "GRCh37",
+            input_vcf = AnnotateMantaVCF.output_manta_filtered_vcf,
+            output_tsv_name = sample + "_AnnotSV.tsv"
     }
 
     output {
@@ -208,5 +181,31 @@ task AnnotateMantaVCF {
   output {
     File output_sv_table = "~{sample_basename}.mantaSVs.txt"
     File output_manta_filtered_vcf = "~{sample_basename}.merged.annotated.filtered.vcf"
+  }
+}
+
+task annotSV {
+  input {
+    String genome_build
+    File input_vcf
+    String output_tsv_name = "AnnotSV.tsv"
+  }
+
+  Int space_needed_gb = 10 + round(size(snps_vcf, "GB") + size(input_vcf, "GB"))
+  runtime {
+    requested_memory_mb_per_core: 8000
+    docker: "mgibio/annotsv-cwl:2.1"
+    disks: "local-disk ~{space_needed_gb} SSD"
+  }
+
+  command <<<
+    /opt/AnnotSV_2.1/bin/AnnotSV -bedtools /usr/bin/bedtools -outputDir "$PWD" \
+    -genomeBuild ~{genome_build} \
+    -SVinputFile ~{input_vcf} \
+    -outputFile ~{output_tsv_name}
+  >>>
+
+  output {
+    File sv_variants_tsv = output_tsv_name
   }
 }
