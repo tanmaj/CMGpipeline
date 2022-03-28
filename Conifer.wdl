@@ -1,7 +1,7 @@
 version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
-import "./manta/manta.wdl" as manta
+import "./manta/manta_workflow.wdl" as manta
 
 # WORKFLOW DEFINITION 
 workflow Conifer {
