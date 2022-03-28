@@ -264,7 +264,8 @@ task DownsampleBED {
 
   command <<<
   set -e
-  cat ~{bed_file} | awk 'NR % ~{select_every_nth_line} == 0' > downsampled_~{bed_filename}
+  #cat ~{bed_file} | awk 'NR % ~{select_every_nth_line} == 0' > downsampled_~{bed_filename}
+  cat ~{bed_file} | awk -F'\t' '{print $1,$2+1,$3-1}' OFS='\t' > downsampled_~{bed_filename}
   >>>
 
   runtime {
