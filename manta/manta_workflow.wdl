@@ -196,6 +196,7 @@ task annotSV {
     requested_memory_mb_per_core: 8000
     docker: "mgibio/annotsv-cwl:2.1"
     continueOnReturnCode: true
+    cpu: 1
   }
 
   command <<<
