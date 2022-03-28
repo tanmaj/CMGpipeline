@@ -676,6 +676,13 @@ workflow FastqToVCF {
     }
   }
 
+  if( enrichment=="WGS1Mb" ){
+     call Qualimap.DownsampleBED as DownsampleBED {
+      input:
+         bed_file = enrichment_bed
+    }
+  }
+
   # Merge per-interval GVCFs
   if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
     call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
@@ -688,7 +695,7 @@ workflow FastqToVCF {
         reference_fai=reference_fai,
         reference_dict=reference_dict,
 
-        enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, enrichment_bed]),
+        enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, DownsampleBED.downsampled_bed_file, enrichment_bed]),
 
         refSeqFile = refSeqFile,
 
