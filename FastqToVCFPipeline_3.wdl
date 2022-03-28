@@ -728,7 +728,7 @@ workflow FastqToVCF {
   }
 
   # Downsample dbSNP bed file if this is a WGS analysis
-  if( enrichment=="WGS" ){
+  if( enrichment=="WGS1Mb" ){
      call ROH.Downsample_dbSNP as Downsample_dbSNP {
       input:
         dbSNPcommon_bed = dbSNPcommon_bed,
