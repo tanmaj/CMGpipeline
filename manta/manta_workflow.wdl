@@ -191,11 +191,9 @@ task annotSV {
     String output_tsv_name = "AnnotSV.tsv"
   }
 
-  Int space_needed_gb = 10 + round(size(snps_vcf, "GB") + size(input_vcf, "GB"))
   runtime {
     requested_memory_mb_per_core: 8000
     docker: "mgibio/annotsv-cwl:2.1"
-    disks: "local-disk ~{space_needed_gb} SSD"
   }
 
   command <<<
