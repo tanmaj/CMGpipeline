@@ -1,6 +1,8 @@
 version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
+import "./manta/manta.wdl" as manta
+
 # WORKFLOW DEFINITION 
 workflow Conifer {
   input {
@@ -59,6 +61,13 @@ workflow Conifer {
         enrichment=enrichment
   }
 
+  call manta.annotSV as annotSV {
+      input:
+        genome_build = "GRCh37",
+        input_vcf = CONIFER_Call.output_conifer_annotSV_input_bed,
+        output_tsv_name = sample + "_CONIFER_annotSV.tsv"
+  }
+
   output {
     File output_conifer_calls = CONIFER_Call.output_conifer_calls
     File output_conifer_calls_wig = CONIFER_Call.output_conifer_calls_wig
@@ -66,6 +75,7 @@ workflow Conifer {
     File CNV_bed = CONIFER_Export.CNV_bed
     File CNV_wig = CONIFER_Export.CNV_wig
     File output_rpkm = MakeRPKM.output_rpkm
+    File annotSV_tsv = annotSV.sv_variants_tsv
   }
 }
 
@@ -163,6 +173,7 @@ task CONIFER_Call {
   if grep -q "~{sample_basename}" ~{sample_basename}.CONIFER_CALLS_POPULATION.txt; then
     cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
     cat ~{sample_basename}.CONIFER_CALLS.txt | grep -v "start" | awk -F'\t' '{ if ($5 == "dup") $5="1"; if ($5 == "del") $5="-1";print $2,$3,$4,$5}' OFS='\t' > ~{sample_basename}.CNV.wig
+    cat ~{sample_basename}.CONIFER_CALLS.txt | grep -v "start" | awk -F'\t' '{ if ($5 == "dup") $5="DUP"; if ($5 == "DEL") $5="-1";print $2,$3,$4,$5,"~{sample_basename}"}' OFS='\t' > ~{sample_basename}.CNV.annotSV.input.bed
     echo "Sample specific CNV calls generated."
   else
     echo "No CNV calls found for sample"
@@ -181,6 +192,7 @@ task CONIFER_Call {
   output {
     File output_conifer_calls = "~{sample_basename}.CONIFER_CALLS.txt"
     File output_conifer_calls_wig = "~{sample_basename}.CNV.wig"
+    File output_conifer_annotSV_input_bed ="~{sample_basename}.CNV.annotSV.input.bed"
   }
 }
 

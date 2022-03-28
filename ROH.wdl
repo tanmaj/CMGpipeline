@@ -102,6 +102,7 @@ task CallROH {
   cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^RG" | awk -F'\t' '{if($7>20 && $8>30 && $6>1000000)print $3,$4,$5,$7}' OFS='\t' > ~{sample_basename}.ROHcalls.size.wig
   cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$4,$5}' OFS='\t' > ~{sample_basename}.ROHintervals.state.wig
   cat ~{sample_basename}.bcftoolsROH.output | grep "^[^#]" | grep "^ST" | awk -F'\t' '{print $3,$4,$4,$6}' OFS='\t' > ~{sample_basename}.ROHintervals.qual.wig
+  cat ~{sample_basename}.ROHcalls.qual.wig | awk -F'\t' '{ print $1,$2,$3,"ROH","~{sample_basename}"}' OFS='\t' > ~{sample_basename}.ROHcalls.annotSV.input.bed
   >>>
 
   runtime {
@@ -115,6 +116,7 @@ task CallROH {
     File ROH_calls_size = "~{sample_basename}.ROHcalls.size.wig"
     File ROH_intervals_state = "~{sample_basename}.ROHintervals.state.wig"
     File ROH_intervals_qual = "~{sample_basename}.ROHintervals.qual.wig"
+    File ROH_calls_annotSV_input_bed = "~{sample_basename}.ROHcalls.annotSV.input.bed"
     File BAF_vcf = "~{sample_basename}.dbSNP.vcf.gz"
   }
 }

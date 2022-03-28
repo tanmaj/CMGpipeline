@@ -770,6 +770,13 @@ workflow FastqToVCF {
     docker = bcftools_docker
   }
 
+  call manta.annotSV as ROH_annotSV {
+      input:
+        genome_build = "GRCh37",
+        input_vcf = CallROH.ROH_calls_annotSV_input_bed,
+        output_tsv_name = sample + "_ROH_annotSV.tsv"
+  }
+
   call ExpansionHunter.ExpansionHunter as ExpansionHunter {
     input:
       sample_id = sample_basename,
@@ -811,6 +818,7 @@ workflow FastqToVCF {
     #File CNV_bed = Conifer.CNV_bed
     File? CNV_wig = Conifer.CNV_wig
     File? conifer_calls_annotated = CONIFER_Annotate.conifer_calls_annotated
+    File? conifer_annotSV_tsv = Conifer.annotSV_tsv
 
     File? mantaVCF = Manta.mantaVcf
     File? mantaVCFindex = Manta.mantaVcfindex
@@ -828,6 +836,7 @@ workflow FastqToVCF {
     File ROH_calls_size = CallROH.ROH_calls_size
     File ROH_intervals_state = CallROH.ROH_intervals_state
     File ROH_intervals_qual = CallROH.ROH_intervals_qual
+    File? conifer_annotSV_tsv = ROH_annotSV.output_tsv_name
     #File ROHplink_calls = CallPlink.ROHplink_calls
 
     File? mitoResults_xls = MitoMap.mitoResults_xls

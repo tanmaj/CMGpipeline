@@ -195,6 +195,7 @@ task annotSV {
   runtime {
     requested_memory_mb_per_core: 8000
     docker: "mgibio/annotsv-cwl:2.1"
+    continueOnReturnCode: true
   }
 
   command <<<
@@ -205,6 +206,6 @@ task annotSV {
   >>>
 
   output {
-    File sv_variants_tsv = output_tsv_name
+    File? sv_variants_tsv = output_tsv_name
   }
 }
