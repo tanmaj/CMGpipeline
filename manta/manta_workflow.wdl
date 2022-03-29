@@ -168,8 +168,11 @@ task AnnotateMantaVCF {
 
   command { 
   java -jar /home/biodocker/bin/snpEff/snpEff.jar -noInteraction -noDownload hg19 ~{input_vcf} > ~{sample_basename}.merged.annotated.vcf
-  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "(ANN[*].IMPACT has 'MODERATE' | ANN[*].IMPACT has 'HIGH') & SUPP < 2 & isVariant(GEN[~{sample_basename}].GT)" ~{sample_basename}.merged.annotated.vcf > ~{sample_basename}.merged.annotated.filtered.vcf
+  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "(ANN[*].IMPACT has 'MODERATE' | ANN[*].IMPACT has 'HIGH') & SUPP < 3 & isVariant(GEN[~{sample_basename}].GT)" ~{sample_basename}.merged.annotated.vcf > ~{sample_basename}.merged.annotated.filtered.vcf
   java -jar /home/biodocker/bin/snpEff/SnpSift.jar extractFields -s "," -e "." ~{sample_basename}.merged.annotated.filtered.vcf CHROM POS REF ALT SVLEN QUAL ANN[*].GENE ANN[1].IMPACT ANN[1].EFFECT GEN[*].GT > ~{sample_basename}.mantaSVs.txt
+
+  # Create an unannotated snpEff file for annotSV and other applications
+  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "SUPP < 3 & isVariant(GEN[~{sample_basename}].GT)" ~{input_vcf} > ~{sample_basename}.merged.filtered.vcf
 
   }
   runtime {
@@ -181,7 +184,8 @@ task AnnotateMantaVCF {
   }
   output {
     File output_sv_table = "~{sample_basename}.mantaSVs.txt"
-    File output_manta_filtered_vcf = "~{sample_basename}.merged.annotated.filtered.vcf"
+    File output_manta_filtered_vcf = "~{sample_basename}.merged.filtered.vcf"
+    File output_manta_annotated_filtered_vcf = "~{sample_basename}.merged.annotated.filtered.vcf"
   }
 }
 
