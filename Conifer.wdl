@@ -71,7 +71,7 @@ workflow Conifer {
       input:
         genome_build = "GRCh37",
         input_vcf = CONIFER_Call.output_conifer_annotSV_input_bed,
-        output_tsv_name = sample_basename + "_CONIFER_annotSV.tsv"
+        output_tsv_name = sample_basename + ".CONIFER.annotSV.tsv"
   }
 
   output {
