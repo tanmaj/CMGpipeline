@@ -34,8 +34,8 @@ workflow ROHanalysis {
 
   call calculateBAF {
   input:
-    input_bam = SortSam.output_bam,
-    input_bam_index = SortSam.output_bam_index,
+    input_bam = input_bam,
+    input_bam_index = input_bam_index,
     sample_basename=sample_basename,
 
     reference_fa=reference_fa,
@@ -48,8 +48,8 @@ workflow ROHanalysis {
 
   call CallROH {
   input:
-    input_bam = SortSam.output_bam,
-    input_bam_index = SortSam.output_bam_index,
+    input_bam = input_bam,
+    input_bam_index = input_bam_index,
     sample_basename=sample_basename,
   
     reference_fa=reference_fa,
