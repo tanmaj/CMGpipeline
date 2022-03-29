@@ -262,7 +262,7 @@ task DownsampleBED {
   }
   
   String bed_filename = basename(select_first([bed_file, ""]))
-  String reference_fai_filename = basename(select_first([reference_fai, ""]))
+  String reference_fai_filename = select_first([reference_fai, ""])
 
   command <<<
   set -e
