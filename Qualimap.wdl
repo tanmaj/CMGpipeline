@@ -255,17 +255,21 @@ task DepthOfCoverage34 {
 task DownsampleBED {
   input {
     File? bed_file
-    Int select_every_nth_line = 2
+    File? reference_fai
 
-    String docker = "biocontainers/tabix:v1.9-11-deb_cv1"
+    Int select_every_nth_line = 2
+    String docker = "pegi3s/bedtools"
   }
   
   String bed_filename = basename(select_first([bed_file, ""]))
+  String reference_fai_filename = basename(select_first([reference_fai, ""]))
 
   command <<<
   set -e
+  awk {'print $1, $2'} OFS='\t' ~{reference_fai_filename} |head -n 26 | grep -v '_' | grep -v 'chrM' | grep -v 'chrY' > hg19.genome
+  bedtools makewindows -w 100000 -g hg19.genome  > downsampled_~{bed_filename}
   #cat ~{bed_file} | awk 'NR % ~{select_every_nth_line} == 0' > downsampled_~{bed_filename}
-  cat ~{bed_file} | awk -F'\t' '{print $1,$2+5,$3-5}' OFS='\t' > downsampled_~{bed_filename}
+  #cat ~{bed_file} | awk -F'\t' '{print $1,$2+5,$3-5}' OFS='\t' > downsampled_~{bed_filename}
   >>>
 
   runtime {

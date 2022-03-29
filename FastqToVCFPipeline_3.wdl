@@ -679,7 +679,8 @@ workflow FastqToVCF {
   if( enrichment=="WGS1Mb" ){
      call Qualimap.DownsampleBED as DownsampleBED {
       input:
-         bed_file = enrichment_bed
+         bed_file = enrichment_bed,
+         reference_fai=reference_fai
     }
   }
 
