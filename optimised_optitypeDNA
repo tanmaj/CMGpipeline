@@ -20,23 +20,23 @@ workflow Optimised_OptitypeDna {
      }
   }
   
-    call PrepareHLA as PrepareHLA_fwd {
-    input:
+  call OptitypeDnaPrepareHLA as PrepareHLA_fwd {
+  input:
        optitype_name = sample_basename,
        input_fq = select_first([input_fq1, BamToFastq.fwd_fastq])
   }
   
-    call PrepareHLA as PrepareHLA_rev {
-    input:
+  call OptitypeDnaPrepareHLA as PrepareHLA_rev {
+  input:
        optitype_name = sample_basename,
        input_fq = select_first([input_fq2, BamToFastq.rev_fastq])
   }
   
-    call OptitypeDnaPipeline {
-    input:
+  call OptitypeDnaPipeline {
+  input:
        optitype_name = sample_basename,
-       hla_fwd_fastq = PrepareHLA_fwd.hla_fastq,
-       hla_rev_fastq = PrepareHLA_rev.hla_fastq
+       hla_fwd_fastq = OptitypeDnaPrepareHLA_fwd.hla_fastq,
+       hla_rev_fastq = OptitypeDnaPrepareHLA_rev.hla_fastq
   }
   
   output {
@@ -77,7 +77,7 @@ task BamToFastq {
 
 
 
-task OptitypeDna_PrepareHLA {
+task OptitypeDnaPrepareHLA {
   input {
     String optitype_name
     File input_fq
@@ -103,11 +103,11 @@ task OptitypeDna_PrepareHLA {
     
     echo Select only the mapped reads from the sam files:
     /opt/samtools/bin/samtools view -S -F 4 $name.aln.sam > $name.aln.map.sam
- #   rm -f  $name.aln.sam
+    #   rm -f  $name.aln.sam
 
     echo Convert sam files to fastq files, also stored in temp dir
     cat $name.aln.map.sam | grep -v ^@ | /usr/bin/awk '{print "@"$1"\n"$10"\n+\n"$11}' > $name.hla.fastq
- #   rm -f $name.aln.map.sam
+    #   rm -f $name.aln.map.sam
 
   >>>
 
