@@ -49,7 +49,7 @@ workflow Optimised_OptitypeDna {
 task BamToFastq {
   input {
     String sample_basename
-    File input_bam
+    File? input_bam
   }
 
   #Int space_needed_gb = 10 + round(5*size([input_bam], "GB"))
