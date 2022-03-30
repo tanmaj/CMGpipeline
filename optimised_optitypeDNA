@@ -52,29 +52,39 @@ task BamToFastq {
     File? input_bam
   }
 
-  #Int space_needed_gb = 10 + round(5*size([input_bam], "GB"))
-  runtime {
-    memory: "64GB"
-    docker: "mgibio/immuno_tools-cwl:1.0.1"
-    #disks: "local-disk ~{space_needed_gb} SSD"
-    #bootDiskSizeGb: 3*space_needed_gb
-  }
+  ##Int space_needed_gb = 10 + round(5*size([input_bam], "GB"))
+  #runtime {
+  #  memory: "64GB"
+  #  docker: "mgibio/immuno_tools-cwl:1.0.1"
+  #  #disks: "local-disk ~{space_needed_gb} SSD"
+  #  #bootDiskSizeGb: 3*space_needed_gb
+  #}
 
+  #command <<<
+  #  set -e -o pipefail
+  #  name=~{sample_basename}
+  #  echo $name
+  #  echo Running bedtools bamtofastq
+  #  /usr/bin/bedtools bamtofastq -fq  $name.fwd.fq -fq2  $name.rev.fq -i ~{input_bam}   2>/dev/null;
+  #>>>
+  
+  runtime {
+    docker: "alesmaver/bwa_samtools_picard"
+  }
+  
   command <<<
     set -e -o pipefail
     name=~{sample_basename}
     echo $name
-
-    echo Running bedtools bamtofastq
-    /usr/bin/bedtools bamtofastq -fq  $name.fwd.fq -fq2  $name.rev.fq -i ~{input_bam}   2>/dev/null;
+    echo Converting BAM to Fastqs
+    java -Xms1000m -Xmx1000m -jar /usr/picard/picard.jar  SamToFastq INPUT=~{input_bam} FASTQ=$name.fwd.fq.gz SECOND_END_FASTQ=$name.rev.fq.gz
   >>>
 
-  output {
-    File fwd_fastq = sample_basename + ".fwd.fq"
-    File rev_fastq = sample_basename + ".rev.fq"
+output {
+    File fwd_fastq = sample_basename + ".fwd.fq.gz"
+    File rev_fastq = sample_basename + ".rev.fq.gz"
   }
 }
-
 
 
 task OptitypeDnaPrepareHLA {
