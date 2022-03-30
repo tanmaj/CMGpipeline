@@ -35,8 +35,8 @@ workflow Optimised_OptitypeDna {
   call OptitypeDnaPipeline {
   input:
        optitype_name = sample_basename,
-       hla_fwd_fastq = OptitypeDnaPrepareHLA_fwd.hla_fastq,
-       hla_rev_fastq = OptitypeDnaPrepareHLA_rev.hla_fastq
+       hla_fwd_fastq = PrepareHLA_fwd.hla_fastq,
+       hla_rev_fastq = PrepareHLA_rev.hla_fastq
   }
   
   output {
