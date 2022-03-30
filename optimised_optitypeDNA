@@ -38,6 +38,11 @@ workflow Optimised_OptitypeDna {
        hla_fwd_fastq = PrepareHLA_fwd.hla_fastq,
        hla_rev_fastq = PrepareHLA_rev.hla_fastq
   }
+  
+  output {
+       File? optitype_tsv = OptitypeDnaPipeline.optitype_tsv
+       File? optitype_plot = OptitypeDnaPipeline.optitype_plot
+  }
 }
 
 
