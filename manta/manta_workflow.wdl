@@ -92,7 +92,7 @@ workflow SVcalling {
         input:
             genome_build = "GRCh37",
             input_vcf = AnnotateMantaVCF.output_manta_filtered_vcf,
-            output_tsv_name = sample + "_AnnotSV.tsv"
+            output_tsv_name = sample + ".manta.AnnotSV.tsv"
     }
 
     output {
