@@ -609,7 +609,7 @@ workflow FastqToVCF {
     }
   }
 
-  if( defined(input_manta_reference_vcfs) ){
+  if( defined(input_manta_reference_vcfs) & !defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
     call Manta.SVcalling as Manta{
     input:
       bamFile = SortSam.output_bam,
