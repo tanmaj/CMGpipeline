@@ -23,7 +23,8 @@ version 1.0
 # SOFTWARE.
 
 
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta.wdl" as manta
+import "./manta.wdl" as manta
+import "../AnnotationPipeline.wdl" as Annotation
 
 
 workflow SVcalling {
@@ -79,7 +80,7 @@ workflow SVcalling {
             input_manta_vcf = manta.mantaVCF,
             input_manta_reference_vcfs = input_manta_reference_vcfs,
             sample_basename = sample
-    }
+    }    
 
     call AnnotateMantaVCF {
         input:
@@ -87,10 +88,19 @@ workflow SVcalling {
             sample_basename = sample
     }
 
+    call annotSV {
+        input:
+            genome_build = "GRCh37",
+            input_vcf = AnnotateMantaVCF.output_manta_filtered_vcf,
+            output_tsv_name = sample + ".manta.AnnotSV.tsv"
+    }
+
     output {
         File mantaVcf = manta.mantaVCF
         File mantaVcfindex = manta.mantaVCFindex
         File output_sv_table = AnnotateMantaVCF.output_sv_table
+        File output_manta_filtered_vcf = AnnotateMantaVCF.output_manta_filtered_vcf
+        File? annotSV_tsv = annotSV.sv_variants_tsv
     }
 
     parameter_meta {
@@ -158,8 +168,11 @@ task AnnotateMantaVCF {
 
   command { 
   java -jar /home/biodocker/bin/snpEff/snpEff.jar -noInteraction -noDownload hg19 ~{input_vcf} > ~{sample_basename}.merged.annotated.vcf
-  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "(ANN[*].IMPACT has 'MODERATE' | ANN[*].IMPACT has 'HIGH') & SUPP < 2 & isVariant(GEN[~{sample_basename}].GT)" ~{sample_basename}.merged.annotated.vcf > ~{sample_basename}.merged.annotated.filtered.vcf
+  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "(ANN[*].IMPACT has 'MODERATE' | ANN[*].IMPACT has 'HIGH') & SUPP < 3 & isVariant(GEN[~{sample_basename}].GT)" ~{sample_basename}.merged.annotated.vcf > ~{sample_basename}.merged.annotated.filtered.vcf
   java -jar /home/biodocker/bin/snpEff/SnpSift.jar extractFields -s "," -e "." ~{sample_basename}.merged.annotated.filtered.vcf CHROM POS REF ALT SVLEN QUAL ANN[*].GENE ANN[1].IMPACT ANN[1].EFFECT GEN[*].GT > ~{sample_basename}.mantaSVs.txt
+
+  # Create an unannotated snpEff file for annotSV and other applications
+  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "SUPP < 3 & isVariant(GEN[~{sample_basename}].GT)" ~{input_vcf} > ~{sample_basename}.merged.filtered.vcf
 
   }
   runtime {
@@ -171,5 +184,33 @@ task AnnotateMantaVCF {
   }
   output {
     File output_sv_table = "~{sample_basename}.mantaSVs.txt"
+    File output_manta_filtered_vcf = "~{sample_basename}.merged.filtered.vcf"
+    File output_manta_annotated_filtered_vcf = "~{sample_basename}.merged.annotated.filtered.vcf"
+  }
+}
+
+task annotSV {
+  input {
+    String genome_build
+    File input_vcf
+    String output_tsv_name = "AnnotSV.tsv"
+  }
+
+  runtime {
+    requested_memory_mb_per_core: 8000
+    docker: "mgibio/annotsv-cwl:2.1"
+    continueOnReturnCode: true
+    cpu: 1
+  }
+
+  command <<<
+    /opt/AnnotSV_2.1/bin/AnnotSV -bedtools /usr/bin/bedtools -outputDir "$PWD" \
+    -genomeBuild ~{genome_build} \
+    -SVinputFile ~{input_vcf} \
+    -outputFile ~{output_tsv_name}
+  >>>
+
+  output {
+    File? sv_variants_tsv = output_tsv_name
   }
 }

@@ -170,7 +170,7 @@ task DepthOfCoverage {
         maxRetries: 3
         requested_memory_mb_per_core: 9000
         cpu: 1
-        runtime_minutes: 2400
+        runtime_minutes: 6000
     }
 }
 
@@ -204,7 +204,7 @@ task DepthOfCoverage34 {
       ~{if defined(enrichment_bed) then "-L " + enrichment_bed else ""} \
        -omitBaseOutput \
        -ip 2 \
-        -allowPotentiallyMisencodedQuals \
+       -allowPotentiallyMisencodedQuals \
        -ct 5 \
        -ct 10 \
        -ct 20 \
@@ -212,9 +212,9 @@ task DepthOfCoverage34 {
        -ct 100 \
        -geneList ~{refSeqFile}
 
-    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.coverage_mean.wig
-    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' > ~{sample_basename}.coverage.wig
-    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' > ~{sample_basename}.coverage_neg.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.coverage_mean.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.coverage.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.coverage_neg.wig
 
     java -Xmx8g -jar /usr/GenomeAnalysisTK.jar \
       -T DepthOfCoverage \
@@ -231,9 +231,9 @@ task DepthOfCoverage34 {
        -ct 50 \
        -ct 100
 
-    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_mean.wig
-    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage.wig
-    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' > ~{sample_basename}.mitochondrial.coverage_neg.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage_mean.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage_neg.wig
 
     tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz *coverage*
     >>>
@@ -247,6 +247,38 @@ task DepthOfCoverage34 {
         maxRetries: 3
         requested_memory_mb_per_core: 9000
         cpu: 1
-        runtime_minutes: 2400
+        runtime_minutes: 6000
     }
+}
+
+
+task DownsampleBED {
+  input {
+    File? bed_file
+    File? reference_fai
+
+    Int select_every_nth_line = 2
+    String docker = "pegi3s/bedtools"
+  }
+  
+  String bed_filename = basename(select_first([bed_file, ""]))
+  String reference_fai_filename = select_first([reference_fai, ""])
+
+  command <<<
+  set -e
+  awk {'print $1, $2'} OFS='\t' ~{reference_fai_filename} |head -n 26 | grep -v '_' | grep -v 'chrM' | grep -v 'chrY' > hg19.genome
+  bedtools makewindows -w 100000 -g hg19.genome  > ~{bed_filename}
+  #cat ~{bed_file} | awk 'NR % ~{select_every_nth_line} == 0' > downsampled_~{bed_filename}
+  cat ~{bed_filename} | awk -F'\t' '{print $1,$2+5,$3-5}' OFS='\t' > downsampled_~{bed_filename}
+  >>>
+
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 2000
+    cpu: 1
+    runtime_minutes: 60
+  }
+  output {
+    File? downsampled_bed_file = "downsampled_~{bed_filename}"
+  }
 }

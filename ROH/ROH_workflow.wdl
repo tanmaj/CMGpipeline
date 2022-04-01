@@ -1,7 +1,90 @@
 version 1.0
 
 ## Copyright CMG@KIGM, Ales Maver
+import "../manta/manta_workflow.wdl" as Manta
 
+workflow ROHanalysis {
+    input {
+        File input_bam
+        File input_bam_index
+
+        String sample_basename
+
+        String enrichment
+
+        File reference_fa
+
+        File dbSNPcommon_bed
+        File dbSNPcommon_bed_index
+
+        File gnomAD_maf01_vcf
+        File gnomAD_maf01_vcf_index
+        File gnomAD_maf01_tab
+        File gnomAD_maf01_tab_index
+  }
+
+  # Downsample dbSNP bed file if this is a WGS analysis
+  if( enrichment=="WGS1Mb" ){
+     call Downsample_dbSNP {
+      input:
+        dbSNPcommon_bed = dbSNPcommon_bed,
+        dbSNPcommon_bed_index = dbSNPcommon_bed_index
+    }
+  }
+
+  call calculateBAF {
+  input:
+    input_bam = input_bam,
+    input_bam_index = input_bam_index,
+    sample_basename=sample_basename,
+
+    reference_fa=reference_fa,
+
+    dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
+    dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
+
+    docker = "alesmaver/bwa_samtools_picard"
+  }
+
+  call CallROH {
+  input:
+    input_bam = input_bam,
+    input_bam_index = input_bam_index,
+    sample_basename=sample_basename,
+  
+    reference_fa=reference_fa,
+  
+    dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
+    dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
+  
+    gnomAD_maf01_vcf = gnomAD_maf01_vcf,
+    gnomAD_maf01_vcf_index = gnomAD_maf01_vcf_index,
+
+    gnomAD_maf01_tab = gnomAD_maf01_tab,
+    gnomAD_maf01_tab_index = gnomAD_maf01_tab_index,
+  
+    docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
+  }
+
+  call Manta.annotSV as ROH_annotSV {
+      input:
+        genome_build = "GRCh37",
+        input_vcf = CallROH.ROH_calls_annotSV_input_bed,
+        output_tsv_name = sample_basename + ".ROH.annotSV.tsv"
+  }
+
+  output {
+      File output_BAF = calculateBAF.output_BAF
+      File ROH_calls_qual = CallROH.ROH_calls_qual
+      File ROH_calls_size = CallROH.ROH_calls_size
+      File ROH_intervals_state = CallROH.ROH_intervals_state
+      File ROH_intervals_qual = CallROH.ROH_intervals_qual
+      File? ROH_annotSV_tsv = ROH_annotSV.sv_variants_tsv
+      #File ROHplink_calls = CallPlink.ROHplink_calls
+  }
+}
+
+# TASKS
 task calculateBAF {
   input {
     # Command parameters

@@ -1,6 +1,14 @@
 version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
+# The manta workflow currently holds the annotSV workflow, therefore importing it from there
+import "./manta/manta_workflow.wdl" as manta
+# Conifer is also used to analyse WGS data as it proved to be useful in detecting rare CNVs while removing the common CNVs as noise
+# We use the BED file with 1Mb windows across the genome, prepared using these steps
+# The chrY and chrM chromosomes were too short to make accurate calling using conifer
+# awk {'print $1, $2'} OFS='\t' hg19.fa.fai |head -n 26 | grep -v '_' | grep -v 'chrM' | grep -v 'chrY' > hg19.genome
+# bedtools makewindows -w 1000 -g hg19.genome  > WGS1Mb.bed
+
 # WORKFLOW DEFINITION 
 workflow Conifer {
   input {
@@ -59,6 +67,13 @@ workflow Conifer {
         enrichment=enrichment
   }
 
+  call manta.annotSV as annotSV {
+      input:
+        genome_build = "GRCh37",
+        input_vcf = CONIFER_Call.output_conifer_annotSV_input_bed,
+        output_tsv_name = sample_basename + ".CONIFER.annotSV.tsv"
+  }
+
   output {
     File output_conifer_calls = CONIFER_Call.output_conifer_calls
     File output_conifer_calls_wig = CONIFER_Call.output_conifer_calls_wig
@@ -66,6 +81,7 @@ workflow Conifer {
     File CNV_bed = CONIFER_Export.CNV_bed
     File CNV_wig = CONIFER_Export.CNV_wig
     File output_rpkm = MakeRPKM.output_rpkm
+    File? annotSV_tsv = annotSV.sv_variants_tsv
   }
 }
 
@@ -95,7 +111,7 @@ task MakeRPKM {
     docker: docker
     requested_memory_mb_per_core: 3000
     cpu: 2
-    runtime_minutes: 120
+    runtime_minutes: 500
   }
   output {
     File output_rpkm = "~{enrichment}_~{sample_basename}.txt"
@@ -122,9 +138,11 @@ task CONIFER_Analyze {
   RPKM_DIR=$(dirname ~{input_reference_rpkms[0]})
   cp ~{input_rpkm} $RPKM_DIR
 
+  if [[ ~{enrichment_bed} == *"WGS"* ]]; then MIN_RPKM=" --min_rpkm=0.01 "; else MIN_RPKM=" "; fi
+
   # Removed this parameter from the analyze command as it was causing issues with python module loads --plot_scree ~{sample_basename}.screeplot.png
   # Need to prefix the python command with HOME= to make home writable in a rootless container
-  HOME=$(dirname ~{input_rpkm}) python /home/bio/conifer_v0.2.2/conifer.py analyze --probes ~{enrichment_bed} --rpkm_dir $RPKM_DIR --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals ~{sample_basename}.singular_values.txt --plot_scree ~{sample_basename}.screeplot.png --write_sd ~{sample_basename}.sd_values.txt
+  HOME=$(dirname ~{input_rpkm}) python /home/bio/conifer_v0.2.2/conifer.py analyze $MIN_RPKM --probes ~{enrichment_bed} --rpkm_dir $RPKM_DIR --output ~{sample_basename}.analysis.hdf5 --svd ~{CONIFER_svd} --write_svals ~{sample_basename}.singular_values.txt --plot_scree ~{sample_basename}.screeplot.png --write_sd ~{sample_basename}.sd_values.txt
   >>>
 
   runtime {
@@ -161,6 +179,7 @@ task CONIFER_Call {
   if grep -q "~{sample_basename}" ~{sample_basename}.CONIFER_CALLS_POPULATION.txt; then
     cat ~{sample_basename}.CONIFER_CALLS_POPULATION.txt | grep ~{sample_basename} >> ~{sample_basename}.CONIFER_CALLS.txt
     cat ~{sample_basename}.CONIFER_CALLS.txt | grep -v "start" | awk -F'\t' '{ if ($5 == "dup") $5="1"; if ($5 == "del") $5="-1";print $2,$3,$4,$5}' OFS='\t' > ~{sample_basename}.CNV.wig
+    cat ~{sample_basename}.CONIFER_CALLS.txt | grep -v "start" | awk -F'\t' '{ if ($5 == "dup") $5="DUP"; if ($5 == "del") $5="DEL";print $2,$3,$4,$5,"~{sample_basename}"}' OFS='\t' > ~{sample_basename}.CNV.annotSV.input.bed
     echo "Sample specific CNV calls generated."
   else
     echo "No CNV calls found for sample"
@@ -179,6 +198,7 @@ task CONIFER_Call {
   output {
     File output_conifer_calls = "~{sample_basename}.CONIFER_CALLS.txt"
     File output_conifer_calls_wig = "~{sample_basename}.CNV.wig"
+    File output_conifer_annotSV_input_bed ="~{sample_basename}.CNV.annotSV.input.bed"
   }
 }
 
@@ -242,5 +262,41 @@ task CONIFER_Export {
   output {
     File CNV_bed = "~{enrichment}_~{sample_basename}.bed" 
     File CNV_wig = "~{sample_basename}.CNV.genome.wig"
+  }
+}
+
+task CONIFER_Annotate {
+  input {
+    # Command parameters
+    File conifer_calls_wig
+
+    String sample_basename
+
+    File HPO
+    File HPO_index
+    File OMIM
+    File OMIM_index
+    File gnomadConstraints
+    File gnomadConstraints_index
+    File CGD
+    File CGD_index
+
+    # Runtime parameters
+    String docker = "pegi3s/bedtools"
+  }
+  
+  command <<<
+  set -e
+  bedtools intersect -a ~{conifer_calls_wig} -b ~{HPO} ~{OMIM} ~{gnomadConstraints} ~{CGD} -wa -wb -loj | awk '{print $1,$2,$3,$4,$9,$10}' OFS='\t' > ~{sample_basename}.CONIFER.ANNOTATED.txt
+  >>>
+
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 4000
+    cpu: 1
+    runtime_minutes: 60
+  }
+  output {
+    File conifer_calls_annotated = "~{sample_basename}.CONIFER.ANNOTATED.txt"
   }
 }
