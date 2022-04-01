@@ -81,7 +81,7 @@ task BamToFastq {
     name=~{sample_basename}
     echo $name
     echo Converting BAM to Fastqs
-    java -Xms1000m -Xmx6g -jar /usr/picard/picard.jar  SamToFastq INPUT=~{input_bam} FASTQ=$name.fwd.fq.gz SECOND_END_FASTQ=$name.rev.fq.gz
+    java -Xms6g -Xmx6g -jar /usr/picard/picard.jar  SamToFastq INPUT=~{input_bam} FASTQ=$name.fwd.fq.gz SECOND_END_FASTQ=$name.rev.fq.gz
   >>>
 
 output {
