@@ -72,6 +72,7 @@ task BamToFastq {
     docker: "alesmaver/bwa_samtools_picard"
     maxRetries: 3
     requested_memory_mb_per_core: 6000
+    cpu: 1
     runtime_minutes: 700
   }
   
