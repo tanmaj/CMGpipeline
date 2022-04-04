@@ -70,7 +70,8 @@ task BamToFastq {
   
   runtime {
     docker: "alesmaver/bwa_samtools_picard"
-    requested_memory_mb_per_core: 6000
+    requested_memory_mb_per_core: 8000
+    cpu: 2
     runtime_minutes: 700
   }
   
@@ -79,7 +80,7 @@ task BamToFastq {
     name=~{sample_basename}
     echo $name
     echo Converting BAM to Fastqs
-    java  -Xmx2g -jar /usr/picard/picard.jar  SamToFastq INPUT=~{input_bam} FASTQ=$name.fwd.fq.gz SECOND_END_FASTQ=$name.rev.fq.gz
+    java  -Xmx14g -jar /usr/picard/picard.jar  SamToFastq INPUT=~{input_bam} FASTQ=$name.fwd.fq.gz SECOND_END_FASTQ=$name.rev.fq.gz
   >>>
 
 output {
