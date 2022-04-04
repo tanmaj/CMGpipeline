@@ -676,11 +676,13 @@ workflow FastqToVCF {
     }
   }
 
-  if( enrichment=="WGS1Mb" ){
-     call Qualimap.DownsampleBED as DownsampleBED {
-      input:
-         bed_file = enrichment_bed,
-         reference_fai=reference_fai
+  if ( defined(enrichment) ){
+    if( enrichment=="WGS1Mb" ){
+       call Qualimap.DownsampleBED as DownsampleBED {
+        input:
+           bed_file = enrichment_bed,
+           reference_fai=reference_fai
+      }
     }
   }
 
@@ -736,11 +738,13 @@ workflow FastqToVCF {
   }
 
   # Downsample dbSNP bed file if this is a WGS analysis
-  if( enrichment=="WGS1Mb" ){
-     call ROH.Downsample_dbSNP as Downsample_dbSNP {
-      input:
-        dbSNPcommon_bed = dbSNPcommon_bed,
-        dbSNPcommon_bed_index = dbSNPcommon_bed_index
+  if ( defined(enrichment) ){
+    if ( enrichment=="WGS1Mb" ){
+       call ROH.Downsample_dbSNP as Downsample_dbSNP {
+        input:
+          dbSNPcommon_bed = dbSNPcommon_bed,
+          dbSNPcommon_bed_index = dbSNPcommon_bed_index
+      }
     }
   }
 
