@@ -8,17 +8,16 @@ version 1.0
 # Manta is for genome analysis
 
 # Subworkflows
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Conifer.wdl" as Conifer
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Qualimap.wdl" as Qualimap
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ROH.wdl" as ROH
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/MitoMap.wdl" as MitoMap
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/exp_hunter.wdl" as ExpansionHunter
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/manta/manta_workflow.wdl" as Manta
-## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
-import "./optitype_dna_bam.wdl" as Optitype
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/SMN_caller/SMN_caller.wdl" as SMN
+import "./AnnotationPipeline.wdl" as Annotation
+import "./Conifer.wdl" as Conifer
+import "./Qualimap.wdl" as Qualimap
+import "./ROH.wdl" as ROH
+import "./CreateInterpretationTable.wdl" as CreateInterpretationTable
+import "./MitoMap.wdl" as MitoMap
+import "./exp_hunter.wdl" as ExpansionHunter
+import "./manta/manta_workflow.wdl" as Manta
+import "./optimised_optitypeDNA" as Optitype
+import "./SMN_caller/SMN_caller.wdl" as SMN
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -209,6 +208,22 @@ workflow FastqToVCF {
       }
   }
 
+  #---------------------------------
+  #  sem pride nova verzija optitypa 
+  #---------------------------------
+  
+  # Calculate Optitype only if targetRegions are not present
+  if ( !defined(targetRegions) ) {
+    call Optitype.Optimised_OptitypeDna as Optitype {
+      input:
+        sample_basename = sample_basename,
+        input_fq1 = CutAdapters_fq1.output_fq_trimmed,
+        input_fq2 = CutAdapters_fq2.output_fq_trimmed,
+        input_bam = input_bam
+    }
+  }
+  # -----------------------
+
   if ( defined(input_cram) ) {
     call CramToBam as Cram_hg19_ToBam {
       input:
@@ -393,14 +408,14 @@ workflow FastqToVCF {
   	}
   }
 
-  # Calculate Optitype only if targetRegions are not present
-  if( !defined(targetRegions) ) {
-    call Optitype.OptitypeDnafromBam as Optitype {
-      input:
-        optitype_name=sample_basename,
-        input_bam=SortSam.output_bam
-    } 
-  }
+  ## Calculate Optitype only if targetRegions are not present
+  #if( !defined(targetRegions) ) {
+  #  call Optitype.OptitypeDnafromBam as Optitype {
+  #    input:
+  #      optitype_name=sample_basename,
+  #      input_bam=SortSam.output_bam
+  #  } 
+  #}
 
   # Calculate SMN only if targetRegions are not present
   if( !defined(targetRegions) ) {
