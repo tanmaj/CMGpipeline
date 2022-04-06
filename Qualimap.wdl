@@ -212,9 +212,9 @@ task DepthOfCoverage34 {
        -ct 100 \
        -geneList ~{refSeqFile}
 
-    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.coverage_mean.wig
-    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.coverage.wig
-    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.coverage_neg.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' | sed 's/NaN/0.00/g' > ~{sample_basename}.coverage_mean.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' | sed 's/NaN/0.00/g' > ~{sample_basename}.coverage.wig
+    cat targetGenes.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' | sed 's/NaN/0.00/g' > ~{sample_basename}.coverage_neg.wig
 
     java -Xmx8g -jar /usr/GenomeAnalysisTK.jar \
       -T DepthOfCoverage \
@@ -231,9 +231,9 @@ task DepthOfCoverage34 {
        -ct 50 \
        -ct 100
 
-    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage_mean.wig
-    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage.wig
-    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' | sed -i 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage_neg.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$5}' OFS='\t' | sed 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage_mean.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,$11}' OFS='\t' | sed 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage.wig
+    cat mitochondrial.coverage.sample_interval_summary | grep -v "Target" | awk -F '[\t:-]' '{print $1,$2,$3,($11-100)}' OFS='\t' | sed 's/NaN/0.00/g' > ~{sample_basename}.mitochondrial.coverage_neg.wig
 
     tar -czf ~{sample_basename}.DepthOfCoverage.tar.gz *coverage*
     >>>
