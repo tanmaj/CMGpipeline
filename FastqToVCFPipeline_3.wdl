@@ -208,22 +208,6 @@ workflow FastqToVCF {
       }
   }
 
-  #---------------------------------
-  #  sem pride nova verzija optitypa 
-  #---------------------------------
-  
-  # Calculate Optitype only if targetRegions are not present
-  if ( !defined(targetRegions) ) {
-    call Optitype.Optimised_OptitypeDna as Optitype {
-      input:
-        sample_basename = sample_basename,
-        input_fq1 = CutAdapters_fq1.output_fq_trimmed,
-        input_fq2 = CutAdapters_fq2.output_fq_trimmed,
-        input_bam = input_bam
-    }
-  }
-  # -----------------------
-
   if ( defined(input_cram) ) {
     call CramToBam as Cram_hg19_ToBam {
       input:
@@ -256,6 +240,18 @@ workflow FastqToVCF {
       n_reads = split_reads_num,
       preemptible_tries = 3,
       compression_level = 2
+  }
+  
+  # Calculate Optitype only if targetRegions are not present
+  if ( !defined(targetRegions) ) {
+    call Optitype.Optimised_OptitypeDna as Optitype {
+      input:
+        sample_basename = sample_basename,
+        input_fq1 = CutAdapters_fq1.output_fq_trimmed,
+        input_fq2 = CutAdapters_fq2.output_fq_trimmed,
+	input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam])
+        #  input_bam = input_bam
+    }
   }
 
   if ( defined(targetRegions) ) {
