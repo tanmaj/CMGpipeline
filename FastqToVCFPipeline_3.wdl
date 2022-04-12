@@ -16,8 +16,7 @@ import "./CreateInterpretationTable.wdl" as CreateInterpretationTable
 import "./MitoMap.wdl" as MitoMap
 import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
-## import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/optitype/optitype_dna.wdl" as Optitype
-import "./optitype_dna_bam.wdl" as Optitype
+import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
 
 # WORKFLOW DEFINITION 
@@ -393,14 +392,27 @@ workflow FastqToVCF {
   	}
   }
 
+##  # Calculate Optitype only if targetRegions are not present
+#  if( !defined(targetRegions) ) {
+#    call Optitype.OptitypeDnafromBam as Optitype {
+#      input:
+#        optitype_name=sample_basename,
+#        input_bam=SortSam.output_bam
+#    } 
+#  }
+  
   # Calculate Optitype only if targetRegions are not present
-  if( !defined(targetRegions) ) {
-    call Optitype.OptitypeDnafromBam as Optitype {
+  if ( !defined(targetRegions) ) {
+    call Optitype.Optimised_OptitypeDna as Optitype {
       input:
-        optitype_name=sample_basename,
-        input_bam=SortSam.output_bam
-    } 
+        sample_basename = sample_basename,
+        input_fq1 = CutAdapters_fq1.output_fq_trimmed,
+        input_fq2 = CutAdapters_fq2.output_fq_trimmed,
+	### input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam])
+        input_bam = input_bam
+    }
   }
+  
 
   # Calculate SMN only if targetRegions are not present
   if( !defined(targetRegions) ) {
