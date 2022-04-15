@@ -185,6 +185,7 @@ task CONIFER_Call {
     echo "No CNV calls found for sample"
     echo "Creating an empty WIG file."
     touch ~{sample_basename}.CNV.wig
+    touch ~{sample_basename}.CNV.annotSV.input.bed
   fi
   >>>
 
