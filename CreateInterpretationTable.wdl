@@ -184,6 +184,18 @@ task GenerateVariantTable {
       zcat ~{input_vcf} | java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter -s panel_gene_list.txt "(isVariant( GEN[0].GT )) &  GEN[0].DP > 8  &  GEN[0].GQ>20  &  QUAL>50 & (ANN[*].GENE in SET[0])" | eval $SNPSIFT_EXTRACTFIELDS > ~{sample_basename}.PANEL_ALL.tab
     fi
 
+    # MUTECT
+    # Take care of the Mutect VCF - this VCF does not have QUAL value in VCF, so it does not get filtered properly using normal VCF filtration code
+    zcat ~{input_vcf} | grep '^#' > vcf_header.txt
+    if grep -q "MutectVersion" "vcf_header.txt"; then
+      echo "This is a MUTECT VCF, all the variants in the VCF will be considered as panel variants...";
+
+      zcat ~{input_vcf} | java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "(     (    (   (  ( gnomADexomes.AF < 0.05 ) | !( exists gnomADexomes.AC )  ) &  (  ( gnomADexomes.nhomalt < 10 ) | !( exists gnomADexomes.nhomalt )  ) & (  ( gnomAD.AF < 0.05 ) | !( exists gnomAD.AC )  ) & (  ( gnomAD.nhomalt < 10 ) | !( exists gnomAD.nhomalt )  ) & (  ( SLOpopulation.AC_Het < 100 ) | !( exists SLOpopulation.AC_Het )  ) & (  !( exists SLOpopulation.AC_Hom ) | ( SLOpopulation.AC_Hom <= 6 )  )   ) & (   ( ANN[*].IMPACT has 'MODERATE') | (ANN[*].IMPACT has 'HIGH') | (dbscSNV.ada_score > 0.5) | (dbscSNV.rf_score > 0.5) ) &  (!(clinvar.CLNSIG =~ '.*Likely_benign.*')) & (!(clinvar.CLNSIG =~ '.*Benign.*'))    )    |    ( clinvar.CLNSIG =~ '.*Likely_pathogenic.*' | clinvar.CLNSIG =~ '.*Pathogenic.*' | clinvar.CLNSIGCONF =~ '.*Likely_pathogenic.*' | clinvar.CLNSIGCONF =~ '.*Pathogenic.*' )    |   ( ( dbscSNV.ada_score > 0.5 | dbscSNV.rf_score > 0.5 ) & ( gnomADexomes.nhomalt < 200 | !(exists gnomADexomes.nhomalt) ) & ( gnomAD.nhomalt < 10 | !(exists gnomAD.nhomalt) ) )  |    (   ((( gnomADexomes.AF < 0.001 ) | !( exists gnomADexomes.AC )) & (( gnomADexomes.nhomalt < 4 ) | !( exists gnomADexomes.nhomalt )) & (( gnomAD.AF < 0.001 ) | !( exists gnomAD.AC )) & (( gnomAD.nhomalt < 4 ) | !( exists gnomAD.nhomalt )) & (( SLOpopulation.AC_Het < 10 ) | !( exists SLOpopulation.AC_Het )) & (!( exists SLOpopulation.AC_Hom ) | ( SLOpopulation.AC_Hom <= 4 ))  & !( ANN[*].IMPACT has 'MODIFIER') ) & isHom(GEN[0].GT)  )    )    &    isVariant( GEN[0].GT )  &  GEN[0].DP > 8" | eval $SNPSIFT_EXTRACTFIELDS > ~{sample_basename}.PANEL_FILTERED.tab
+
+      zcat ~{input_vcf} | java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "(isVariant( GEN[0].GT )) &  GEN[0].DP > 8" | eval $SNPSIFT_EXTRACTFIELDS > ~{sample_basename}.PANEL_ALL.tab    
+    fi
+    rm vcf_header.txt
+
     echo $(date +"%Y_%m_%d_%I_%M_%p") > timestamp
   >>>
 
@@ -257,7 +269,11 @@ task GenerateXLSX {
   }
 
   command {
-  Rscript ~{makeXSLSXoutputs_Rscript} --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx     
+  wget -t 1 -T 20 https://raw.githubusercontent.com/AlesMaver/CMGpipeline/targeted_masking/makeXLSXoutputs.R
+  unset https_proxy
+  wget -t 1 -T 20 https://raw.githubusercontent.com/AlesMaver/CMGpipeline/targeted_masking/makeXLSXoutputs.R
+
+  Rscript makeXLSXoutputs.R --sample_basename=~{sample_basename} --RARE_FUNCTIONAL=~{RARE_FUNCTIONAL} --HET_DOMINANT=~{HET_DOMINANT} --COMPHET_RECESSIVE=~{COMPHET_RECESSIVE} --HOM_RECESSIVE=~{HOM_RECESSIVE} --CLINVAR_PATHOGENIC=~{CLINVAR_PATHOGENIC} --CLINVAR_FILTERED=~{CLINVAR_FILTERED} --CLINVAR_ALL=~{CLINVAR_ALL} ~{if defined(PANEL_FILTERED) then " --PANEL_FILTERED " + PANEL_FILTERED else ""}  ~{if defined(mitoResults_txt) then " --MITOMAP " + mitoResults_txt else ""}  ~{if defined(PANEL_ALL) then " --PANEL_ALL " + PANEL_ALL else ""} --XLSX_OUTPUT=~{sample_basename}.FinalReportNew.xlsx     
   }
   runtime {
     docker: docker

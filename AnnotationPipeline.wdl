@@ -42,6 +42,8 @@ workflow AnnotateVCF {
     File dbNSFP
     File dbNSFP_index
 
+    String? targetRegions
+
     #String bgzip_docker = "dockerbiotools/bcftools:latest"
     ##String bcftools_docker = "dceoy/bcftools:latest"
     String bcftools_docker = "dceoy/bcftools"
@@ -85,8 +87,16 @@ workflow AnnotateVCF {
       docker = bcftools_docker
   }
 
+  if( defined(targetRegions) ) {
+    call StringToArray {
+      input:
+        input_string = select_first([targetRegions, ""]),
+        separator = ";"
+    }
+  }
+
   # Call variants in parallel over grouped calling intervals
-  scatter (chromosome in chromosomes) {
+  scatter (chromosome in select_first([StringToArray.values, chromosomes]) ) {
     call bcftoolsAnnotate {
       input:
         input_vcf = CompressAndIndexVCF1.output_vcfgz,
@@ -506,3 +516,25 @@ task GenerateVariantTable {
     File output_table = " ~{sample_basename}.tab"
   }
 }
+
+task StringToArray {
+  input {
+    String input_string
+    String separator
+  }
+  command <<<
+    echo '~{input_string}' | tr '~{separator}' \\n | tr -d "[:blank:]" > intervals.list
+    echo '~{input_string}' | tr '~{separator}' \\n | tr -d "[:blank:]"
+  >>>
+  runtime {
+    docker:"biocontainers/bcftools:v1.9-1-deb_cv1"
+    requested_memory_mb_per_core: 500
+    cpu: 1
+    runtime_minutes: 5
+  }
+  output {
+    Array[String] values = read_lines(stdout())
+    File intervals_list = "intervals.list"
+  }
+}
+

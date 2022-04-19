@@ -1,8 +1,8 @@
 version 1.0
 
 # Subworkflows
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/CreateInterpretationTable.wdl" as CreateInterpretationTable
+import "./AnnotationPipeline.wdl" as Annotation
+import "./CreateInterpretationTable.wdl" as CreateInterpretationTable
 
 workflow AnnotateAndTable {
   input {
@@ -47,6 +47,8 @@ workflow AnnotateAndTable {
     File dbNSFP
     File dbNSFP_index
 
+    String? targetRegions
+
     #String bgzip_docker = "dockerbiotools/bcftools:latest"
     String bcftools_docker = "dceoy/bcftools:latest"
     #String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
@@ -63,6 +65,12 @@ workflow AnnotateAndTable {
         sample_basename = sample_basename,
 
         docker = R_docker
+    }
+
+  call GetVariantRegions {
+      input:
+        input_variant_string = input_variant_string,
+        separator = ":"
     }
 
   call Annotation.AnnotateVCF as AnnotateVCF {
@@ -104,6 +112,8 @@ workflow AnnotateAndTable {
 
       dbNSFP = dbNSFP,
       dbNSFP_index = dbNSFP_index,
+
+      targetRegions = select_first([GetVariantRegions.regions, targetRegions]),
 
       #bcftools_docker = bcftools_docker,
       #SnpEff_docker = SnpEff_docker,
@@ -183,5 +193,25 @@ task CreateVCFfromString {
   }
   output {
     File output_vcf = "~{sample_basename}.IMPORTVARIANT.vcf"
+  }
+}
+
+task GetVariantRegions {
+  input {
+    String input_variant_string
+    String separator
+  }
+  command <<<
+    echo "~{input_variant_string}" | tr "~{separator}" \\n | awk -F' ' '{print $1":"$2-1"-"$2+1}' OFS='\t' | tr \\n ";" | sed 's/\;$//'
+  >>>
+  runtime {
+    docker:"biocontainers/bcftools:v1.9-1-deb_cv1"
+    requested_memory_mb_per_core: 500
+    cpu: 1
+    runtime_minutes: 5
+  }
+  output {
+    Array[String] value = read_lines(stdout())
+    String regions = value[0]
   }
 }

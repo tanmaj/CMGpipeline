@@ -306,7 +306,12 @@ genotypeProcessor <- function(genotype){
 
 qualityProcessor <- function(AD, DP, GT, QUAL, GQ) {
   QUAL_TAGS<-c()
+
+  # If the the GQ field is missing, this is most likely due to the Mutect2 output, therefore quality tags assignment should be skipped
+  if ( is.na(GQ) ) { return(paste0(QUAL_TAGS, collapse=",")) }
+  if ( is.na(QUAL) ) { return(paste0(QUAL_TAGS, collapse=",")) }
   
+  # Assign quality tags
   if ( QUAL<100 ) QUAL_TAGS <- c(QUAL_TAGS, "BAD_VARIANT_QUALITY")
   if ( GQ<90 ) QUAL_TAGS <- c(QUAL_TAGS, "BAD_GENOTYPE_QUALITY")
   if ( DP <10 ) QUAL_TAGS <- c(QUAL_TAGS, "BAD_COVERAGE")

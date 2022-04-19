@@ -110,6 +110,7 @@ task CallROH {
     requested_memory_mb_per_core: 3000
     cpu: 2
     runtime_minutes: 1200
+    continueOnReturnCode: true
   }
   output {
     File ROH_calls_qual = "~{sample_basename}.ROHcalls.qual.wig"

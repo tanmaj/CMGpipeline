@@ -18,6 +18,7 @@ import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
 import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
+import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -41,6 +42,8 @@ workflow FastqToVCF {
     File chromosome_list
 
     String? targetRegions
+    Boolean? perform_masked_alignment
+    Boolean call_somatic_variants = false
 
     Int bwa_threads
     Int threads
@@ -242,7 +245,7 @@ workflow FastqToVCF {
       compression_level = 2
   }
 
-  if ( defined(targetRegions) ) {
+  if ( defined(targetRegions) && select_first([perform_masked_alignment, false]) ) {
     call PrepareMaskedGenomeFasta {
       input:
         reference_fixed_fa=reference_fixed_fa,
@@ -252,8 +255,6 @@ workflow FastqToVCF {
         # Runtime 
         docker = "pegi3s/bedtools"
     }
-
-    #String enrichment_bed = PrepareMaskedGenomeFasta.targetRegions_bed
 
     call PrepareMaskedBWAIndex {
       input:
@@ -423,8 +424,33 @@ workflow FastqToVCF {
        sample_basename=sample_basename
      }
   }
-  
-  scatter (chromosome in chromosomes) {
+
+  if( defined(targetRegions) ) {
+    call StringToArray {
+      input:
+        input_string = select_first([targetRegions, ""]),
+        separator = ";"
+    }
+  }
+
+  if( defined(targetRegions) && call_somatic_variants ) {
+    call Mutect2.Mutect2 {
+        input:
+          ref_fasta = reference_fa,
+          ref_fai = reference_fai,
+          ref_dict = reference_dict, 
+          scatter_count = 1,
+          intervals = StringToArray.intervals_list,
+          tumor_reads = GatherSortedBamFiles.output_bam,
+          tumor_reads_index = GatherSortedBamFiles.output_bam_index,
+          make_bamout = true, 
+          # We mostly use Mutect2 for detection using PCR-based approaches, therefore disabling NotDuplicateReadFilter for testing purposes
+          m2_extra_args = " --disable-read-filter NotDuplicateReadFilter ",
+          gatk_docker = gatk_docker
+    }
+  }
+
+  scatter (chromosome in select_first([StringToArray.values, chromosomes]) ) {
     call HaplotypeCaller {
       input:
         input_bam = GatherSortedBamFiles.output_bam,
@@ -533,7 +559,7 @@ workflow FastqToVCF {
 
   call Annotation.AnnotateVCF as AnnotateVCF{
     input:
-      input_vcf = SelectFinalVariants.output_vcf,
+      input_vcf = select_first([Mutect2.filtered_vcf, SelectFinalVariants.output_vcf]),
       chromosome_list = chromosome_list,
       
       gnomAD_vcf = gnomAD_vcf,
@@ -570,6 +596,8 @@ workflow FastqToVCF {
 
       dbNSFP = dbNSFP,
       dbNSFP_index = dbNSFP_index,
+
+      targetRegions = targetRegions,
 
       #bcftools_docker = bcftools_docker,
       #SnpEff_docker = SnpEff_docker,
@@ -637,7 +665,7 @@ workflow FastqToVCF {
     }    
   }
 
-  if( defined(input_manta_reference_vcfs) && !defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
+  if( defined(input_manta_reference_vcfs) && !defined(targetRegions) ){
     call Manta.SVcalling as Manta{
     input:
       bamFile = SortSam.output_bam,
@@ -676,13 +704,24 @@ workflow FastqToVCF {
     }
   }
 
-  if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
+  if ( defined(targetRegions) ){
+    call RegionsToBed {
+      input:
+        targetRegions=select_first([targetRegions,""]),
+
+        # Runtime 
+        docker = "pegi3s/bedtools"
+
+    }
+  }
+
+  if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) || defined(RegionsToBed.targetRegions_bed) ){
     call Qualimap.bamqc as Qualimap {
     input:
       bam = SortSam.output_bam,
       sample_basename=sample_basename,
       
-      enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, enrichment_bed]),
+      enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, enrichment_bed]),
 
       ncpu = 8
     }
@@ -698,8 +737,8 @@ workflow FastqToVCF {
     }
   }
 
-  # Merge per-interval GVCFs
-  if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
+  # Depth of coverage
+  if( defined(enrichment_bed) || defined(PrepareMaskedGenomeFasta.targetRegions_bed) || defined(RegionsToBed.targetRegions_bed) ){
     call Qualimap.DepthOfCoverage34 as DepthOfCoverage {
       input:
         input_bam = SortSam.output_bam,
@@ -710,7 +749,7 @@ workflow FastqToVCF {
         reference_fai=reference_fai,
         reference_dict=reference_dict,
 
-        enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, DownsampleBED.downsampled_bed_file, enrichment_bed]),
+        enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, DownsampleBED.downsampled_bed_file, enrichment_bed]),
 
         refSeqFile = refSeqFile,
 
@@ -721,7 +760,7 @@ workflow FastqToVCF {
   }
   
   # Calculate WGS coverage if neither enrichment_bed nor target regions parameter is defined
-  if( !defined(enrichment_bed) && !defined(PrepareMaskedGenomeFasta.targetRegions_bed) ){
+  if( !defined(enrichment_bed) && !defined(PrepareMaskedGenomeFasta.targetRegions_bed) && !defined(RegionsToBed.targetRegions_bed) ){
   
     call Qualimap.bamqc as QualimapWGS {
       input:
@@ -760,46 +799,50 @@ workflow FastqToVCF {
     }
   }
 
-  call ROH.calculateBAF as calculateBAF {
-  input:
-    input_bam = SortSam.output_bam,
-    input_bam_index = SortSam.output_bam_index,
-    sample_basename=sample_basename,
+  # Do not perform ROH calling if target regions are defined - this means targeted sequencing
+  # Currently ROHs are left on because they do not disrupt the WF and they generate the files, even if empty, and make it easier for copying, etc
+  #if ( !defined(targetRegions) ){
+    call ROH.calculateBAF as calculateBAF {
+    input:
+      input_bam = SortSam.output_bam,
+      input_bam_index = SortSam.output_bam_index,
+      sample_basename=sample_basename,
 
-    reference_fa=reference_fa,
+      reference_fa=reference_fa,
 
-    dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
-    dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
+      dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
+      dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
 
-    docker = "alesmaver/bwa_samtools_picard"
-  }
+      docker = "alesmaver/bwa_samtools_picard"
+    }
 
-  call ROH.CallROH as CallROH {
-  input:
-    input_bam = SortSam.output_bam,
-    input_bam_index = SortSam.output_bam_index,
-    sample_basename=sample_basename,
-  
-    reference_fa=reference_fa,
-  
-    dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
-    dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
-  
-    gnomAD_maf01_vcf = gnomAD_maf01_vcf,
-    gnomAD_maf01_vcf_index = gnomAD_maf01_vcf_index,
+    call ROH.CallROH as CallROH {
+    input:
+      input_bam = SortSam.output_bam,
+      input_bam_index = SortSam.output_bam_index,
+      sample_basename=sample_basename,
+    
+      reference_fa=reference_fa,
+    
+      dbSNPcommon_bed = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed, dbSNPcommon_bed]),
+      dbSNPcommon_bed_index = select_first([Downsample_dbSNP.downsampled_dbSNPcommon_bed_index, dbSNPcommon_bed_index]),
+    
+      gnomAD_maf01_vcf = gnomAD_maf01_vcf,
+      gnomAD_maf01_vcf_index = gnomAD_maf01_vcf_index,
 
-    gnomAD_maf01_tab = gnomAD_maf01_tab,
-    gnomAD_maf01_tab_index = gnomAD_maf01_tab_index,
-  
-    docker = bcftools_docker
-  }
+      gnomAD_maf01_tab = gnomAD_maf01_tab,
+      gnomAD_maf01_tab_index = gnomAD_maf01_tab_index,
+    
+      docker = bcftools_docker
+    }
 
-  call Manta.annotSV as ROH_annotSV {
-      input:
-        genome_build = "GRCh37",
-        input_vcf = CallROH.ROH_calls_annotSV_input_bed,
-        output_tsv_name = sample_basename + ".ROH.annotSV.tsv"
-  }
+    call Manta.annotSV as ROH_annotSV {
+        input:
+          genome_build = "GRCh37",
+          input_vcf = select_first([CallROH.ROH_calls_annotSV_input_bed, ""]),
+          output_tsv_name = sample_basename + ".ROH.annotSV.tsv"
+    }
+  #}
 
   call ExpansionHunter.ExpansionHunter as ExpansionHunter {
     input:
@@ -855,11 +898,11 @@ workflow FastqToVCF {
     File? DepthOfCoverage_output = DepthOfCoverage.DepthOfCoverage_output
     File? DepthOfCoverageWGS_output = DepthOfCoverageWGS.DepthOfCoverage_output
 
-    File output_BAF = calculateBAF.output_BAF
-    File ROH_calls_qual = CallROH.ROH_calls_qual
-    File ROH_calls_size = CallROH.ROH_calls_size
-    File ROH_intervals_state = CallROH.ROH_intervals_state
-    File ROH_intervals_qual = CallROH.ROH_intervals_qual
+    File? output_BAF = calculateBAF.output_BAF
+    File? ROH_calls_qual = CallROH.ROH_calls_qual
+    File? ROH_calls_size = CallROH.ROH_calls_size
+    File? ROH_intervals_state = CallROH.ROH_intervals_state
+    File? ROH_intervals_qual = CallROH.ROH_intervals_qual
     File? ROH_annotSV_tsv = ROH_annotSV.sv_variants_tsv
     #File ROHplink_calls = CallPlink.ROHplink_calls
 
@@ -931,6 +974,32 @@ task CutAdapters {
   }
   output {
     File output_fq_trimmed = "~{sample_basename}.trimmed.fq.gz"
+  }
+}
+
+task RegionsToBed {
+  input {
+    # Command parameters
+    String? targetRegions # FORMAT "chr1:123033-130000;chrX:1-1000"
+
+    # Runtime parameters
+    String docker
+  }
+  
+  command <<<
+    set -e
+
+    echo "~{targetRegions}"  | tr ';' '\n' | tr ':' '\t' | tr '-' '\t' > targetRegions.bed
+  >>>
+
+  runtime {
+    docker: docker
+    requested_memory_mb_per_core: 500
+    cpu: 1
+    runtime_minutes: 10
+  }
+  output {
+    File targetRegions_bed = "targetRegions.bed"
   }
 }
 
@@ -1888,6 +1957,25 @@ task ConvertToCram {
   }
 }
 
-
+task StringToArray {
+  input {
+    String input_string
+    String separator
+  }
+  command <<<
+    echo '~{input_string}' | tr '~{separator}' \\n | tr -d "[:blank:]" > intervals.list
+    echo '~{input_string}' | tr '~{separator}' \\n | tr -d "[:blank:]"
+  >>>
+  runtime {
+    docker:"biocontainers/bcftools:v1.9-1-deb_cv1"
+    requested_memory_mb_per_core: 500
+    cpu: 1
+    runtime_minutes: 5
+  }
+  output {
+    Array[String] values = read_lines(stdout())
+    File intervals_list = "intervals.list"
+  }
+}
 
 
