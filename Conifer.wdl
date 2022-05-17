@@ -187,6 +187,8 @@ task CONIFER_Call {
     touch ~{sample_basename}.CNV.wig
     touch ~{sample_basename}.CNV.annotSV.input.bed
   fi
+  sed -i 's/chr23/chrX/' ~{sample_basename}.CNV.wig
+  sed -i 's/chr24/chrY/' ~{sample_basename}.CNV.wig
   >>>
 
   runtime {
@@ -251,6 +253,8 @@ task CONIFER_Export {
   export LC_CTYPE="C.UTF-8"
   python /home/bio/conifer_v0.2.2/conifer.py export --input ~{input_hdf5} --sample ~{enrichment}_~{sample_basename} --output ./
   cat ~{enrichment}_~{sample_basename}.bed | awk -F'\t' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.CNV.genome.wig
+  sed -i 's/chr23/chrX/' ~{sample_basename}.CNV.genome.wig
+  sed -i 's/chr24/chrY/' ~{sample_basename}.CNV.genome.wig
   >>>
 
   runtime {
