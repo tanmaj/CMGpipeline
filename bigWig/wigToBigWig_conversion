@@ -1,0 +1,73 @@
+version 1.0
+
+# wigToBigWig conversion
+# The input files are the reference fast index file and an array of wig files, we would like to convert
+
+task wigToBigWig {
+  input {
+    String sample_basename
+    Array[File] wig_files
+    File ref_fasta_index
+  }
+  
+  String out_bigwig_tar_file = sample_basename + ".bigwig.tar.gz"
+    
+  runtime {
+    docker: "abralab/wigtobigwig:v4"
+    requested_memory_mb_per_core: 8000
+    cpu: 2
+    runtime_minutes: 700
+  }
+  
+  command <<<
+    # set -exo pipefail
+    # set -e
+       
+    echo "Making chrom_sizes file from reference fasta index file"
+    cut -f1,2 ~{ref_fasta_index} > chrom_sizes.txt
+    
+    echo "Converting..."
+    for x in ~{sep=' ' wig_files}
+    do
+        echo "${x}" to $(basename "${x}" .wig).bw
+        ## touch $(basename "${x}" .wig).bw
+        wigToBigWig "${x}" chrom_sizes.txt $(basename "${x}" .wig).bw
+    done;
+    echo "Tar&zip..."
+    #tar -czvf ~{out_bigwig_tar_file} *.bw 
+    tar --create --gzip --verbose --group=cmg --owner=cmg --file=~{out_bigwig_tar_file} *.bw
+    echo "Done."  
+  >>>
+   
+  output {
+    ## Array[File] bigWig_files = glob("*.bw")  
+    File? bigWig_tar_file = out_bigwig_tar_file
+  }
+}
+
+workflow wigToBigWigConversion {
+  input {
+    String sample_basename
+    File  ref_fasta_index
+    File? baf_wig
+    File? roh_calls_qual_wig
+    File? cnv_genome_wig
+    File? cnv_wig
+    File? coverage_neg_wig
+    File? coverage_wig
+    File? coverage_mean_wig
+ 
+  }
+  Array[File] wig_files = select_all([baf_wig, cnv_wig, cnv_genome_wig, roh_calls_qual_wig, coverage_neg_wig, coverage_wig, coverage_mean_wig])
+  call wigToBigWig {
+    input:
+      sample_basename=sample_basename,
+      wig_files=wig_files,
+      ref_fasta_index=ref_fasta_index
+      
+  }
+  output {
+    ## Array[File] bigWig_files = wigToBigWig.bigWig_files
+    File? bigWig_tar_file = wigToBigWig.bigWig_tar_file
+  }
+}

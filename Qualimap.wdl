@@ -240,6 +240,9 @@ task DepthOfCoverage34 {
     
     output {
     File DepthOfCoverage_output = "~{sample_basename}.DepthOfCoverage.tar.gz"
+    File coverage_mean_wig = "~{sample_basename}.coverage_mean.wig"
+    File coverage_wig = "~{sample_basename}.coverage.wig"
+    File coverage_neg_wig = "~{sample_basename}.coverage_neg.wig"
     }
 
     runtime {

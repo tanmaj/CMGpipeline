@@ -18,6 +18,7 @@ import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
 import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
+import "./bigWig/wigToBigWig_conversion" as BigWig
 import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
 
 # WORKFLOW DEFINITION 
@@ -860,6 +861,19 @@ workflow FastqToVCF {
   #
   #  docker = "asherkhb/plink"
   #}
+  
+  call BigWig.wigToBigWigConversion as BigWig {
+  input:
+    sample_basename = sample_basename,
+    ref_fasta_index = reference_fai,
+    baf_wig = calculateBAF.output_BAF,
+    roh_calls_qual_wig = CallROH.ROH_calls_qual,
+    cnv_genome_wig = Conifer.CNV_wig,
+    cnv_wig = Conifer.output_conifer_calls_wig,
+    coverage_neg_wig = DepthOfCoverage.coverage_neg_wig,
+    coverage_wig = DepthOfCoverage.coverage_wig,
+    coverage_mean_wig = DepthOfCoverage.coverage_mean_wig
+  }
 
   output {
     File output_bam = SortSam.output_bam
@@ -917,6 +931,9 @@ workflow FastqToVCF {
     File? output_pdf = SMN_caller.output_pdf
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
+    
+    ## Array[File] bigWig_files = BigWig.bigWig_files
+    File? bigWig_tar_file = BigWig.bigWig_tar_file
   }
 }
 
