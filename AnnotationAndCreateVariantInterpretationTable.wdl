@@ -70,7 +70,7 @@ workflow AnnotateAndTable {
   call GetVariantRegions {
       input:
         input_variant_string = input_variant_string,
-        separator = ":"
+        separator = ";"
     }
 
   call Annotation.AnnotateVCF as AnnotateVCF {
