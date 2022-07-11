@@ -11,7 +11,7 @@ task bamqc {
         String sample_basename
         Int ncpu = 5
         Int max_retries = 1
-        Int memory_gb = 25
+        Int memory_gb = 100            # 25
         Int? disk_size_gb
     }
 
@@ -47,7 +47,7 @@ task bamqc {
         disk: disk_size + " GB"
         docker: 'stjudecloud/qualimap:1.0.0'
         maxRetries: max_retries
-        requested_memory_mb_per_core: 5000
+        requested_memory_mb_per_core: 15000   ## 5000
         cpu: 5
         ## runtime_minutes: 180
         runtime_minutes: 900
