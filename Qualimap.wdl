@@ -49,7 +49,8 @@ task bamqc {
         maxRetries: max_retries
         requested_memory_mb_per_core: 5000
         cpu: 5
-        runtime_minutes: 180
+        ## runtime_minutes: 180
+        runtime_minutes: 900
     }
 
     output {
@@ -170,7 +171,8 @@ task DepthOfCoverage {
         maxRetries: 3
         requested_memory_mb_per_core: 9000
         cpu: 1
-        runtime_minutes: 6000
+        #runtime_minutes: 6000
+        runtime_minutes: 9000
     }
 }
 
