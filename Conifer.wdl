@@ -311,7 +311,7 @@ task GenerateAnnotatedIntervalFile {
   input {
     # Command parameters
     File bedtools_annotated_file
-    String AnnotateIntervals_Rscript = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/R_scripts/SCRIPTS_createVCFfromVariantString.R"
+    String AnnotateIntervals_Rscript = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/R_scripts/SCRIPTS_convertBedIntervalAnnotations.R"
   }
 
   String bedtools_annotated_filename = basename(bedtools_annotated_file)
@@ -322,7 +322,7 @@ task GenerateAnnotatedIntervalFile {
   unset https_proxy
   wget -t 1 -T 20 ~{AnnotateIntervals_Rscript}
 
-  Rscript SCRIPTS_createVCFfromVariantString.R -i=~{bedtools_annotated_file}
+  Rscript SCRIPTS_convertBedIntervalAnnotations.R -i=~{bedtools_annotated_file}
   mv output.txt ~{bedtools_annotated_filename}
   }
   runtime {
