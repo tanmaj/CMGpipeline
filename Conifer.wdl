@@ -325,7 +325,7 @@ task GenerateAnnotatedIntervalFile {
   wget -t 1 -T 20 ~{AnnotateIntervals_Rscript}
 
   Rscript SCRIPTS_convertBedIntervalAnnotations.R -i ~{bedtools_annotated_file}
-  mv output.txt ~{bedtools_annotated_filename}
+  mv output.txt ANNOTATED_~{bedtools_annotated_filename}
   }
   runtime {
     docker: "alesmaver/r-base"
