@@ -324,7 +324,7 @@ task GenerateAnnotatedIntervalFile {
   unset https_proxy
   wget -t 1 -T 20 ~{AnnotateIntervals_Rscript}
 
-  Rscript SCRIPTS_convertBedIntervalAnnotations.R -i=~{bedtools_annotated_file}
+  Rscript SCRIPTS_convertBedIntervalAnnotations.R -i ~{bedtools_annotated_file}
   mv output.txt ~{bedtools_annotated_filename}
   }
   runtime {
