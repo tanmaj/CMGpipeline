@@ -663,7 +663,12 @@ workflow FastqToVCF {
       gnomadConstraints_index = gnomadConstraints_index,
       CGD = CGD,
       CGD_index = CGD_index
-    }    
+    }   
+
+    call Conifer.GenerateAnnotatedIntervalFile as CONIFER_GenerateAnnotatedIntervalFile {
+    input:
+      bedtools_annotated_file = CONIFER_Annotate.conifer_calls_annotated
+    }     
   }
 
   if( defined(input_manta_reference_vcfs) && !defined(targetRegions) ){

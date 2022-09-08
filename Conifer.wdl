@@ -305,3 +305,33 @@ task CONIFER_Annotate {
     File conifer_calls_annotated = "~{sample_basename}.CONIFER.ANNOTATED.txt"
   }
 }
+
+# Output SimulConsult compatible outputs
+task GenerateAnnotatedIntervalFile {
+  input {
+    # Command parameters
+    File bedtools_annotated_file
+    String AnnotateIntervals_Rscript = "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/R_scripts/SCRIPTS_createVCFfromVariantString.R"
+  }
+
+  String bedtools_annotated_filename = basename(bedtools_annotated_file)
+
+  command {
+  wget -t 1 -T 20 ~{AnnotateIntervals_Rscript}
+  # Repeat in case the proxy defined in the docker image would case problems accessing the GitHub repo
+  unset https_proxy
+  wget -t 1 -T 20 ~{AnnotateIntervals_Rscript}
+
+  Rscript SCRIPTS_createVCFfromVariantString.R -i=~{bedtools_annotated_file}
+  mv output.txt ~{bedtools_annotated_filename}
+  }
+  runtime {
+    docker: "alesmaver/r-base"
+    requested_memory_mb_per_core: 3000
+    cpu: 1
+    runtime_minutes: 30
+  }
+  output {
+    File AnnotatedInterval_file = "ANNOTATED_~{bedtools_annotated_filename}"
+  }
+}
