@@ -31,7 +31,7 @@ collapseAnnotations=function(x, annotation_type){
 # Input annotation file 
 annotated_intervals_file= opt$annotatedIntervalsFile
 
-ncol=max(count.fields(annotated_intervals_file, sep = "\t"))
+ncol=max(na.omit(count.fields(annotated_intervals_file, sep = "\t")))
 
 annotated_intervals = read.table(annotated_intervals_file, fill=TRUE, sep = "\t", na.strings = "N/A", col.names = c("chr", "start", "stop", 4:ncol))
 annotation_types=unique(annotated_intervals$X5)
