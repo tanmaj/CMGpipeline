@@ -34,7 +34,7 @@ annotated_intervals_file= opt$annotatedIntervalsFile
 # Determine number of fields in the interval file
 annotated_intervals_file_numfields = count.fields(annotated_intervals_file, sep = "\t")
 
-if (annotated_intervals_file_numfields)>0 {
+if (annotated_intervals_file_numfields > 0) {
   ncol=max(na.omit(annotated_intervals_file_numfields))
 
   annotated_intervals = read.table(annotated_intervals_file, fill=TRUE, sep = "\t", na.strings = "N/A", col.names = c("chr", "start", "stop", 4:ncol))
