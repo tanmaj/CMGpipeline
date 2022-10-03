@@ -31,33 +31,40 @@ collapseAnnotations=function(x, annotation_type){
 # Input annotation file 
 annotated_intervals_file= opt$annotatedIntervalsFile
 
-ncol=max(na.omit(count.fields(annotated_intervals_file, sep = "\t")))
+# Determine number of fields in the interval file
+annotated_intervals_file_numfields = count.fields(annotated_intervals_file, sep = "\t")
 
-annotated_intervals = read.table(annotated_intervals_file, fill=TRUE, sep = "\t", na.strings = "N/A", col.names = c("chr", "start", "stop", 4:ncol))
-annotation_types=unique(annotated_intervals$X5)
-annotation_type = annotation_types[1]
-createIntervalID=function(x){paste(trimws(x[1:3]),sep="-", collapse="-")}
-annotated_intervals=cbind(uniqueID=apply(annotated_intervals, 1, createIntervalID), annotated_intervals)
+if (annotated_intervals_file_numfields)>0 {
+  ncol=max(na.omit(annotated_intervals_file_numfields))
 
-interval_list=data.frame(uniqueID = unique(annotated_intervals$uniqueID), chr="", start="", stop="")
-for(annotation_type in annotation_types) {
-  interval_list[,annotation_type]=""
-}
-interval_list[,"omim_hgncs"]=""
+  annotated_intervals = read.table(annotated_intervals_file, fill=TRUE, sep = "\t", na.strings = "N/A", col.names = c("chr", "start", "stop", 4:ncol))
+  annotation_types=unique(annotated_intervals$X5)
+  annotation_type = annotation_types[1]
+  createIntervalID=function(x){paste(trimws(x[1:3]),sep="-", collapse="-")}
+  annotated_intervals=cbind(uniqueID=apply(annotated_intervals, 1, createIntervalID), annotated_intervals)
 
-for (interval in unique(annotated_intervals$uniqueID)){
-  interval_list[interval_list$uniqueID == interval,c("chr", "start", "stop")]=annotated_intervals[annotated_intervals$uniqueID==interval,c("chr", "start", "stop")][1,]
-  
-  for (annotation_type in annotation_types) {
-    DF = annotated_intervals[annotated_intervals$uniqueID == interval & annotated_intervals$X5 == annotation_type,]
-    DF$collapsedAnnotations = apply(DF[10:ncol], 1, collapseAnnotations)
-    interval_list[interval_list$uniqueID == interval,annotation_type] = paste(unique(DF$collapsedAnnotations, annotation_type=annotation_type), collapse="; ")
+  interval_list=data.frame(uniqueID = unique(annotated_intervals$uniqueID), chr="", start="", stop="")
+  for(annotation_type in annotation_types) {
+    interval_list[,annotation_type]=""
   }
-  
-  OMIM_DF=annotated_intervals[annotated_intervals$uniqueID==interval & annotated_intervals$X5=="OMIM",]
-  if(nrow(OMIM_DF)>0){
-    interval_list[interval_list$uniqueID == interval,"omim_hgncs"] = paste( unique(OMIM_DF[,10]), collapse = ", ")
-  }
-}
+  interval_list[,"omim_hgncs"]=""
 
+  for (interval in unique(annotated_intervals$uniqueID)){
+    interval_list[interval_list$uniqueID == interval,c("chr", "start", "stop")]=annotated_intervals[annotated_intervals$uniqueID==interval,c("chr", "start", "stop")][1,]
+
+    for (annotation_type in annotation_types) {
+      DF = annotated_intervals[annotated_intervals$uniqueID == interval & annotated_intervals$X5 == annotation_type,]
+      DF$collapsedAnnotations = apply(DF[10:ncol], 1, collapseAnnotations)
+      interval_list[interval_list$uniqueID == interval,annotation_type] = paste(unique(DF$collapsedAnnotations, annotation_type=annotation_type), collapse="; ")
+    }
+
+    OMIM_DF=annotated_intervals[annotated_intervals$uniqueID==interval & annotated_intervals$X5=="OMIM",]
+    if(nrow(OMIM_DF)>0){
+      interval_list[interval_list$uniqueID == interval,"omim_hgncs"] = paste( unique(OMIM_DF[,10]), collapse = ", ")
+    }
+  }
+} else {
+  interval_list = ""
+}
+  
 write.table(interval_list, file="output.txt", sep="\t", quote=F, row.names = F)
