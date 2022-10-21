@@ -3,7 +3,7 @@ version 1.0
 import "./Conifer.wdl" as Conifer
 
 # WORKFLOW DEFINITION 
-workflow Conifer.Conifer_OnlyRPKM as Conifer_OnlyRPKM {
+workflow Conifer_OnlyRPKM {
   input {
     File input_bam
     File input_bam_index
@@ -14,7 +14,7 @@ workflow Conifer.Conifer_OnlyRPKM as Conifer_OnlyRPKM {
 
   String sample_basename = sub(basename(input_bam), "[\_,\.].*", "" )
   
-  call MakeRPKM {
+  call Conifer.MakeRPKM as MakeRPKM {
       input:
         input_bam=input_bam,
         input_bam_index=input_bam_index,
