@@ -6,8 +6,10 @@ import "./manta/manta_workflow.wdl" as manta
 # Conifer is also used to analyse WGS data as it proved to be useful in detecting rare CNVs while removing the common CNVs as noise
 # We use the BED file with 1Mb windows across the genome, prepared using these steps
 # The chrY and chrM chromosomes were too short to make accurate calling using conifer
-# awk {'print $1, $2'} OFS='\t' hg19.fa.fai |head -n 26 | grep -v '_' | grep -v 'chrM' | grep -v 'chrY' > hg19.genome
-# bedtools makewindows -w 1000 -g hg19.genome  > WGS1Mb.bed
+# awk {'print $1, $2'} OFS='\t' hg19.fa.fai |head -n 26 | grep -v '_' | grep -v 'chrM' > hg19.1Mb.genome
+# awk {'print $1, $2'} OFS='\t' hg19.fa.fai |head -n 26 | grep -v '_' | grep 'chrM' > hg19.mt.genome
+# bedtools makewindows -w 1000 -g hg19.1Mb.genome  > WGS1Mb.bed
+# bedtools makewindows -w 20 -g hg19.mt.genome  >> WGS1Mb.bed
 
 # WORKFLOW DEFINITION 
 workflow Conifer {
@@ -126,7 +128,7 @@ task MakeRPKM {
     File? enrichment_bed
 
     # Runtime parameters
-    String docker = "molecular/conifer"
+    String docker = "alesmaver/conifer_modified"
   }
   
   command {
