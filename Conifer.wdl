@@ -192,6 +192,7 @@ task CONIFER_Call {
   fi
   sed -i 's/chr23/chrX/' ~{sample_basename}.CNV.wig
   sed -i 's/chr24/chrY/' ~{sample_basename}.CNV.wig
+  sed -i 's/chr25/chrM/' ~{sample_basename}.CNV.wig
   >>>
 
   runtime {
@@ -260,6 +261,7 @@ task CONIFER_Export {
   cat ~{enrichment}_~{sample_basename}.bed | awk -F'\t' '{print $1,$2,$3,$5}' OFS='\t' > ~{sample_basename}.CNV.genome.wig
   sed -i 's/chr23/chrX/' ~{sample_basename}.CNV.genome.wig
   sed -i 's/chr24/chrY/' ~{sample_basename}.CNV.genome.wig
+  sed -i 's/chr25/chrM/' ~{sample_basename}.CNV.genome.wig
   >>>
 
   runtime {
