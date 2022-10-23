@@ -11,6 +11,7 @@ import "./manta/manta_workflow.wdl" as manta
 # bedtools makewindows -w 1000 -g hg19.1Mb.genome  > WGS1Mb.bed
 # bedtools makewindows -w 20 -g hg19.mt.genome  >> WGS1Mb.bed
 
+
 # WORKFLOW DEFINITION 
 workflow Conifer {
   input {
@@ -132,7 +133,7 @@ task CONIFER_Analyze {
     File? enrichment_bed
 
     # Runtime parameters
-    String docker = "molecular/conifer"
+    String docker = "alesmaver/conifer_modified"
   }
 
   command <<<
@@ -167,7 +168,7 @@ task CONIFER_Call {
     String sample_basename
 
     # Runtime parameters
-    String docker = "molecular/conifer"
+    String docker = "alesmaver/conifer_modified"
   }
   
   command <<<
@@ -215,7 +216,8 @@ task CONIFER_Plotcalls {
     String sample_basename
 
     # Runtime parameters
-    String docker = "molecular/conifer"
+    String docker = "alesmaver/conifer_modified"
+    #String docker = "molecular/conifer"
   }
   
   command {
@@ -246,7 +248,8 @@ task CONIFER_Export {
     String? enrichment
 
     # Runtime parameters
-    String docker = "molecular/conifer"
+    String docker = "alesmaver/conifer_modified"
+    #String docker = "molecular/conifer"
   }
   
   command <<<
