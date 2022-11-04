@@ -54,14 +54,16 @@ workflow DELLY {
         input:
             genome_build = "GRCh37",
             input_vcf = DELLY_filter.filtered_vcf,
-            output_tsv_name = sample_basename + ".DELLY.AnnotSV.tsv"
+            output_tsv_name = sample_basename + ".delly.AnnotSV.tsv"
     }
 
   output {
+    File call_bcf_file = DELLY_call.call_bcf_file
     File sample_bcfs = DELLY_genotype.geno_bcf_file
     File sample_bcf_indices = DELLY_genotype.geno_bcf_index_file
     File unfiltered_population_bcf = DELLY_merge_genotype.merged_geno_file
     File filtered_population_bcf = DELLY_filter.filtered_bcf
+    File? delly_annotSV = annotSV.sv_variants_tsv
   }
 }
 
@@ -81,7 +83,7 @@ task DELLY_call {
     unset https_proxy
     wget https://raw.githubusercontent.com/dellytools/delly/main/excludeTemplates/human.hg19.excl.tsv
     delly call -g ~{reference_fasta} -o ~{sample_basename}.unfiltered.bcf -x human.hg19.excl.tsv ~{input_bam}
-    bcftools filter -i 'FILTER=="PASS" &&  PRECISE==1' ~{sample_basename}.unfiltered.bcf -Ob -o ~{sample_basename}.bcf
+    bcftools filter -i 'FILTER=="PASS" &&  PRECISE==1' ~{sample_basename}.unfiltered.bcf -Ob -o ~{sample_basename}.delly.call.bcf
   }
 
   runtime {
@@ -91,7 +93,7 @@ task DELLY_call {
     runtime_minutes: 200
   }
   output {
-    File bcf_file = "~{sample_basename}.bcf" 
+    File call_bcf_file = "~{sample_basename}.delly.call.bcf" 
   }
 }
 
@@ -129,7 +131,7 @@ task DELLY_genotype {
     wget https://raw.githubusercontent.com/dellytools/delly/main/excludeTemplates/human.hg19.excl.tsv
     unset https_proxy
     wget https://raw.githubusercontent.com/dellytools/delly/main/excludeTemplates/human.hg19.excl.tsv
-    delly call -g ~{reference_fasta} -v ~{sites_bcf_file} -o ~{sample_basename}.geno.bcf -x human.hg19.excl.tsv ~{input_bam}
+    delly call -g ~{reference_fasta} -v ~{sites_bcf_file} -o ~{sample_basename}.delly.geno.bcf -x human.hg19.excl.tsv ~{input_bam}
   }
 
   runtime {
@@ -139,8 +141,8 @@ task DELLY_genotype {
     runtime_minutes: 200
   }
   output {
-    File geno_bcf_file = "~{sample_basename}.geno.bcf" 
-    File geno_bcf_index_file = "~{sample_basename}.geno.bcf.csi" 
+    File geno_bcf_file = "~{sample_basename}.delly.geno.bcf" 
+    File geno_bcf_index_file = "~{sample_basename}.delly.geno.bcf.csi" 
   }
 }
 
@@ -184,9 +186,9 @@ task DELLY_filter {
 
   command {
     bcftools index ~{input_bcf}
-    bcftools view -i 'INFO/AC<4 || INFO/AC="."' ~{input_bcf} | bcftools view --no-update -s ~{sample_basename} | bcftools view --no-update -e 'GT="0/0" || GT="./."' | bcftools view -Ob -o ~{sample_basename}.bcf
-    #delly filter -f germline -o population.bcf ~{input_bcf}
-    bcftools view -Ov -o ~{sample_basename}.vcf ~{sample_basename}.bcf
+    bcftools view -i 'INFO/AC<4 || INFO/AC="."' ~{input_bcf} | bcftools view --no-update -s ~{sample_basename} | bcftools view --no-update -e 'GT="0/0" || GT="./."' | bcftools view -Ob -o ~{sample_basename}.delly.filter.bcf
+    #delly filter -f germline -o delly.population.bcf ~{input_bcf}
+    bcftools view -Ov -o ~{sample_basename}.delly.filter.vcf ~{sample_basename}.delly.filter.bcf
   }
 
   runtime {
@@ -196,7 +198,7 @@ task DELLY_filter {
     runtime_minutes: 200
   }
   output {
-    File filtered_bcf = "~{sample_basename}.bcf" 
-    File filtered_vcf = "~{sample_basename}.vcf" 
+    File filtered_bcf = "~{sample_basename}.delly.filter.bcf" 
+    File filtered_vcf = "~{sample_basename}.delly.filter.vcf" 
   }
 }   
