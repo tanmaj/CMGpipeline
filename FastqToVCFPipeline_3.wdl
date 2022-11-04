@@ -16,6 +16,7 @@ import "./CreateInterpretationTable.wdl" as CreateInterpretationTable
 import "./MitoMap.wdl" as MitoMap
 import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
+import "./Delly/DELLY_single3.wdl" as Delly
 import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
 import "./bigWig/wigToBigWig_conversion" as BigWig
@@ -122,6 +123,10 @@ workflow FastqToVCF {
     # Manta
     Array[File]? input_manta_reference_vcfs
     Boolean exome = false
+    
+    # DELLY
+    File population_bcf
+    File population_bcf_index
 
     ## Boolean GenerateCRAM = false
     Boolean? GenerateCRAM
@@ -710,6 +715,20 @@ workflow FastqToVCF {
     }
   }
 
+  # DELLY
+  if ( defined(enrichment) ){
+    if( enrichment=="WGS1Mb" ){
+       call Delly.DELLY as Delly {
+        input:
+	  input_bam = SortSam.output_bam,
+          input_bai = SortSam.output_bam_index,
+          population_bcf = population_bcf,
+          population_bcf_index = population_bcf_index,
+          reference_fasta = reference_fa
+      }
+    }
+  }
+
   if ( defined(targetRegions) ){
     call RegionsToBed {
       input:
@@ -910,6 +929,14 @@ workflow FastqToVCF {
     File? mantaVCFindex = Manta.mantaVcfindex
     File? mantaSVs = Manta.output_sv_table
     File? mantaSVs_annotSV_tsv = Manta.annotSV_tsv
+    
+    # Delly
+    File? call_bcf_file = Delly.call_bcf_file
+    File? sample_bcfs = Delly.sample_bcfs
+    File? sample_bcf_indices = Delly.sample_bcf_indices
+    #File? unfiltered_population_bcf = Delly.sample_bcf_indices
+    File? filtered_population_bcf = Delly.filtered_population_bcf
+    File? delly_annotSV = Delly.delly_annotSV 
 
     File? Qualimap_results = Qualimap.results
     File? QualimapWGS_results = QualimapWGS.results
