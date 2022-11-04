@@ -20,7 +20,7 @@ workflow DELLY {
           reference_fasta = reference_fasta
   }
 
-  Array[File] input_bcfs = [DELLY_call.bcf_file, population_bcf]
+  Array[File] input_bcfs = [DELLY_call.call_bcf_file, population_bcf]
 
   call DELLY_merge {
     input:
