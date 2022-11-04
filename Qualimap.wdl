@@ -271,7 +271,8 @@ task DownsampleBED {
 
   command <<<
   set -e
-  awk {'print $1, $2'} OFS='\t' ~{reference_fai_filename} |head -n 26 | grep -v '_' | grep -v 'chrM' | grep -v 'chrY' > hg19.genome
+  #awk {'print $1, $2'} OFS='\t' ~{reference_fai_filename} |head -n 26 | grep -v '_' | grep -v 'chrM' | grep -v 'chrY' > hg19.genome
+  awk {'print $1, $2'} OFS='\t' ~{reference_fai_filename} |head -n 26 | grep -v '_'  > hg19.genome
   bedtools makewindows -w 100000 -g hg19.genome  > ~{bed_filename}
   #cat ~{bed_file} | awk 'NR % ~{select_every_nth_line} == 0' > downsampled_~{bed_filename}
   cat ~{bed_filename} | awk -F'\t' '{print $1,$2+5,$3-5}' OFS='\t' > downsampled_~{bed_filename}
