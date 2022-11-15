@@ -106,10 +106,10 @@ workflow SVcalling_wo_Germline {
     }
 
     output {
-        # File mantaVcf = manta.mantaVCF
-        # File mantaVcfindex = manta.mantaVCFindex
-        File output_sv_table = AnnotateMantaVCF.output_sv_table
-        File output_manta_filtered_vcf = AnnotateMantaVCF.output_manta_filtered_vcf
+        ## File mantaVcf = manta.mantaVCF
+        ## File mantaVcfindex = manta.mantaVCFindex
+        #File output_sv_table = AnnotateMantaVCF.output_sv_table
+        #File output_manta_filtered_vcf = AnnotateMantaVCF.output_manta_filtered_vcf
         File? annotSV_tsv = annotSV.sv_variants_tsv
     }
 
