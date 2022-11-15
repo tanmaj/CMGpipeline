@@ -24,6 +24,7 @@ version 1.0
 
 
 #import "./manta.wdl" as manta
+import "./manta_workflow.wdl" as manta_wf
 import "../AnnotationPipeline.wdl" as Annotation
 
 # T.M. 15.11.2002
@@ -85,20 +86,20 @@ workflow SVcalling_wo_Germline {
     #        exome = exome
     #}
 
-    call MergeMantaFiles {
+    call manta_wf.MergeMantaFiles as MergeMantaFiles {
         input:
             input_manta_vcf = input_manta_vcf,
             input_manta_reference_vcfs = input_manta_reference_vcfs,
             sample_basename = sample
     }    
 
-    call AnnotateMantaVCF {
+    call manta_wf.AnnotateMantaVCF as AnnotateMantaVCF {
         input:
             input_vcf = MergeMantaFiles.merged_vcf,
             sample_basename = sample
     }
 
-    call annotSV {
+    call manta_wf.annotSV as annotSV{
         input:
             genome_build = "GRCh37",
             input_vcf = AnnotateMantaVCF.output_manta_filtered_vcf,
@@ -129,103 +130,4 @@ workflow SVcalling_wo_Germline {
     }
 }
 
-###
-###
-###
-task MergeMantaFiles {
-  input {
-    # Command parameters
-    File input_manta_vcf
-    Array[File] input_manta_reference_vcfs 
-    String sample_basename
-  }
 
-  command <<<
-  MANTA_VCFS_DIR=$(dirname ~{input_manta_reference_vcfs[0]})
-  cp ~{input_manta_vcf} $MANTA_VCFS_DIR
-  cp $MANTA_VCFS_DIR/*.vcf ./
-  cp $MANTA_VCFS_DIR/*.vcf.gz ./
-
-  gunzip ./*manta.vcf.gz
-  for file in *manta.vcf; do
-    awk -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS") print}' $file > "${file/vcf/filtered.vcf}"
-  done
-
-  ls -d ./*manta.filtered.vcf > fileList
-
-  SURVIVOR merge fileList 500 1 1 0 0 20 ./merged.vcf
-  >>>
-
-  runtime {
-    docker: "quay.io/biocontainers/survivor:1.0.6--h6bb024c_0"
-    requested_memory_mb_per_core: 3000
-    cpu: 2
-    runtime_minutes: 120
-    docker_user: "root"
-  }
-  output {
-    File merged_vcf = "merged.vcf"
-  }
-}
-
-# SNPeff task
-task AnnotateMantaVCF {
-  input {
-    # Command parameters
-    File input_vcf
-    String sample_basename
-  }
-
-  command { 
-  java -jar /home/biodocker/bin/snpEff/snpEff.jar -noInteraction -noDownload hg19 ~{input_vcf} > ~{sample_basename}.merged.annotated.vcf
-  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "(ANN[*].IMPACT has 'MODERATE' | ANN[*].IMPACT has 'HIGH') & SUPP < 3 & isVariant(GEN[~{sample_basename}].GT)" ~{sample_basename}.merged.annotated.vcf > ~{sample_basename}.merged.annotated.filtered.vcf
-  java -jar /home/biodocker/bin/snpEff/SnpSift.jar extractFields -s "," -e "." ~{sample_basename}.merged.annotated.filtered.vcf CHROM POS REF ALT SVLEN QUAL ANN[*].GENE ANN[1].IMPACT ANN[1].EFFECT GEN[*].GT > ~{sample_basename}.mantaSVs.txt
-
-  # Create an unannotated snpEff file for annotSV and other applications
-  java -jar /home/biodocker/bin/snpEff/SnpSift.jar filter "SUPP < 3 & isVariant(GEN[~{sample_basename}].GT)" ~{input_vcf} > ~{sample_basename}.merged.filtered.vcf
-
-  }
-  runtime {
-    docker: "alesmaver/snpeff_v50"
-    maxRetries: 3
-    requested_memory_mb_per_core: 2000
-    cpu: 8
-    runtime_minutes: 120
-  }
-  output {
-    File output_sv_table = "~{sample_basename}.mantaSVs.txt"
-    File output_manta_filtered_vcf = "~{sample_basename}.merged.filtered.vcf"
-    File output_manta_annotated_filtered_vcf = "~{sample_basename}.merged.annotated.filtered.vcf"
-  }
-}
-
-task annotSV {
-  input {
-    String genome_build
-    File input_vcf
-    String output_tsv_name = "AnnotSV.tsv"
-  }
-
-  runtime {
-    requested_memory_mb_per_core: 8000
-    #docker: "mgibio/annotsv-cwl:2.1" # Disabling the old image and trying the 3.1 image due to inclusion of cytobands in the annotation
-    # The image was created by:
-    # 1. Pulling trinhanne/annotsv:3.1 image
-    # 2. cd-ing into the /opt/AnnotSV_3.1 directory
-    # 3. Running the make PREFIX=. install-human-annotation
-    docker: "alesmaver/annotsv"
-    continueOnReturnCode: true
-    cpu: 1
-  }
-
-  command <<<
-    /opt/AnnotSV_3.1/bin/AnnotSV -bedtools /usr/bin/bedtools -outputDir "$PWD" \
-    -genomeBuild ~{genome_build} \
-    -SVinputFile ~{input_vcf} \
-    -outputFile ~{output_tsv_name}
-  >>>
-
-  output {
-    File? sv_variants_tsv = output_tsv_name
-  }
-}
