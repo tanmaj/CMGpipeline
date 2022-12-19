@@ -716,18 +716,18 @@ workflow FastqToVCF {
   }
 
   # DELLY
-  if ( defined(enrichment) ){
-    if( enrichment=="WGS1Mb" ){
-       call Delly.DELLY as Delly {
-       input:
-   	 input_bam = SortSam.output_bam,
-         input_bai = SortSam.output_bam_index,
-         population_bcf = population_bcf,
-         population_bcf_index = population_bcf_index,
-         reference_fasta = reference_fa
-       }
-    }
-  }
+  #if ( defined(enrichment) ){
+  #  if( enrichment=="WGS1Mb" ){
+  #     call Delly.DELLY as Delly {
+  #     input:
+  # 	 input_bam = SortSam.output_bam,
+  #       input_bai = SortSam.output_bam_index,
+  #       population_bcf = population_bcf,
+  #       population_bcf_index = population_bcf_index,
+  #       reference_fasta = reference_fa
+  #     }
+  #  }
+  #}
 
   if ( defined(targetRegions) ){
     call RegionsToBed {
