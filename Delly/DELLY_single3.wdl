@@ -91,6 +91,7 @@ task DELLY_call {
     requested_memory_mb_per_core: 4000
     cpu: 2
     runtime_minutes: 200
+    continueOnReturnCode: true
   }
   output {
     File call_bcf_file = "~{sample_basename}.delly.call.bcf" 
@@ -111,6 +112,7 @@ task DELLY_merge {
     requested_memory_mb_per_core: 4000
     cpu: 2
     runtime_minutes: 200
+    continueOnReturnCode: true
   }
   output {
     File sites_bcf_file = "sites.bcf" 
@@ -139,6 +141,7 @@ task DELLY_genotype {
     requested_memory_mb_per_core: 4000
     cpu: 2
     runtime_minutes: 200
+    continueOnReturnCode: true
   }
   output {
     File geno_bcf_file = "~{sample_basename}.delly.geno.bcf" 
@@ -172,6 +175,7 @@ task DELLY_merge_genotype {
     requested_memory_mb_per_core: 4000
     cpu: 2
     runtime_minutes: 200
+    continueOnReturnCode: true
   }
   output {
     File merged_geno_file = "merged.bcf" 
@@ -196,6 +200,7 @@ task DELLY_filter {
     requested_memory_mb_per_core: 4000
     cpu: 2
     runtime_minutes: 200
+    continueOnReturnCode: true
   }
   output {
     File filtered_bcf = "~{sample_basename}.delly.filter.bcf" 
