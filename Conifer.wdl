@@ -133,7 +133,7 @@ task CONIFER_Analyze {
     File? enrichment_bed
 
     # Runtime parameters
-    String docker = "alesmaver/conifer_modified"
+    String docker = "alesmaver/conifer_modified2"
   }
 
   command <<<
