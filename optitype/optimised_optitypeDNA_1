@@ -140,9 +140,14 @@ task OptitypeDnaPipeline {
     echo run Optitype
     # run optitype 
     /usr/bin/python /usr/local/bin/OptiType/OptiTypePipeline.py -i ~{hla_fwd_fastq} ~{hla_rev_fastq} --dna -v -p $name -o .
-
-    mv ./${name}_result.tsv ./${name}.optitype_result.tsv
-    mv ./${name}_coverage_plot.pdf ./${name}.optitype_coverage_plot.pdf
+    if [ $? == 0 ]
+    then
+        mv ./${name}_result.tsv ./${name}.optitype_result.tsv
+        mv ./${name}_coverage_plot.pdf ./${name}.optitype_coverage_plot.pdf
+    else
+        echo Optitype has failed. Creating empty result files...
+    fi
+    echo Finished.
   >>>
 
   output {
