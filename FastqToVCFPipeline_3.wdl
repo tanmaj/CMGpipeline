@@ -398,27 +398,19 @@ workflow FastqToVCF {
 	      sample_basename = sample_basename
   	}
   }
-
-##  # Calculate Optitype only if targetRegions are not present
-#  if( !defined(targetRegions) ) {
-#    call Optitype.OptitypeDnafromBam as Optitype {
-#      input:
-#        optitype_name=sample_basename,
-#        input_bam=SortSam.output_bam
-#    } 
-#  }
+  
   
   # Calculate Optitype only if targetRegions are not present
-#  if ( !defined(targetRegions) ) {
-#    call Optitype.Optimised_OptitypeDna as Optitype {
-#      input:
-#        sample_basename = sample_basename,
-#        input_fq1 = CutAdapters_fq1.output_fq_trimmed,
-#        input_fq2 = CutAdapters_fq2.output_fq_trimmed,
-#	### input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam])
-#        input_bam = input_bam
-#    }
-#  }
+  if ( !defined(targetRegions) ) {
+    call Optitype.Optimised_OptitypeDna as Optitype {
+      input:
+        sample_basename = sample_basename,
+        input_fq1 = CutAdapters_fq1.output_fq_trimmed,
+        input_fq2 = CutAdapters_fq2.output_fq_trimmed,
+	### input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam])
+        input_bam = input_bam
+    }
+  }
   
 
   # Calculate SMN only if targetRegions are not present
