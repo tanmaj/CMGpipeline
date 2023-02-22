@@ -137,16 +137,23 @@ task OptitypeDnaPipeline {
     name=~{optitype_name}
     echo $name
     
-    echo run Optitype
-    # run optitype 
-    /usr/bin/python /usr/local/bin/OptiType/OptiTypePipeline.py -i ~{hla_fwd_fastq} ~{hla_rev_fastq} --dna -v -p $name -o .
-    if [ $? == 0 ]
-    then
-        mv ./${name}_result.tsv ./${name}.optitype_result.tsv
-        mv ./${name}_coverage_plot.pdf ./${name}.optitype_coverage_plot.pdf
+    if [[ -s ~{hla_fwd_fastq} ]] && [[ -s ~{hla_rev_fastq} ]]
+    then 
+        echo run Optitype
+        # run optitype 
+        /usr/bin/python /usr/local/bin/OptiType/OptiTypePipeline.py -i ~{hla_fwd_fastq} ~{hla_rev_fastq} --dna -v -p $name -o .
+        if [ $? -eq 0 ]
+        then
+            mv ./${name}_result.tsv ./${name}.optitype_result.tsv
+            mv ./${name}_coverage_plot.pdf ./${name}.optitype_coverage_plot.pdf
+        else
+            echo Optitype has failed. Creating empty result files...
+        fi
+
     else
-        echo Optitype has failed. Creating empty result files...
+        echo Input HLA files are empty. Breaking Optitype.
     fi
+    
     echo Finished.
   >>>
 
