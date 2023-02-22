@@ -147,22 +147,22 @@ task OptitypeDnaPipeline {
             mv ./${name}_result.tsv ./${name}.optitype_result.tsv
             mv ./${name}_coverage_plot.pdf ./${name}.optitype_coverage_plot.pdf
         else
-            echo Optitype has failed. Creating empty result files.
-            touch ./${name}.optitype_result.tsv
-            touch ./${name}.optitype_coverage_plot.pdf
+            echo Optitype has failed. #Creating empty result files.
+            #touch ./${name}.optitype_result.tsv
+            #touch ./${name}.optitype_coverage_plot.pdf
         fi
 
     else
         echo Input HLA files are empty. Breaking Optitype.
-        touch ./${name}.optitype_result.tsv
-        touch ./${name}.optitype_coverage_plot.pdf
+        #touch ./${name}.optitype_result.tsv
+        #touch ./${name}.optitype_coverage_plot.pdf
     fi
     
     echo Finished.
   >>>
 
   output {
-    File optitype_tsv = optitype_name + ".optitype_result.tsv"
-    File optitype_plot = optitype_name + ".optitype_coverage_plot.pdf"
+    File? optitype_tsv = optitype_name + ".optitype_result.tsv"
+    File? optitype_plot = optitype_name + ".optitype_coverage_plot.pdf"
   }
 }
