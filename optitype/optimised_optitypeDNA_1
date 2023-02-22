@@ -152,6 +152,8 @@ task OptitypeDnaPipeline {
 
     else
         echo Input HLA files are empty. Breaking Optitype.
+        touch ./${name}.optitype_result.tsv
+        touch ./${name}.optitype_coverage_plot.pdf
     fi
     
     echo Finished.
