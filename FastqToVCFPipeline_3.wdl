@@ -17,7 +17,7 @@ import "./MitoMap.wdl" as MitoMap
 import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
 import "./Delly/DELLY_single3.wdl" as Delly
-#import "./optimised_optitypeDNA" as Optitype
+import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
 import "./bigWig/wigToBigWig_conversion" as BigWig
 import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
@@ -947,8 +947,8 @@ workflow FastqToVCF {
     File? mitoResults_xls = MitoMap.mitoResults_xls
     File? mitoResults_txt = MitoMap.mitoResults_txt
     
-    #File? optitype_tsv = Optitype.optitype_tsv
-    #File? optitype_plot = Optitype.optitype_plot
+    File? optitype_tsv = Optitype.optitype_tsv
+    File? optitype_plot = Optitype.optitype_plot
 
     File? output_tsv = SMN_caller.output_tsv
     File? output_json = SMN_caller.output_json
