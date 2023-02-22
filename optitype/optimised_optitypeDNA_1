@@ -147,7 +147,9 @@ task OptitypeDnaPipeline {
             mv ./${name}_result.tsv ./${name}.optitype_result.tsv
             mv ./${name}_coverage_plot.pdf ./${name}.optitype_coverage_plot.pdf
         else
-            echo Optitype has failed. Creating empty result files...
+            echo Optitype has failed. Creating empty result files.
+            touch ./${name}.optitype_result.tsv
+            touch ./${name}.optitype_coverage_plot.pdf
         fi
 
     else
