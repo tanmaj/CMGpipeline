@@ -38,17 +38,15 @@ workflow SCRAMBLE_workflow {
             sample_basename=sample_basename
     }
 
-    call Manta.annotSV as ROH_annotSV {
+    call Manta.annotSV as MEI_annotSV {
       input:
         genome_build = "GRCh37",
-        input_vcf = CallROH.ROH_calls_annotSV_input_bed,
-        output_tsv_name = sample_basename + ".ROH.annotSV.tsv"
+        input_vcf = SCRAMBLE.output_meis,
+        output_tsv_name = sample_basename + ".MEIs.annotSV.tsv"
     }
 
     output {
-        File? output_tsv = SCRAMBLE.output_tsv
-        File? output_json = SCRAMBLE.output_json
-        File? output_pdf = SCRAMBLE.output_pdf
+        File MEI_output = MEI_annotSV.sv_variants_tsv
     }
 
 }
@@ -86,8 +84,6 @@ task SCRAMBLE {
     continueOnReturnCode: true
   }
   output {
-    File? output_tsv = "~{sample_basename}.smn_caller.tsv"
-    File? output_json = "~{sample_basename}.smn_caller.json"
-    File? output_pdf = "~{sample_basename}.smn_caller.pdf"
+    File? output_meis = "~{sample_basename}_MEIs.txt"
   }
 }
