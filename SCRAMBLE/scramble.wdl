@@ -41,12 +41,13 @@ workflow SCRAMBLE_workflow {
     call Manta.annotSV as MEI_annotSV {
       input:
         genome_build = "GRCh37",
-        input_vcf = SCRAMBLE.output_meis,
+        input_vcf = SCRAMBLE.output_meis_bed,
         output_tsv_name = sample_basename + ".MEIs.annotSV.tsv"
     }
 
     output {
-        File? MEI_output = MEI_annotSV.sv_variants_tsv
+        File MEI_output = SCRAMBLE.output_meis
+        File? MEI_output_annotated = MEI_annotSV.sv_variants_tsv
     }
 
 }
@@ -73,7 +74,8 @@ task SCRAMBLE {
         --eval-meis \
         --no-vcf
 
-    awk -F'[:\t]' -v OFS="\t" '{print $1,$2,$2,"INS",$0}' $PWD/output_MEIs.txt > ~{sample_basename}_MEIs.txt
+    cp $PWD/output_MEIs.txt ~{sample_basename}_output_MEIs.txt
+    awk -F'[:\t]' -v OFS="\t" '{print $1,$2,$2,"INS",$0}' ~{sample_basename}_output_MEIs.txt > ~{sample_basename}_MEIs.bed
   >>>
   
   runtime {
@@ -84,6 +86,7 @@ task SCRAMBLE {
     continueOnReturnCode: true
   }
   output {
-    File output_meis = "~{sample_basename}_MEIs.txt"
+    File output_meis = "~{sample_basename}_output_MEIs.txt"
+    File output_meis_bed = "~{sample_basename}_MEIs.bed"
   }
 }
