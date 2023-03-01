@@ -64,7 +64,7 @@ task SCRAMBLE {
     String docker = "alesmaver/scramble"
   }
 
-  command {
+  command <<<
     cluster_identifier ~{input_bam} > clusters.txt
 
     Rscript --vanilla /app/cluster_analysis/bin/SCRAMble.R \
@@ -76,8 +76,8 @@ task SCRAMBLE {
         --no-vcf
 
     awk -F'[:\t]' -v OFS="\t" '{print $1,$2,$2,"INS",$0}' /output_MEIs.txt > ~{sample_basename}_MEIs.txt
-
-  }
+  >>>
+  
   runtime {
     docker: docker
     requested_memory_mb_per_core: 2000
