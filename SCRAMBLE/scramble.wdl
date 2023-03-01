@@ -84,6 +84,6 @@ task SCRAMBLE {
     continueOnReturnCode: true
   }
   output {
-    File? output_meis = "~{sample_basename}_MEIs.txt"
+    File output_meis = "~{sample_basename}_MEIs.txt"
   }
 }
