@@ -202,7 +202,7 @@ task GetVariantRegions {
     String separator
   }
   command <<<
-    echo "~{input_variant_string}" | tr "~{separator}" \\n | awk -F' ' '{print $1":"$2-1"-"$2+1}' OFS='\t' | tr \\n ";" | sed 's/\;$//'
+    echo "~{input_variant_string}" | tr "~{separator}" \\n | awk -F' ' '{print $1":"$2-100"-"$2+100}' OFS='\t' | tr \\n ";" | sed 's/\;$//'
   >>>
   runtime {
     docker:"biocontainers/bcftools:v1.9-1-deb_cv1"

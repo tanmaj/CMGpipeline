@@ -398,15 +398,7 @@ workflow FastqToVCF {
 	      sample_basename = sample_basename
   	}
   }
-
-##  # Calculate Optitype only if targetRegions are not present
-#  if( !defined(targetRegions) ) {
-#    call Optitype.OptitypeDnafromBam as Optitype {
-#      input:
-#        optitype_name=sample_basename,
-#        input_bam=SortSam.output_bam
-#    } 
-#  }
+  
   
   # Calculate Optitype only if targetRegions are not present
   if ( !defined(targetRegions) ) {

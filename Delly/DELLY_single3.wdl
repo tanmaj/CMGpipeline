@@ -90,7 +90,7 @@ task DELLY_call {
     docker: "alesmaver/delly2@sha256:7308ad44bbf469c45d6bd3b6e3d9454f5f35ed879258fd82d28a961dd62c67cf"
     requested_memory_mb_per_core: 4000
     cpu: 2
-    runtime_minutes: 200
+    runtime_minutes: 720
     continueOnReturnCode: true
   }
   output {
@@ -111,7 +111,7 @@ task DELLY_merge {
     docker: "alesmaver/delly2@sha256:7308ad44bbf469c45d6bd3b6e3d9454f5f35ed879258fd82d28a961dd62c67cf"
     requested_memory_mb_per_core: 4000
     cpu: 2
-    runtime_minutes: 200
+    runtime_minutes: 400
     continueOnReturnCode: true
   }
   output {
@@ -140,7 +140,7 @@ task DELLY_genotype {
     docker: "alesmaver/delly2@sha256:7308ad44bbf469c45d6bd3b6e3d9454f5f35ed879258fd82d28a961dd62c67cf"
     requested_memory_mb_per_core: 4000
     cpu: 2
-    runtime_minutes: 200
+    runtime_minutes: 400
     continueOnReturnCode: true
   }
   output {
@@ -174,7 +174,7 @@ task DELLY_merge_genotype {
     docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
     requested_memory_mb_per_core: 4000
     cpu: 2
-    runtime_minutes: 200
+    runtime_minutes: 400
     continueOnReturnCode: true
   }
   output {
@@ -199,7 +199,7 @@ task DELLY_filter {
     docker: "alesmaver/delly2@sha256:7308ad44bbf469c45d6bd3b6e3d9454f5f35ed879258fd82d28a961dd62c67cf"
     requested_memory_mb_per_core: 4000
     cpu: 2
-    runtime_minutes: 200
+    runtime_minutes: 400
     continueOnReturnCode: true
   }
   output {
