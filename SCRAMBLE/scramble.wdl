@@ -46,7 +46,7 @@ workflow SCRAMBLE_workflow {
     }
 
     output {
-        File MEI_output = MEI_annotSV.sv_variants_tsv
+        File? MEI_output = MEI_annotSV.sv_variants_tsv
     }
 
 }
