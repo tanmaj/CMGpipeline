@@ -66,14 +66,14 @@ task SCRAMBLE {
     cluster_identifier ~{input_bam} > clusters.txt
 
     Rscript --vanilla /app/cluster_analysis/bin/SCRAMble.R \
-        --out-name /output \
+        --out-name $PWD/output \
         --cluster-file "$(realpath clusters.txt)" \
         --install-dir /app/cluster_analysis/bin \
         --mei-refs /app/cluster_analysis/resources/MEI_consensus_seqs.fa \
         --eval-meis \
         --no-vcf
 
-    awk -F'[:\t]' -v OFS="\t" '{print $1,$2,$2,"INS",$0}' /output_MEIs.txt > ~{sample_basename}_MEIs.txt
+    awk -F'[:\t]' -v OFS="\t" '{print $1,$2,$2,"INS",$0}' $PWD/output_MEIs.txt > ~{sample_basename}_MEIs.txt
   >>>
   
   runtime {
