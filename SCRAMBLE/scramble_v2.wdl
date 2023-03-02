@@ -12,10 +12,10 @@ workflow SCRAMBLE_workflow {
         File? input_bam_index
         File? input_cram
         File? input_cram_index
-        # Fields required for converting CRAM TO BAM
-        File? reference_fa
-        File? reference_fai
-        File? reference_dict
+        # Fields required for converting CRAM TO BAM  -- mandatory because of the definition in original CramToBam task
+        File reference_fa
+        File reference_fai
+        File reference_dict
     }
 
     #String sample_basename = " "           # = sub(basename(input_cram), "[\_,\.].*", "" )
