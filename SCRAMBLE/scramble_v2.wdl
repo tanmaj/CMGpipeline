@@ -49,9 +49,9 @@ workflow SCRAMBLE_workflow {
         input:
             #input_bam=Cram_hg19_ToBam.output_bam,
             #input_bam_index=Cram_hg19_ToBam.output_bai,
-            sample_basename=sample_basename
-            input_bam=select_first([input_bam, Cram_hg19_ToBam.output_bam])
-            input_bam_index=select_first([input_bam_index, Cram_hg19_ToBam.output_bai])
+            sample_basename = sample_basename,
+            input_bam = select_first([input_bam, Cram_hg19_ToBam.output_bam]),
+            input_bam_index = select_first([input_bam_index, Cram_hg19_ToBam.output_bai])
     }
 
     call Manta.annotSV as MEI_annotSV {
