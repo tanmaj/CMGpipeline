@@ -18,11 +18,17 @@ workflow SCRAMBLE_workflow {
         File? reference_dict
     }
 
-    String sample_basename = sub(basename(input_cram), "[\_,\.].*", "" )
+    String sample_basename = " "           # = sub(basename(input_cram), "[\_,\.].*", "" )
     
     String gitc_docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817"
     String samtools_path = "samtools" # Path to samtools command within GITC docker
     
+    if ( defined(input_bam) ) {
+        sample_basename = sub(basename(input_bam), "[\_,\.].*", "" )
+    }
+    if ( defined(input_cram) ) {
+        sample_basename = sub(basename(input_cram), "[\_,\.].*", "" )
+    }
     
     if ( defined(input_cram) ) {
         call FastqToVcf.CramToBam as Cram_hg19_ToBam {
