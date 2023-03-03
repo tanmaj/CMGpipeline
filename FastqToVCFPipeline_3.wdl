@@ -20,7 +20,7 @@ import "./manta/manta_workflow.wdl" as Manta
 import "./Delly/DELLY_single3.wdl" as Delly
 import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
-### import "./SCRAMBLE/scramble_v2.wdl" as Scramble
+import "./SCRAMBLE/scramble_v2.wdl" as Scramble
 import "./bigWig/wigToBigWig_conversion" as BigWig
 import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
 
@@ -426,17 +426,17 @@ workflow FastqToVCF {
   }
   
   
-  #### Calculate Scramble only if targetRegions are not present
-  ###if( !defined(targetRegions) ) {
-  ###   call Scramble.SCRAMBLE_workflow as Scramble {
-  ###   input:
-  ###     input_bam = SortSam.output_bam,
-  ###     input_bam_index = SortSam.output_bam_index,
-  ###     reference_fa = reference_fa,
-  ###     reference_fai = reference_fai,
-  ###     reference_dict = reference_dict 
-  ###   }
-  ###}
+  # Calculate Scramble only if targetRegions are not present
+  if( !defined(targetRegions) ) {
+     call Scramble.SCRAMBLE_workflow as Scramble {
+     input:
+       input_bam = SortSam.output_bam,
+       input_bam_index = SortSam.output_bam_index,
+       reference_fa = reference_fa,
+       reference_fai = reference_fai,
+       reference_dict = reference_dict 
+     }
+  }
   
 
   if( defined(targetRegions) ) {
@@ -970,8 +970,8 @@ workflow FastqToVCF {
     File? output_json = SMN_caller.output_json
     File? output_pdf = SMN_caller.output_pdf
 
-    ###File? MEI_output = Scramble.MEI_output
-    ###File? MEI_output_annotated = Scramble.MEI_output_annotated
+    File? MEI_output = Scramble.MEI_output
+    File? MEI_output_annotated = Scramble.MEI_output_annotated
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
     
