@@ -392,7 +392,7 @@ workflow FastqToVCF {
   }
 
   if ( select_first([GenerateCRAM, false])) {
-	  call ConvertToCram {
+	  call CramConversions.ConvertToCram as ConvertToCram {
 	    input:
 	      input_bam = SortSam.output_bam,
 	      ref_fasta = reference_fa,
