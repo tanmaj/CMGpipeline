@@ -9,7 +9,7 @@ version 1.0
 
 # Subworkflows
 import "./AnnotationPipeline.wdl" as Annotation
-import "../CRAM_conversions.wdl" as CramConversions
+import "./CRAM_conversions.wdl" as CramConversions
 import "./Conifer.wdl" as Conifer
 import "./Qualimap.wdl" as Qualimap
 import "./ROH.wdl" as ROH
