@@ -1,7 +1,8 @@
 version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
-import "../FastqToVCFPipeline_3.wdl" as FastqToVcf
+### import "../FastqToVCFPipeline_3.wdl" as FastqToVcf
+import "../CRAM_conversions.wdl" as CramToBam
 import "../manta/manta_workflow.wdl" as Manta
 
 # WORKFLOW DEFINITION
@@ -24,7 +25,7 @@ workflow SCRAMBLE_workflow {
     String sample_basename = sub(basename(select_first([input_bam, input_cram])), "[\_,\.].*", "" )
     
     if ( defined(input_cram) ) {
-        call FastqToVcf.CramToBam as Cram_hg19_ToBam {
+        call CramToBam.CramToBam as Cram_hg19_ToBam {
             input:
                 input_cram = input_cram,
                 sample_name = sample_basename,
