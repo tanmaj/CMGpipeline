@@ -83,7 +83,7 @@ task SCRAMBLE {
         --no-vcf
 
     cp $PWD/output_MEIs.txt ~{sample_basename}.output_MEIs.txt
-    awk -F'[:\t]' -v OFS="\t" '{print $1,$2,$2,"INS",$0}' ~{sample_basename}.output_MEIs.txt > ~{sample_basename}.MEIs.bed
+    awk -F'[:\t]' -v OFS="\t" '{print $1,$2,$2+1,"INS",$0}' ~{sample_basename}.output_MEIs.txt > ~{sample_basename}.MEIs.bed
   >>>
   
   runtime {
