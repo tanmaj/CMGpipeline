@@ -90,7 +90,7 @@ task SCRAMBLE {
     docker: docker
     requested_memory_mb_per_core: 2000
     cpu: 6
-    runtime_minutes: 60
+    runtime_minutes: 300
     continueOnReturnCode: true
   }
   output {
