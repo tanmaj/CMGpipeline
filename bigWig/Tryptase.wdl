@@ -34,7 +34,7 @@ task Tryptase_call {
     
     # Extract reads mapping to the general tryptase locus from original BAM file
     echo Extract reads mapping to the general tryptase locus from original BAM file
-    samtools view -b -F0xF0C ~{sample_basename}.bam chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
+    samtools view -b -F0xF0C ~{input_bam} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
     ls -ls ~{sample_basename}.tryptase.bam
 
     # Convert to interleaved FASTQ
