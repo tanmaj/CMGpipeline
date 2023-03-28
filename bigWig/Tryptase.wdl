@@ -6,7 +6,7 @@ workflow Tryptase {
     ##File input_bai
     File input_cram
     File input_crai
-    File reference_fasta
+    File ref_fa
   }
 
   call Tryptase_call {
@@ -15,7 +15,7 @@ workflow Tryptase {
           ##input_bai = input_bai,
           input_cram = input_cram,
           input_crai = input_crai,
-          reference_fasta = reference_fasta          
+          reference_fasta = ref_fa        
   }
  
   output {
@@ -29,7 +29,7 @@ task Tryptase_call {
     ##File input_bai
     File input_cram
     File input_crai
-    File reference_fasta
+    File ref_fa
   }
   
   String sample_basename = sub(basename(input_cram), "[\_,\.].*", "" )
@@ -38,7 +38,7 @@ task Tryptase_call {
     
     # Extract reads mapping to the general tryptase locus from original BAM file
     echo Extract reads mapping to the general tryptase locus from original CRAM file
-    samtools view -b -F0xF0C ~{input_cram} -T ~{reference_fasta} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
+    samtools view -b -F0xF0C ~{input_cram} -T ~{ref_fa} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
     ls -ls ~{sample_basename}.tryptase.bam
 
     # Convert to interleaved FASTQ
