@@ -15,7 +15,7 @@ workflow Tryptase {
           ##input_bai = input_bai,
           input_cram = input_cram,
           input_crai = input_crai,
-          reference_fasta = ref_fa        
+          ref_fa = ref_fa        
   }
  
   output {
