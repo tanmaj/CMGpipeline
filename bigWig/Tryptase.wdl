@@ -51,7 +51,7 @@ task Tryptase_call {
     echo Cluster mapped reads into distinct haplotypes
     cat ~{sample_basename}.cons.sam \
       | awk '$10!~/N/' \
-      | python parseHaplotypes.py \
+      | python /usr/working/Tryptase/parseHaplotypes.py \
       > ~{sample_basename}.fa
      
     ls -ls ~{sample_basename}.fa
