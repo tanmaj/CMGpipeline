@@ -2,18 +2,20 @@ version 1.0
 
 workflow Tryptase {
   input {
-    File input_bam
-    File input_bai
-
+    ##File input_bam
+    ##File input_bai
+    File input_cram
+    File input_crai
+    File reference_fasta
   }
-
-  #String sample_basename = sub(basename(input_bam), "[\_,\.].*", "" )
 
   call Tryptase_call {
       input:
-          input_bam = input_bam,
-          input_bai = input_bai,
-          #reference_fasta = reference_fasta          
+          ##input_bam = input_bam,
+          ##input_bai = input_bai,
+          input_cram = input_cram,
+          input_crai = input_crai,
+          reference_fasta = reference_fasta          
   }
  
   output {
@@ -23,18 +25,22 @@ workflow Tryptase {
 
 task Tryptase_call {
   input {
-    File input_bam
-    File input_bai
-    #File reference_fasta
+    ##File input_bam
+    ##File input_bai
+    File input_cram
+    File input_crai
+    File reference_fasta
   }
   
-  String sample_basename = sub(basename(input_bam), "[\_,\.].*", "" )
+  String sample_basename = sub(basename(input_cram), "[\_,\.].*", "" )
   
   command {
     
     # Extract reads mapping to the general tryptase locus from original BAM file
-    echo Extract reads mapping to the general tryptase locus from original BAM file
-    samtools view -b -F0xF0C ~{input_bam} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
+    ##echo Extract reads mapping to the general tryptase locus from original BAM file
+    ##samtools view -b -F0xF0C ~{input_bam} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
+    echo Extract reads mapping to the general tryptase locus from original CRAM file
+    samtools view -b -F0xF0C ~{input_cram} -T {reference_fasta} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
     ls -ls ~{sample_basename}.tryptase.bam
 
     # Convert to interleaved FASTQ
@@ -48,7 +54,7 @@ task Tryptase_call {
     ls -ls ~{sample_basename}.cons.sam
 
     # Cluster mapped reads into distinct haplotypes
-    echo Cluster mapped reads into distinct haplotypes
+    echo Cluster mapped reads into distinct haplotypes - parseHaplotypes - stay patient...
     cat ~{sample_basename}.cons.sam \
       | awk '$10!~/N/' \
       | python /usr/working/Tryptase/parseHaplotypes.py \
