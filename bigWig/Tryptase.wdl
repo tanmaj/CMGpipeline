@@ -37,8 +37,6 @@ task Tryptase_call {
   command {
     
     # Extract reads mapping to the general tryptase locus from original BAM file
-    ##echo Extract reads mapping to the general tryptase locus from original BAM file
-    ##samtools view -b -F0xF0C ~{input_bam} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
     echo Extract reads mapping to the general tryptase locus from original CRAM file
     samtools view -b -F0xF0C ~{input_cram} -T ~{reference_fasta} chr16:1250000-1350000 > ~{sample_basename}.tryptase.bam
     ls -ls ~{sample_basename}.tryptase.bam
