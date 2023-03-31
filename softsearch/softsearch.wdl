@@ -55,6 +55,7 @@ workflow SoftSearchWF {
   output {
     File output_cram = MergeVCFs.output_vcf
     File output_cram_index = MergeVCFs.output_vcf_index
+    File? output_tsv_name = SoftSearch_annotSV.sv_variants_tsv
   }
 }
 
