@@ -20,6 +20,7 @@ workflow Tryptase {
  
   output {
     File tryptase_output_file = Tryptase_call.tryptase_output_file
+    File tryptase_output1_file = Tryptase_call.tryptase_output1_file
   }
 }
 
@@ -47,10 +48,10 @@ task Tryptase_call {
     ls -ls ~{sample_basename}.tryptase.fq
 
     # Map reads to consensus sequence, retaininly only mapped reads
-    echo Map reads to consensus sequence, retaininly only mapped reads
+    echo Map reads to consensus sequence, retaininly only mapped reads (CONS.fa)
     bwa mem -pM -R '@RG\tID:1\tSM:~{sample_basename}' /usr/working/Tryptase/CONS.fa ~{sample_basename}.tryptase.fq | samtools view -F0xF0C -S -h - > ~{sample_basename}.cons.sam
     ls -ls ~{sample_basename}.cons.sam
-
+    
     # Cluster mapped reads into distinct haplotypes
     echo Cluster mapped reads into distinct haplotypes - parseHaplotypes - stay patient...
     cat ~{sample_basename}.cons.sam \
@@ -80,6 +81,45 @@ task Tryptase_call {
       
     ls -ls ~{sample_basename}.tryptase.output.txt
     
+    # --------------------------------------------
+    # vse skupaj ponovimo še s CONS1.fa in TPS1.fa
+    # --------------------------------------------
+    echo Ponovimo vse skupaj še s CONS1.fa in TPS1.fa
+    
+    # Map reads to consensus sequence, retaininly only mapped reads 
+    echo Map reads to consensus sequence, retaininly only mapped reads 
+    bwa mem -pM -R '@RG\tID:1\tSM:~{sample_basename}' /usr/working/Tryptase/CONS1.fa ~{sample_basename}.tryptase.fq | samtools view -F0xF0C -S -h - > ~{sample_basename}.cons1.sam
+    ls -ls ~{sample_basename}.cons1.sam
+    
+    # Cluster mapped reads into distinct haplotypes
+    echo Cluster mapped reads into distinct haplotypes  - parseHaplotypes - stay patient... 
+    cat ~{sample_basename}.cons1.sam \
+      | awk '$10!~/N/' \
+      | python /usr/working/Tryptase/parseHaplotypes.py \
+      > ~{sample_basename}.1.fa
+     
+    ls -ls ~{sample_basename}.1.fa
+
+    cat ~{sample_basename}.1.fa \
+      | sed 's/ .*//' \
+      | sed 's/^X*//' \
+      | sed 's/X*$//' \
+      | tr X N \
+      | bwa mem -M /usr/working/Tryptase/TPS1.fa - \
+      | awk '$1!~/_[0-9]_/' \
+      > ~{sample_basename}.consx1.sam
+      
+    ls -ls ~{sample_basename}.consx1.sam
+
+
+    cat ~{sample_basename}.consx1.sam |grep -v ^@ \
+      | cut -f1,3,4,6,12-13|tr _ "\t" \
+      | awk '$3>5' \
+      | sort -k4,4 -k3nr \
+      > ~{sample_basename}.tryptase.output.1.txt
+      
+    ls -ls ~{sample_basename}.tryptase.output.1.txt
+    
     echo END.
         
   }
@@ -92,6 +132,7 @@ task Tryptase_call {
     continueOnReturnCode: true
   }
   output {
-    File tryptase_output_file = "~{sample_basename}.tryptase.output.txt" 
+    File tryptase_output_file = "~{sample_basename}.tryptase.output.txt"
+    File tryptase_output1_file = "~{sample_basename}.tryptase.output.1.txt"
   }
 }
