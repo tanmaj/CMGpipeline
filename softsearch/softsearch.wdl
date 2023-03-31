@@ -2,6 +2,7 @@ version 1.0
 
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/FastqToVCFPipeline_3.wdl" as FastqToVcf
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
+import "../manta/manta_workflow.wdl" as Manta
 
 # WORKFLOW DEFINITION 
 workflow SoftSearchWF {
@@ -42,6 +43,13 @@ workflow SoftSearchWF {
       sample_basename = sample_basename,
       docker = "broadinstitute/gatk:4.2.0.0",
       gatk_path = "/gatk/gatk"
+  }
+
+  call Manta.annotSV as SoftSearch_annotSV {
+    input:
+      genome_build = "GRCh37",
+      input_vcf = MergeVCFs.output_vcf,
+      output_tsv_name = sample_basename + ".SoftSearch.annotSV.tsv"
   }
 
   output {
