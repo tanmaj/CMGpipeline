@@ -48,7 +48,7 @@ task Tryptase_call {
     ls -ls ~{sample_basename}.tryptase.fq
 
     # Map reads to consensus sequence, retaininly only mapped reads
-    echo Map reads to consensus sequence, retaininly only mapped reads (CONS.fa)
+    echo Map reads to consensus sequence, retaininly only mapped reads 
     bwa mem -pM -R '@RG\tID:1\tSM:~{sample_basename}' /usr/working/Tryptase/CONS.fa ~{sample_basename}.tryptase.fq | samtools view -F0xF0C -S -h - > ~{sample_basename}.cons.sam
     ls -ls ~{sample_basename}.cons.sam
     
