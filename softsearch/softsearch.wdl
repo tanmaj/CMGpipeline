@@ -108,7 +108,7 @@ task MergeVCFs {
   command {
     set -e
     ~{gatk_path} --java-options -Xmx4G  \
-      MergeVcfs \
+      SortVcf \
       ~{"--SEQUENCE_DICTIONARY " + reference_dict} \
       --INPUT ~{sep=' --INPUT ' input_vcfs} \
       --OUTPUT ~{sample_basename}.softSearch.vcf.gz
