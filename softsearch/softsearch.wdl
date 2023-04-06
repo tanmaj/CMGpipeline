@@ -44,17 +44,24 @@ workflow SoftSearchWF {
       docker = "broadinstitute/gatk:4.2.0.0",
       gatk_path = "/gatk/gatk"
   }
+  
+  call SoftSearch_filter as SoftSearch_filter {
+    input:
+      input_vcf = MergeVCFs.output_vcf,
+      sample_basename = sample_basename
+  }
 
   call Manta.annotSV as SoftSearch_annotSV {
     input:
       genome_build = "GRCh37",
-      input_vcf = MergeVCFs.output_vcf,
+      input_vcf = SoftSearch_filter.output_vcf,
       output_tsv_name = sample_basename + ".SoftSearch.annotSV.tsv"
   }
 
   output {
     File output_cram = MergeVCFs.output_vcf
     File output_cram_index = MergeVCFs.output_vcf_index
+    File output_vcf = SoftSearch_filter.output_vcf
     File? output_tsv_name = SoftSearch_annotSV.sv_variants_tsv
   }
 }
@@ -132,5 +139,30 @@ task MergeVCFs {
   output {
     File output_vcf = "~{sample_basename}.softSearch.vcf.gz"
     File output_vcf_index = "~{sample_basename}.softSearch.vcf.gz.tbi"
+  }
+}
+
+task SoftSearch_filter {
+  input {
+    File input_vcf
+    String sample_basename
+    String docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
+  }
+  
+  command {
+  set -e
+    echo Filtering soft search vcf file
+    bcftools filter -sFilterName -i'FORMAT/nSC>5 && FORMAT/lSC>10' -Oz -o ~{sample_basename}.softSearch.filtered.vcf.gz ~{input_vcf}
+    
+  }
+  runtime {
+    docker: docker
+    maxRetries: 3
+    requested_memory_mb_per_core: 5000
+    cpu: 1
+    runtime_minutes: 30
+  }
+  output {
+    File output_vcf = "~{sample_basename}.softSearch.filtered.vcf.gz"
   }
 }
