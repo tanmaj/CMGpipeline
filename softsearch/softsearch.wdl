@@ -152,7 +152,7 @@ task SoftSearch_filter {
   command {
   set -e
     echo Filtering soft search vcf file
-    bcftools filter -sFilterName -i'FORMAT/nSC>5 && FORMAT/lSC>10' -Oz -o ~{sample_basename}.softSearch.filtered.vcf.gz ~{input_vcf}
+    bcftools view -i'FORMAT/nSC>5 && FORMAT/lSC>10' -Oz -o ~{sample_basename}.softSearch.filtered.vcf.gz ~{input_vcf}
     
   }
   runtime {
