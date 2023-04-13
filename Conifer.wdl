@@ -230,10 +230,9 @@ task CONIFER_Plotcalls {
   # Need to prefix the python command to make home writable in a rootless container
   HOME=$(dirname ~{input_hdf5}) python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
   
-  echo zdaj pa zatarajmo slike:
+  echo tarring the plots:
   echo ~{tar_filename}
-  echo tar --create --gzip --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
-  tar --create --gzip --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
+  tar --create --gzip --verbose --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
   
   }
 
