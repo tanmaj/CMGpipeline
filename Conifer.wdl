@@ -219,6 +219,7 @@ task CONIFER_Plotcalls {
     # Runtime parameters
     String docker = "alesmaver/conifer_modified"
     #String docker = "molecular/conifer"
+    String tar_filename = sample_basename + ".CONIFER.plots.tar.gz"
   }
   
   command {
@@ -228,9 +229,9 @@ task CONIFER_Plotcalls {
   # Need to prefix the python command to make home writable in a rootless container
   HOME=$(dirname ~{input_hdf5}) python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
   
-  include_list=$(ls -1 *.list)
-  echo tole je ime fileta:
-  echo $include_list
+  echo zdaj pa zatarajmo slike:
+  ls -1 chr*{sample_basename}.png | wc -l
+  tar --create --gzip --verbose --group=cmg --owner=cmg --file=~{tar_filename} chr*{sample_basename}.png
   
   }
 
