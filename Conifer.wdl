@@ -81,7 +81,7 @@ workflow Conifer {
     File output_conifer_calls = CONIFER_Call.output_conifer_calls
     File output_conifer_calls_wig = CONIFER_Call.output_conifer_calls_wig
     Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
-    File conifer_plots_tar = CONIFER_Plotcalls.conifer_plots_tar
+    File? conifer_plots_tar = CONIFER_Plotcalls.conifer_plots_tar
     File CNV_bed = CONIFER_Export.CNV_bed
     File CNV_wig = CONIFER_Export.CNV_wig
     File output_rpkm = MakeRPKM.output_rpkm
@@ -232,7 +232,16 @@ task CONIFER_Plotcalls {
   
   echo tarring the plots:
   echo ~{tar_filename}
-  tar --create --gzip --verbose --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
+  #tar --create --gzip --verbose --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
+ 
+  if ls chr*~{sample_basename}.png ; then
+    echo files do exist
+    tar --create --gzip --verbose --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
+  else
+    echo files do not exist
+    echo no tar performed
+  fi
+  
   
   }
 
@@ -245,7 +254,7 @@ task CONIFER_Plotcalls {
   }
   output {
     Array[File] output_plotcalls = glob("*.png")
-    File conifer_plots_tar = "~{tar_filename}"
+    File? conifer_plots_tar = "~{tar_filename}"
   }
 }
 
