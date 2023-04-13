@@ -230,7 +230,7 @@ task CONIFER_Plotcalls {
   HOME=$(dirname ~{input_hdf5}) python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
   
   echo zdaj pa zatarajmo slike:
-  ls -1 chr*{sample_basename}.png | wc -l
+  ls -1 chr*{sample_basename}.png
   tar --create --gzip --verbose --group=cmg --owner=cmg --file=~{tar_filename} chr*{sample_basename}.png
   
   }
