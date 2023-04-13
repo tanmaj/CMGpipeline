@@ -227,6 +227,11 @@ task CONIFER_Plotcalls {
   export LC_CTYPE="C.UTF-8"
   # Need to prefix the python command to make home writable in a rootless container
   HOME=$(dirname ~{input_hdf5}) python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
+  
+  include_list=$(ls -1 *.list)
+  echo tole je ime fileta:
+  echo $include_list
+  
   }
 
   runtime {
