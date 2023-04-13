@@ -81,6 +81,7 @@ workflow Conifer {
     File output_conifer_calls = CONIFER_Call.output_conifer_calls
     File output_conifer_calls_wig = CONIFER_Call.output_conifer_calls_wig
     Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
+    File conifer_plots_tar = CONIFER_Plotcalls.conifer_plots_tar
     File CNV_bed = CONIFER_Export.CNV_bed
     File CNV_wig = CONIFER_Export.CNV_wig
     File output_rpkm = MakeRPKM.output_rpkm
@@ -230,8 +231,9 @@ task CONIFER_Plotcalls {
   HOME=$(dirname ~{input_hdf5}) python /home/bio/conifer_v0.2.2/conifer.py plotcalls --input ~{input_hdf5} --calls ~{input_conifer_calls} --output ./
   
   echo zdaj pa zatarajmo slike:
-  ls -1 chr*~{sample_basename}.png
-  tar --create --gzip --verbose --group=cmg --owner=cmg --file=~{tar_filename} chr*~{sample_basename}.png
+  echo ~{tar_filename}
+  echo tar --create --gzip --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
+  tar --create --gzip --group=cmg --owner=cmg --file=./~{tar_filename} chr*~{sample_basename}.png
   
   }
 
@@ -244,6 +246,7 @@ task CONIFER_Plotcalls {
   }
   output {
     Array[File] output_plotcalls = glob("*.png")
+    File conifer_plots_tar = "~{tar_filename}"
   }
 }
 
