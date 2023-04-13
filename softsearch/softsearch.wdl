@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/FastqToVCFPipeline_3.wdl" as FastqToVcf
+##import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/FastqToVCFPipeline_3.wdl" as FastqToVcf    # ni v uporabi
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
 import "../manta/manta_workflow.wdl" as Manta
 
@@ -59,8 +59,8 @@ workflow SoftSearchWF {
   }
 
   output {
-    File output_cram = MergeVCFs.output_vcf
-    File output_cram_index = MergeVCFs.output_vcf_index
+    File output_complete_vcf = MergeVCFs.output_vcf
+    File output_complete_vcf_index = MergeVCFs.output_vcf_index
     File output_vcf = SoftSearch_filter.output_vcf
     File? output_tsv_name = SoftSearch_annotSV.sv_variants_tsv
   }
