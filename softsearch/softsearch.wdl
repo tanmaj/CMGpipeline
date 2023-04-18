@@ -100,7 +100,7 @@ task SoftSearch {
     maxRetries: 3
     requested_memory_mb_per_core: 5000
     cpu: 2
-    runtime_minutes: 360
+    runtime_minutes: 600
   }
   output {
     File output_vcf = "~{sample_basename}.softSearch.vcf"
