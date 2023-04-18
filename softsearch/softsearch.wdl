@@ -1,7 +1,6 @@
 version 1.0
 
-##import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/FastqToVCFPipeline_3.wdl" as FastqToVcf    # ni v uporabi
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
+### import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/AnnotationPipeline.wdl" as Annotation
 import "../manta/manta_workflow.wdl" as Manta
 
 # WORKFLOW DEFINITION 
@@ -27,7 +26,7 @@ workflow SoftSearchWF {
         sample_basename=sample_basename
     }
 
-    call Annotation.CompressAndIndexVCF as CompressAndIndexVCF {
+    call CompressAndIndexVCF {
       input:
         input_vcf = SoftSearch.output_vcf,
         sample_basename = sample_basename,
@@ -166,3 +165,35 @@ task SoftSearch_filter {
     File output_vcf = "~{sample_basename}.softSearch.filtered.vcf.gz"
   }
 }
+
+
+task CompressAndIndexVCF {
+  input {
+    File input_vcf
+    String sample_basename
+    String docker
+  }
+
+  command {
+    set -e
+    # sorting the variants part of the input file
+    cat ~{input_vcf} | bcftools view -h  > ~{sample_basename}.header.vcf 
+    cat ~{input_vcf} | bcftools view -H | sort -k1,1V -k2,2n > ~{sample_basename}.variants.vcf
+    cat ~{sample_basename}.header.vcf ~{sample_basename}.variants.vcf > ~{sample_basename}.sorted.vcf
+  
+    bcftools view -Oz ~{sample_basename}.sorted.vcf > ~{sample_basename}.vcf.gz
+    bcftools index -t ~{sample_basename}.vcf.gz
+  }
+  runtime {
+    docker: docker
+    maxRetries: 3
+    requested_memory_mb_per_core: 5000
+    cpu: 1
+    runtime_minutes: 90
+  }
+  output {
+    File output_vcfgz = "~{sample_basename}.vcf.gz"
+    File output_vcfgz_index = "~{sample_basename}.vcf.gz.tbi"
+  }
+}
+
