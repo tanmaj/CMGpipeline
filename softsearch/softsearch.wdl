@@ -77,6 +77,8 @@ task SoftSearch {
   }
 
   command <<<
+    echo chromosome: ~{chromosome}
+    
     # Generate the genome file
     awk -v OFS='\t' {'print $1,$2'} ~{ref_fasta_index} > hg19.genome
 
