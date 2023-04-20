@@ -441,6 +441,8 @@ workflow FastqToVCF {
   
   
   # Calculate Softsearch only if targetRegions are not present
+  Boolean do_it = false
+  if (do_it) {
   if( !defined(targetRegions) ) {
      call Softsearch.SoftSearchWF as SoftsearchWF {
      input:
@@ -449,12 +451,12 @@ workflow FastqToVCF {
        reference_fa = reference_fa,
        reference_fai = reference_fai,
        reference_dict = reference_dict,
-       scatter_regions = ["chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10","chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19","chr20","chr21","chr22","chrX","chrY"],
+       scatter_regions = ["chr1:1-69423421", "chr1:69423421-125361115", "chr1:125361115-249250621","chr2","chr3", "chr4:1-50694630", "chr4:50694630-191154276","chr5","chr6","chr7","chr8","chr9","chr10","chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19","chr20","chr21","chr22","chrX","chrY"],
        
        sample_basename = sample_basename
      }
   }
-  
+  }
 
   if( defined(targetRegions) ) {
     call StringToArray {
