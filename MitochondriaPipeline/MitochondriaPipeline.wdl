@@ -172,12 +172,6 @@ workflow MitochondriaPipeline {
       gatk_docker_override = gatk_docker_override,
       preemptible_tries = preemptible_tries
   }
-  
-  call FilterVCF {
-    input:
-      input_vcf = SplitMultiAllelicSites.split_vcf,
-      base_name = base_name
-  }
 
   call variantEffectPredictor {
     input: 
@@ -188,6 +182,14 @@ workflow MitochondriaPipeline {
       gnomad_mito_sites_vcf = gnomad_mito_sites_vcf,
       gnomad_mito_sites_vcf_index = gnomad_mito_sites_vcf_index
     }
+
+    call FilterVCF {
+      input:
+        input_vcf = variantEffectPredictor.out,
+        base_name = base_name
+    }
+
+
 
   output {
     File subset_bam = SubsetBamToChrM.output_bam
