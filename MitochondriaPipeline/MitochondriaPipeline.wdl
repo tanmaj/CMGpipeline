@@ -175,7 +175,7 @@ workflow MitochondriaPipeline {
 
   call variantEffectPredictor {
     input: 
-      chromosomeVCF = FilterVCF.output_vcf,
+      chromosomeVCF = SplitMultiAllelicSites.split_vcf,
       assembly = "GRCh38",
       bufferSize = 100000,
       referenceFasta = mt_fasta,
