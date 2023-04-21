@@ -435,10 +435,13 @@ task FilterVCF {
   
   command {
     bcftools view -i 'FILTER!~"weak_evidence"' ~{input_vcf} > ~{output_vcf}
+    bcftools +fill-tags ~{output_vcf} -Oz -o variantEP.vaf.vcf.gz -- -t 'FORMAT/VAF,FORMAT/VAF1'
+    echo CHR POS REF ALT FILTER AF DP AD VAF $(bcftools +split-vep variantEP.vaf.vcf.gz -l | cut -f2 | paste -s) | tr ' ' '\t' > mito_table.txt
+    bcftools +split-vep variantEP.vaf.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER\t%AF\t[ %DP]\t[ %AD]\t[ %VAF]\t%CSQ\n' -A "tab" -s worst >> mito_table.txt
   }
 
   runtime {
-    docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
+    docker: "dceoy/bcftools"
     requested_memory_mb_per_core: 4000
     cpu: 2
     runtime_minutes: 200
