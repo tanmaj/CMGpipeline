@@ -481,6 +481,8 @@ task  variantEffectPredictor {
         --domains \
         --regulatory \
         --canonical \
+        --mane \
+        --mane_select \
         --protein \
         --biotype \
         --af \
