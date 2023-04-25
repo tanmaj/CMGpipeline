@@ -128,7 +128,7 @@ task Tryptase_call {
     docker: "alesmaver/bwa_samtools_picard_tryptase"
     requested_memory_mb_per_core: 4000
     cpu: 2
-    runtime_minutes: 200
+    runtime_minutes: 600
     continueOnReturnCode: true
   }
   output {
