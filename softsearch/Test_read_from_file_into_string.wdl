@@ -22,12 +22,12 @@ workflow TestWF {
 task FileToArray {
     command <<<
         # Get chromosome interval list file
-        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/softsearch/wgs_calling_regions.v1_mod.list.txt
+        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/softsearch/Test_chromosome_interval_list.txt
         # Re-attempt the wget without the https_proxy set
         unset https_proxy 
-        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/softsearch/wgs_calling_regions.v1_mod.list.txt
+        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/softsearch/Test_chromosome_interval_list.txt
         
-        var=$(<file)
+        var=$(<Test_chromosome_interval_list.txt)
         echo $var
     >>>
       
