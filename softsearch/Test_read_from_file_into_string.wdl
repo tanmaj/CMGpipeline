@@ -30,7 +30,7 @@ task FileToArray {
         #var=$(<Test_chromosome_interval_list.txt)
         #echo $var
         
-        cat Test_chromosome_interval_list
+        cat Test_chromosome_interval_list.txt
     >>>
       
     runtime {
