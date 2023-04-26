@@ -27,8 +27,10 @@ task FileToArray {
         unset https_proxy 
         wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/softsearch/Test_chromosome_interval_list.txt
         
-        var=$(<Test_chromosome_interval_list.txt)
-        echo $var
+        #var=$(<Test_chromosome_interval_list.txt)
+        #echo $var
+        
+        cat Test_chromosome_interval_list
     >>>
       
     runtime {
