@@ -60,7 +60,7 @@ task DoSomethingWithChromosome {
     runtime_minutes: 5
   }
   output {
-    File outfile = stdout()
+    #File outfile = stdout()
   }
 }
 
