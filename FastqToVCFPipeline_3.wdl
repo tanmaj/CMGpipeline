@@ -441,7 +441,7 @@ workflow FastqToVCF {
   
   
   # Calculate Softsearch only if targetRegions are not present
-  Boolean do_it = true
+  Boolean do_it = false
   if (do_it) {
   if( !defined(targetRegions) ) {
      call Softsearch.SoftSearchWF as SoftsearchWF {
