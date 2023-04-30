@@ -15,11 +15,17 @@ workflow SoftSearchWF {
   
   call FileToArray
   
+  call LocaliseInput as LocaliseInput {
+    input:
+      input_bam = input_bam,
+      input_bam_index = input_bam_index
+  }
+
   scatter (chromosome in FileToArray.scatter_regions ) {
     call SoftSearch {
       input:
-        input_bam = input_bam,
-        input_bam_index = input_bam_index,
+        input_bam = LocaliseInput.ouput_bam,
+        input_bam_index = LocaliseInput.output_bam_index,
         ref_fasta=reference_fa,
         ref_fasta_index=reference_fai,
         chromosome=chromosome,
@@ -65,6 +71,34 @@ workflow SoftSearchWF {
   }
 }
 
+
+# Localise input BAM file to prevent multiple copy events for several shards (when inputs are on a different block device)
+task LocaliseInput {
+  input {
+    File input_bam
+    File input_bam_index
+  }
+
+  String output_bam = basename(input_bam)
+  String output_bam_index = basename(input_bam_inde)
+
+  command <<<
+    cp ~{input_bam} ./
+    cp ~{input_bam_index} ./
+  >>>
+
+  runtime {
+    docker: "alesmaver/softsearch"
+    maxRetries: 3
+    requested_memory_mb_per_core: 500
+    cpu: 1
+    runtime_minutes: 20
+  }
+  output {
+    File output_bam = "~{output_bam}"
+    File output_bam_index = "~{output_bam_index}"
+  }
+}
 
 task FileToArray {
 
