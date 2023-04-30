@@ -24,7 +24,7 @@ workflow SoftSearchWF {
   scatter (chromosome in FileToArray.scatter_regions ) {
     call SoftSearch {
       input:
-        input_bam = LocaliseInput.ouput_bam,
+        input_bam = LocaliseInput.output_bam,
         input_bam_index = LocaliseInput.output_bam_index,
         ref_fasta=reference_fa,
         ref_fasta_index=reference_fai,
