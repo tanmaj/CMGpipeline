@@ -80,7 +80,7 @@ task LocaliseInput {
   }
 
   String output_bam = basename(input_bam)
-  String output_bam_index = basename(input_bam_inde)
+  String output_bam_index = basename(input_bam_index)
 
   command <<<
     cp ~{input_bam} ./
