@@ -21,7 +21,7 @@ import "./Delly/DELLY_single3.wdl" as Delly
 import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
 import "./SCRAMBLE/scramble_v2.wdl" as Scramble
-import "./softsearch/softsearch.wdl" as Softsearch
+import "./softsearch/softsearch_v2.wdl" as Softsearch
 import "./bigWig/wigToBigWig_conversion" as BigWig
 import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
 
@@ -443,19 +443,17 @@ workflow FastqToVCF {
   # Calculate Softsearch only if targetRegions are not present
   Boolean do_it = false
   if (do_it) {
-  if( !defined(targetRegions) ) {
-     call Softsearch.SoftSearchWF as SoftsearchWF {
-     input:
-       input_bam = SortSam.output_bam,
-       input_bam_index = SortSam.output_bam_index,
-       reference_fa = reference_fa,
-       reference_fai = reference_fai,
-       reference_dict = reference_dict,
-       scatter_regions = ["chr1:1-30401845", "chr1:30401845-69423421", "chr1:69423421-125361115", "chr1:125361115-249250621","chr2","chr3", "chr4:1-23340439", "chr4:23340439-50694630", "chr4:50694630-191154276","chr5","chr6","chr7","chr8","chr9","chr10","chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19","chr20","chr21","chr22","chrX","chrY"],
-       
-       sample_basename = sample_basename
-     }
-  }
+    if( !defined(targetRegions) ) {
+      call Softsearch.SoftSearchWF as SoftsearchWF {
+        input:
+          input_bam = SortSam.output_bam,
+          input_bam_index = SortSam.output_bam_index,
+          reference_fa = reference_fa,
+          reference_fai = reference_fai,
+          reference_dict = reference_dict,
+          sample_basename = sample_basename
+      }
+    }
   }
 
   if( defined(targetRegions) ) {
