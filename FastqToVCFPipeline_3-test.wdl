@@ -521,7 +521,7 @@ workflow FastqToVCF {
 	ref_fasta = reference_fa,
 	ref_fai = reference_fai,
 	ref_dict = reference_dict,
-	bam_outs = HaplotypeCaller.output_bamOut,
+	bam_outs = HaplotypeCaller.output_bamout,
 	sample_basename = sample_basename,
         docker = gatk_docker,
         gatk_path = gatk_path
@@ -1561,8 +1561,10 @@ task HaplotypeCaller {
       -O ~{sample_basename}.raw.vcf.gz \
       # -bamout ~{sample_basename}.bamout.bam
       ~{true='-bamout bamout.bam' false='' make_bamout}
-      
-    mv bamout.bam ~{sample_basename}.bamout.bam
+    
+    if [ -e bamout.bam ]
+    then 
+        mv bamout.bam ~{sample_basename}.bamout.bam
   }
 
   output {
