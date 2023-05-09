@@ -1551,7 +1551,10 @@ task HaplotypeCaller {
   String chromosome_intervals = sub(chromosome, ",", " -L ")
   
   command {
-  set -e   
+    set -e   
+    # We need to create this file, even if it stays empty
+    touch bamout.bam
+    
     ~{gatk_path} --java-options "-Xmx8g -XX:ParallelGCThreads=~{threads}" \
       HaplotypeCaller \
       -R ~{reference_fa} \
@@ -1561,16 +1564,14 @@ task HaplotypeCaller {
       -O ~{sample_basename}.raw.vcf.gz \
       # -bamout ~{sample_basename}.bamout.bam
       ~{true='-bamout bamout.bam' false='' make_bamout}
-    
-    if [ -e bamout.bam ]
-    then 
-        mv bamout.bam ~{sample_basename}.bamout.bam
+     
+    # mv bamout.bam ~{sample_basename}.bamout.bam
   }
 
   output {
     File output_vcf = "~{sample_basename}.raw.vcf.gz"
     File output_vcf_index = "~{sample_basename}.raw.vcf.gz.tbi"
-    File? output_bamout = "~{sample_basename}.bamout.bam"
+    File output_bamout = "bamout.bam"
   }
 
   runtime {
