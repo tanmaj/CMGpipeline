@@ -997,6 +997,9 @@ workflow FastqToVCF {
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
     
+    # merged haplotype caller bamout:
+    #File? haplotypecaller_bamout_file = HaplotypeCaller.bamout_file
+    
     ## Array[File] bigWig_files = BigWig.bigWig_files
     File? bigWig_tar_file = BigWig.bigWig_tar_file
   }
@@ -1536,12 +1539,13 @@ task HaplotypeCaller {
       -L ~{chromosome_intervals} \
       -I ~{input_bam} \
       -O ~{sample_basename}.raw.vcf.gz \
-      -bamout ~{sample_basename}.bamout.bam
+      -bamout ~{sample_basename}.HC.bamout.bam
   }
 
   output {
     File output_vcf = "~{sample_basename}.raw.vcf.gz"
     File output_vcf_index = "~{sample_basename}.raw.vcf.gz.tbi"
+    File? bamout_file = "~{sample_basename}.HC.bamout.bam"
   }
 
   runtime {
