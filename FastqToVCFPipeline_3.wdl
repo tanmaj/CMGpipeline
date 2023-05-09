@@ -1539,13 +1539,13 @@ task HaplotypeCaller {
       -L ~{chromosome_intervals} \
       -I ~{input_bam} \
       -O ~{sample_basename}.raw.vcf.gz \
-      -bamout ~{sample_basename}.HC.bamout.bam
+      -bamout ~{sample_basename}.bamout.bam
   }
 
   output {
     File output_vcf = "~{sample_basename}.raw.vcf.gz"
     File output_vcf_index = "~{sample_basename}.raw.vcf.gz.tbi"
-    File? bamout_file = "~{sample_basename}.HC.bamout.bam"
+    File? bamout_file = "~{sample_basename}.bamout.bam"
   }
 
   runtime {
