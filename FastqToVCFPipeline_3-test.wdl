@@ -1622,6 +1622,7 @@ task MergeBamOuts {
     File ref_fai
     File ref_dict
     Array[File]+ bam_outs
+    Array[File] bam_outs
     String sample_basename
     String gatk_path
     String docker
