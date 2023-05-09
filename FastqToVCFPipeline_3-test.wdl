@@ -116,7 +116,7 @@ workflow FastqToVCF {
 
     File refSeqFile
     
-    Boolean make_bamout = true ### false  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    Boolean make_bamout = false
 
     String? enrichment
     File? enrichment_bed
