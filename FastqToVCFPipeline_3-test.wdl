@@ -1623,7 +1623,7 @@ task MergeBamOuts {
     String docker
   }
 
-  command <<<
+  command {
         # This command block assumes that there is at least one file in bam_outs.
         #  Do not call this task if len(bam_outs) == 0
         set -e
@@ -1636,7 +1636,7 @@ task MergeBamOuts {
 	
 	mv bamout.bam  ~{sample_basename}.bamout.bam
 	mv bamout.bai  ~{sample_basename}.bamout.bai
-  >>>
+  }
 
   runtime {
 	    docker: docker
