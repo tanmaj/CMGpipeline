@@ -1613,17 +1613,17 @@ task MergeVCFs {
 }
 
 task MergeBamOuts {
-    input {
-      File ref_fasta
-      File ref_fai
-      File ref_dict
-      Array[File]+ bam_outs
-      String sample_basename
-      String gatk_path
-      String docker
-    }
+  input {
+    File ref_fasta
+    File ref_fai
+    File ref_dict
+    Array[File]+ bam_outs
+    String sample_basename
+    String gatk_path
+    String docker
+  }
 
-    command <<<
+  command <<<
         # This command block assumes that there is at least one file in bam_outs.
         #  Do not call this task if len(bam_outs) == 0
         set -e
@@ -1636,19 +1636,19 @@ task MergeBamOuts {
 	
 	mv bamout.bam  ~{sample_basename}.bamout.bam
 	mv bamout.bai  ~{sample_basename}.bamout.bai
-    >>>
+  >>>
 
-    runtime {
+  runtime {
 	    docker: docker
 	    maxRetries: 3
 	    requested_memory_mb_per_core: 4000
 	    cpu: 1
 	    runtime_minutes: 60 
-    }
-    output {
+  }
+  output {
         File merged_bam_out = "~{sample_basename}.bamout.bam"
         File merged_bam_out_index = "~{sample_basename}.bamout.bai"
-    }
+  }
 }
 
 
