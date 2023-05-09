@@ -1619,7 +1619,6 @@ task MergeBamOuts {
       File ref_dict
       Array[File]+ bam_outs
       String sample_basename
-      
       String gatk_path
       String docker
     }
@@ -1646,13 +1645,11 @@ task MergeBamOuts {
 	    cpu: 1
 	    runtime_minutes: 60 
     }
-
     output {
         File merged_bam_out = "~{sample_basename}.bamout.bam"
         File merged_bam_out_index = "~{sample_basename}.bamout.bai"
     }
 }
-
 
 
 task SplitSNPindel {
