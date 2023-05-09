@@ -1626,13 +1626,12 @@ task MergeBamOuts {
   }
 
   command {
+  	set -e
         # This command block assumes that there is at least one file in bam_outs.
-        #  Do not call this task if len(bam_outs) == 0
-        set -e
+        #  Do not call this task if len(bam_outs) == 0  
 	~{gatk_path} --java-options -Xmx4G GatherBamFiles -I ~{sep=" -I " bam_outs} -O unsorted.out.bam -R ~{ref_fasta}
 
         # We must sort because adjacent scatters may have overlapping (padded) assembly regions, hence overlapping bamouts
-
         ~{gatk_path} --java-options -Xmx4G SortSam -I unsorted.out.bam -O bamout.bam --SORT_ORDER coordinate -VALIDATION_STRINGENCY LENIENT
         ~{gatk_path} --java-options -Xmx4G BuildBamIndex -I bamout.bam -VALIDATION_STRINGENCY LENIENT
 	
