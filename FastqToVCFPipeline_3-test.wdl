@@ -1562,10 +1562,7 @@ task HaplotypeCaller {
       -L ~{chromosome_intervals} \
       -I ~{input_bam} \
       -O ~{sample_basename}.raw.vcf.gz \
-      # -bamout ~{sample_basename}.bamout.bam
       ~{true='-bamout bamout.bam' false='' make_bamout}
-     
-    # mv bamout.bam ~{sample_basename}.bamout.bam
   }
 
   output {
