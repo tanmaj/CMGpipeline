@@ -73,8 +73,8 @@ task AlignAndMarkDuplicates {
     Int? preemptible_tries
   }
 
-  ### String basename = basename(input_bam, ".bam")
-  String basename = sub(basename(input_bam), "[\_,\.].*", "" )
+  String basename = basename(input_bam, ".bam")
+  ### naša koda za samle_basename: String basename = sub(basename(input_bam), "[\_,\.].*", "" )
   String metrics_filename = basename + ".metrics"
   Float ref_size = size(ref_fasta, "GB") + size(ref_fasta_index, "GB") + size(ref_amb, "GB") + size(ref_ann, "GB") + size(ref_bwt, "GB") + size(ref_pac, "GB") + size(ref_sa, "GB")
   Int disk_size = ceil(size(input_bam, "GB") * 4 + ref_size) + 20
