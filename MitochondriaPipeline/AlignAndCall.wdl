@@ -90,6 +90,7 @@ workflow AlignAndCall {
 
   call CollectWgsMetrics {
     input:
+      base_name = base_name,
       input_bam = AlignToMt.mt_aligned_bam,
       input_bam_index = AlignToMt.mt_aligned_bai,
       ref_fasta = mt_fasta,
@@ -178,6 +179,7 @@ workflow AlignAndCall {
  
   call SplitMultiAllelicsAndRemoveNonPassSites {
     input:
+      base_name = base_name,
       ref_fasta = mt_fasta,
       ref_fai = mt_fasta_index,
       ref_dict = mt_dict,
@@ -188,6 +190,7 @@ workflow AlignAndCall {
 
   call GetContamination {
     input:
+      base_name = base_name,
       input_vcf = SplitMultiAllelicsAndRemoveNonPassSites.vcf_for_haplochecker,
       preemptible_tries = preemptible_tries
   }
@@ -260,8 +263,11 @@ workflow AlignAndCall {
     File input_vcf_for_haplochecker = SplitMultiAllelicsAndRemoveNonPassSites.vcf_for_haplochecker
     File duplicate_metrics = AlignToMt.duplicate_metrics
     File coverage_metrics = CollectWgsMetrics.metrics
+    File coverage_mean_metrics = CollectWgsMetrics.metrics_mean_coverage
+    File coverage_median_metrics = CollectWgsMetrics.metrics_median_coverage
     File theoretical_sensitivity_metrics = CollectWgsMetrics.theoretical_sensitivity
     File contamination_metrics = GetContamination.contamination_file
+    File major_haplogroup_file = GetContamination.major_haplogroup_file
     Int mean_coverage = CollectWgsMetrics.mean_coverage
     Float median_coverage = CollectWgsMetrics.median_coverage
     String major_haplogroup = GetContamination.major_hg
@@ -272,6 +278,7 @@ workflow AlignAndCall {
 
 task GetContamination {
   input {
+    String base_name
     File input_vcf
     # runtime
     Int? preemptible_tries
@@ -316,6 +323,9 @@ task GetContamination {
   awk -F "\t" '{print $8}' output-data > minor_hg.txt
   awk -F "\t" '{print $14}' output-data > mean_het_major.txt
   awk -F "\t" '{print $15}' output-data > mean_het_minor.txt
+  
+  cp -p major_hg.txt ~{base_name}.major_hg.txt 
+  
   >>>
   runtime {
     preemptible: select_first([preemptible_tries, 5])
@@ -324,6 +334,7 @@ task GetContamination {
     docker: "us.gcr.io/broad-dsde-methods/haplochecker:haplochecker-0124"
   }
   output {
+    File major_haplogroup_file = "~{base_name}.major_hg.txt"
     File contamination_file = "output-noquotes"
     String hasContamination = read_string("contamination.txt") 
     String major_hg = read_string("major_hg.txt")
@@ -335,6 +346,7 @@ task GetContamination {
 
 task CollectWgsMetrics {
   input {
+    String base_name
     File input_bam
     File input_bam_index
     File ref_fasta
@@ -376,6 +388,10 @@ task CollectWgsMetrics {
       write.table(floor(df[,"MEAN_COVERAGE"]), "mean_coverage.txt", quote=F, col.names=F, row.names=F)
       write.table(df[,"MEDIAN_COVERAGE"], "median_coverage.txt", quote=F, col.names=F, row.names=F)
     CODE
+    cp -p metrics.txt ~{base_name}.coverage_metrics.txt
+    cp -p mean_coverage.txt ~{base_name}.coverage_metrics.mean.txt
+    cp -p median_coverage.txt ~{base_name}.coverage_metrics.median.txt
+    
   >>>
   runtime {
     preemptible: select_first([preemptible_tries, 5])
@@ -384,7 +400,10 @@ task CollectWgsMetrics {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.2-1552931386"
   }
   output {
-    File metrics = "metrics.txt"
+    File metrics = "~{base_name}.coverage_metrics.txt"
+    File metrics_mean_coverage = "~{base_name}.coverage_metrics.mean.txt"
+    File metrics_median_coverage = "~{base_name}.coverage_metrics.median.txt"
+    
     File theoretical_sensitivity = "theoretical_sensitivity.txt"
     Int mean_coverage = read_int("mean_coverage.txt")
     Float median_coverage = read_float("median_coverage.txt")
@@ -633,6 +652,7 @@ task MergeStats {
 
 task SplitMultiAllelicsAndRemoveNonPassSites {
   input {
+    String base_name
     File ref_fasta
     File ref_fai
     File ref_dict
@@ -655,12 +675,12 @@ task SplitMultiAllelicsAndRemoveNonPassSites {
 
       gatk SelectVariants \
         -V split.vcf \
-        -O splitAndPassOnly.vcf \
+        -O ~{base_name}.splitAndPassOnly.vcf \
         --exclude-filtered
   
   }
   output {
-    File vcf_for_haplochecker = "splitAndPassOnly.vcf"
+    File vcf_for_haplochecker = "~{base_name}.splitAndPassOnly.vcf"
   }
   runtime {
       docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])

@@ -1,9 +1,6 @@
 version 1.0
 
 import "AlignAndCall.wdl" as AlignAndCall
-import "https://raw.githubusercontent.com/AlesMaver/bravo-pipeline/e79726c9b745cb13e9bb70a99f25cd414ca5658d/vcfPercentilesPreparation.wdl" as Bravo
-
-#import "https://api.firecloud.org/ga4gh/v1/tools/mitochondria:AlignAndCall/versions/23/plain-WDL/descriptor" as AlignAndCall
 
 workflow MitochondriaPipeline {
 
@@ -13,6 +10,7 @@ workflow MitochondriaPipeline {
   }
 
   input {
+    String sample_basename
     File wgs_aligned_input_bam_or_cram
     File wgs_aligned_input_bam_or_cram_index
     String contig_name = "chrM"
@@ -81,9 +79,10 @@ workflow MitochondriaPipeline {
     f_score_beta: "F-Score beta balances the filtering strategy between recall and precision. The relative weight of recall to precision."
     contig_name: "Name of mitochondria contig in reference that wgs_aligned_input_bam_or_cram is aligned to"
   }
-
+  
   call SubsetBamToChrM {
     input:
+      basename = sample_basename,
       input_bam = wgs_aligned_input_bam_or_cram,
       input_bai = wgs_aligned_input_bam_or_cram_index,
       contig_name = contig_name,
@@ -98,18 +97,19 @@ workflow MitochondriaPipeline {
 
   call RevertSam {
     input:
+      basename = sample_basename,
       input_bam = SubsetBamToChrM.output_bam,
       preemptible_tries = preemptible_tries
   }
 
   String base_name = basename(SubsetBamToChrM.output_bam, ".bam")
-
-
+  
   call AlignAndCall.AlignAndCall as AlignAndCall {
     input:
       unmapped_bam = RevertSam.unmapped_bam,
       autosomal_coverage = autosomal_coverage,
-      base_name = base_name,
+      # base_name = base_name,
+      base_name = sample_basename,
       mt_dict = mt_dict,
       mt_fasta = mt_fasta,
       mt_fasta_index = mt_fasta_index,
@@ -146,6 +146,7 @@ workflow MitochondriaPipeline {
   # This proivdes coverage at each base so low coverage sites can be considered ./. rather than 0/0.
   call CoverageAtEveryBase {
     input:
+      sample_basename = sample_basename,
       input_bam_regular_ref = AlignAndCall.mt_aligned_bam,
       input_bam_regular_ref_index = AlignAndCall.mt_aligned_bai,
       input_bam_shifted_ref = AlignAndCall.mt_aligned_shifted_bam,
@@ -192,24 +193,32 @@ workflow MitochondriaPipeline {
 
 
   output {
-    File subset_bam = SubsetBamToChrM.output_bam
-    File subset_bai = SubsetBamToChrM.output_bai
+    # unnecessary: File subset_bam = SubsetBamToChrM.output_bam
+    # unnecessary: File subset_bai = SubsetBamToChrM.output_bai
     File mt_aligned_bam = AlignAndCall.mt_aligned_bam
     File mt_aligned_bai = AlignAndCall.mt_aligned_bai
-    File out_vcf = AlignAndCall.out_vcf
-    File out_vcf_index = AlignAndCall.out_vcf_index
+    # unnecessary: File out_vcf = AlignAndCall.out_vcf
+    # unnecessary: File out_vcf_index = AlignAndCall.out_vcf_index
     File split_vcf = SplitMultiAllelicSites.split_vcf
     File split_vcf_index = SplitMultiAllelicSites.split_vcf_index
     File input_vcf_for_haplochecker = AlignAndCall.input_vcf_for_haplochecker
     File duplicate_metrics = AlignAndCall.duplicate_metrics
     File coverage_metrics = AlignAndCall.coverage_metrics
-    File theoretical_sensitivity_metrics = AlignAndCall.theoretical_sensitivity_metrics
-    File contamination_metrics = AlignAndCall.contamination_metrics
+    File coverage_mean_metrics = AlignAndCall.coverage_mean_metrics
+    File coverage_median_metrics = AlignAndCall.coverage_median_metrics
+    # unnecessary: File theoretical_sensitivity_metrics = AlignAndCall.theoretical_sensitivity_metrics
+    # unnecessary: File contamination_metrics = AlignAndCall.contamination_metrics
+    File major_haplogroup_file = AlignAndCall.major_haplogroup_file
     File base_level_coverage_metrics = CoverageAtEveryBase.table
+    
+    File filterVCF_output_vcf = FilterVCF.output_vcf
+    File filterVCF_mito_table = FilterVCF.mito_table
+    
+    # data not in files:
     Int mean_coverage = AlignAndCall.mean_coverage
     Float median_coverage = AlignAndCall.median_coverage
     String major_haplogroup = AlignAndCall.major_haplogroup
-    Float contamination = AlignAndCall.contamination
+    # unnecessary: Float contamination = AlignAndCall.contamination
   }
 }
 
@@ -325,6 +334,7 @@ task CoverageAtEveryBase {
     File shifted_ref_fasta
     File shifted_ref_fasta_index
     File shifted_ref_dict
+    String sample_basename
 
     Int? preemptible_tries
   }
@@ -377,6 +387,8 @@ task CoverageAtEveryBase {
       write.table(combined_table, "per_base_coverage.tsv", row.names=F, col.names=T, quote=F, sep="\t")
 
     CODE
+    mv  per_base_coverage.tsv ~{sample_basename}.per_base_coverage.tsv
+    
   >>>
   runtime {
     disks: "local-disk " + disk_size + " HDD"
@@ -385,7 +397,7 @@ task CoverageAtEveryBase {
     preemptible: select_first([preemptible_tries, 5])
   }
   output {
-    File table = "per_base_coverage.tsv"
+    File table = "~{sample_basename}.per_base_coverage.tsv"
   }
 }
 
@@ -417,7 +429,7 @@ task SplitMultiAllelicSites {
   }
   output {
     File split_vcf = "~{output_vcf}"
-    File split_vcf_index = "~{output_vcf}"
+    File split_vcf_index = "~{output_vcf_index}"
   }
   runtime {
       docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])
@@ -434,12 +446,13 @@ task FilterVCF {
   }
 
   String output_vcf = base_name + ".final.filtered.vcf"
+  String mito_table = base_name + ".mito_table.txt"
   
   command {
     bcftools view -i 'FILTER!~"weak_evidence"' ~{input_vcf} > ~{output_vcf}
     bcftools +fill-tags ~{output_vcf} -Oz -o variantEP.vaf.vcf.gz -- -t 'FORMAT/VAF,FORMAT/VAF1'
-    echo CHR POS REF ALT FILTER AF DP AD VAF $(bcftools +split-vep variantEP.vaf.vcf.gz -l | cut -f2 | paste -s) | tr ' ' '\t' > mito_table.txt
-    bcftools +split-vep variantEP.vaf.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER\t%AF\t[ %DP]\t[ %AD]\t[ %VAF]\t%CSQ\n' -A "tab" -s worst >> mito_table.txt
+    echo CHR POS REF ALT FILTER AF DP AD VAF $(bcftools +split-vep variantEP.vaf.vcf.gz -l | cut -f2 | paste -s) | tr ' ' '\t' > ~{mito_table}
+    bcftools +split-vep variantEP.vaf.vcf.gz -f '%CHROM\t%POS\t%REF\t%ALT\t%FILTER\t%AF\t[ %DP]\t[ %AD]\t[ %VAF]\t%CSQ\n' -A "tab" -s worst >> ~{mito_table}
   }
 
   runtime {
@@ -450,6 +463,7 @@ task FilterVCF {
   }
   output {
     File output_vcf = "~{output_vcf}" 
+    File mito_table = "~{mito_table}"
   }
 }
 
