@@ -966,6 +966,7 @@ workflow FastqToVCF {
     File? CNV_wig = Conifer.CNV_wig
     File? conifer_calls_annotated = CONIFER_Annotate.conifer_calls_annotated
     File? conifer_annotSV_tsv = Conifer.annotSV_tsv
+    File? conifer_plots_tar = Conifer.conifer_plots_tar
 
     File? mantaVCF = Manta.mantaVcf
     File? mantaVCFindex = Manta.mantaVcfindex
