@@ -146,7 +146,7 @@ workflow AnnotateAndTable {
 
   # Outputs that will be retained when execution is complete
   output {
-    File XLSX_OUTPUT = RenameFile.final_output_xlsx
+    File XLSX_OUTPUT = RenameFile.renamed_file
   }
 }
 
