@@ -49,7 +49,7 @@ createVCFfromVariants <- function(VARIANT, EXOME, VCF_OUTDIR){
   write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">', file=VCF, append = T)
   write('##FORMAT=<ID=PL,Number=G,Type=Integer,Description="Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification">', file=VCF, append = T)
   write('##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each ALT allele, in the same order as listed">', file=VCF, append = T)
-  write(paste0("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t", EXOME, ".IMPORTVARIANT"), file=VCF, append = T)
+  write(paste0("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t", EXOME), file=VCF, append = T)
   write(paste(VARIANT$CHR, VARIANT$POS, ".", VARIANT$REF, VARIANT$ALT, QUAL, FILTER, INFO, GTFIELDS, VARIANT$GT, sep="\t"), file=VCF, append = T)
   
   return(VCF)
