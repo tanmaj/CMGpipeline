@@ -48,7 +48,7 @@ workflow AnnotateAndTable {
     File dbNSFP_index
 
     String? targetRegions
-
+    
     #String bgzip_docker = "dockerbiotools/bcftools:latest"
     String bcftools_docker = "dceoy/bcftools:latest"
     #String bcftools_docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
@@ -58,6 +58,8 @@ workflow AnnotateAndTable {
     String vcfanno_docker = "clinicalgenomics/vcfanno:0.3.2"
     String R_docker = "alesmaver/r-base"
   }
+
+  String final_output_xlsx = sample_basename + ".IMPORTVARIANT.FinalReportNew.xlsx"
 
   call CreateVCFfromString {
       input:
@@ -136,9 +138,15 @@ workflow AnnotateAndTable {
       panel_gene_list = GetGeneListFromVCF.panel_gene_list
   }
 
+  call RenameFile {
+    input:
+      input_file = CreateInterpretationTable.XLSX_OUTPUT,
+      new_name = final_output_xlsx
+  }
+
   # Outputs that will be retained when execution is complete
   output {
-    File XLSX_OUTPUT = CreateInterpretationTable.XLSX_OUTPUT
+    File XLSX_OUTPUT = RenameFile.final_output_xlsx
   }
 }
 
@@ -213,5 +221,18 @@ task GetVariantRegions {
   output {
     Array[String] value = read_lines(stdout())
     String regions = value[0]
+  }
+}
+
+task RenameFile {
+  File input_file
+  String new_name
+
+  command {
+    mv ${input_file} ${new_name}
+  }
+
+  output {
+    File renamed_file = "${new_name}"
   }
 }
