@@ -225,8 +225,10 @@ task GetVariantRegions {
 }
 
 task RenameFile {
-  File input_file
-  String new_name
+  input {
+    File input_file
+    String new_name
+  }
 
   command {
     mv ${input_file} ${new_name}
