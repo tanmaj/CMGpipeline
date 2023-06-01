@@ -18,7 +18,7 @@ createVCFfromVariants <- function(VARIANT, EXOME, VCF_OUTDIR){
   # VARIANT = "chr2 167055804 AACA TCC HET;chr2 167055804 AACA TCC HET"
   
   if(missing(VCF_OUTDIR)) {VCF_OUTDIR = ""}
-  VCF<-paste0(VCF_OUTDIR, EXOME, ".IMPORTVARIANT.vcf")
+  VCF<-paste0(VCF_OUTDIR, EXOME, ".vcf")
   
   # Support multiple variant imports added
   VARIANT<-strsplit(VARIANT, split=";")[[1]]
