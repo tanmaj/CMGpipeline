@@ -192,7 +192,7 @@ task CreateVCFfromString {
     runtime_minutes: 30
   }
   output {
-    File output_vcf = "~{sample_basename}.IMPORTVARIANT.vcf"
+    File output_vcf = "~{sample_basename}.vcf"
   }
 }
 
