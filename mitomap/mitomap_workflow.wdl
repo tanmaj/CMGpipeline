@@ -36,11 +36,12 @@ workflow MitoMapWorkflow {
 
       docker = "broadinstitute/gatk3:3.8-1"
   }
-  
+  if ( AnalyseInputVcf.variant_count > 0) {
   call MitoMap {
     input:
     mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
     sample_basename = sample_basename
+  }
   }
 
   output {
@@ -65,24 +66,24 @@ task AnalyseInputVcf {
         echo Number of mitochondrial variants:
         cat variant_count.txt
         echo ---
-        vcf_file=~{input_vcf}
-        mito_variants=$(grep '^chrM' "$vcf_file")
-        variant_count=$(echo "$mito_variants" | wc -l)
-        echo $variant_count
-        if [ $variant_count -gt 0 ]
-        then
-          echo True > variant_exists.txt
-        else
-          echo False > variant_exists.txt
-        fi
-        cat variant_exists.txt
+        #vcf_file=~{input_vcf}
+        #mito_variants=$(grep '^chrM' "$vcf_file")
+        #variant_count=$(echo "$mito_variants" | wc -l)
+        #echo $variant_count
+        #if [ $variant_count -gt 0 ]
+        #then
+        #  echo True > variant_exists.txt
+        #else
+        #  echo False > variant_exists.txt
+        #fi
+        #cat variant_exists.txt
         
         echo "query   tpos    qpos    tnt     qnt     ntchange        allele  calc_locus      calc_aachange   conservation    haplogroup      verbose_haplogroup    patientphenotype        mmutid  rtmutid polyid  subvar_cnt      is_polymorphism is_mmut is_rtmut        is_submitted gb_cnt   gb_perc hap_cnt hap_perc" > header.txt
     }
     
     output {
         Int variant_count = read_int("variant_count.txt")
-        Boolean variant_exists = read_boolean("variant_exists.txt")
+        #Boolean variant_exists = read_boolean("variant_exists.txt")
     }
 
     runtime {
