@@ -65,18 +65,6 @@ task AnalyseInputVcf {
         grep '^chrM' ~{input_vcf} | wc -l > variant_count.txt
         echo Number of mitochondrial variants:
         cat variant_count.txt
-        echo ---
-        #vcf_file=~{input_vcf}
-        #mito_variants=$(grep '^chrM' "$vcf_file")
-        #variant_count=$(echo "$mito_variants" | wc -l)
-        #echo $variant_count
-        #if [ $variant_count -gt 0 ]
-        #then
-        #  echo True > variant_exists.txt
-        #else
-        #  echo False > variant_exists.txt
-        #fi
-        #cat variant_exists.txt
         
         echo "query   tpos    qpos    tnt     qnt     ntchange        allele  calc_locus      calc_aachange   conservation    haplogroup      verbose_haplogroup    patientphenotype        mmutid  rtmutid polyid  subvar_cnt      is_polymorphism is_mmut is_rtmut        is_submitted gb_cnt   gb_perc hap_cnt hap_perc" > header.txt
     }
