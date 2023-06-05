@@ -64,8 +64,7 @@ task AnalyseInputVcf {
         grep '^chrM' ~{input_vcf} | wc -l > variant_count.txt
         echo Number of mitochondrial variants:
         cat variant_count.txt
-        echo "query   tpos    qpos    tnt     qnt     ntchange        allele  calc_locus      calc_aachange   conservation    haplogroup      verbose_haplogroup    patientphenotype        mmutid  rtmutid polyid  subvar_cnt      is_polymorphism is_mmut is_rtmut        is_submitted gb_cnt   gb_perc hap_cnt hap_perc\n" > header.txt
-        echo 
+        echo "query   tpos    qpos    tnt     qnt     ntchange        allele  calc_locus      calc_aachange   conservation    haplogroup      verbose_haplogroup    patientphenotype        mmutid  rtmutid polyid  subvar_cnt      is_polymorphism is_mmut is_rtmut        is_submitted gb_cnt   gb_perc hap_cnt hap_perc" > header.txt
     }
     
     output {
