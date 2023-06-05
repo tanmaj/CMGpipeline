@@ -64,7 +64,7 @@ task AnalyseInputVcf {
         # mito_variants=$(grep '^chrM' "$~{input_vcf}")
         # variant_count=$(echo "$mito_variants" | wc -l)
         # echo Number of mitochondrial variants: $variant_count       
-        cat ~{input_vcf} | grep '^chrM' | wc -l > variant_count.txt
+        grep '^chrM' ~{input_vcf} | wc -l > variant_count.txt
         echo $variant_count > variant_count.txt
 
     }
