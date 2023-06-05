@@ -19,6 +19,11 @@ workflow MitoMapWorkflow {
     File reference_fai
     File reference_dict
   }  
+  
+  call AnalyseInputVcf {
+    input:
+      input_vcf = input_vcf  
+  }  
 
   call CreateMitoFasta {
     input:
@@ -44,6 +49,38 @@ workflow MitoMapWorkflow {
 
   }
 }
+
+
+# Let's check if input VCF file has any mitochondrial variants.
+# number greater than 1 means we have variants
+task AnalyseInputVcf {
+    input {
+        File input_vcf
+    }   
+ 
+    command {
+        echo Analysing ~{input_vcf}
+        # Filter entries with "chrM" in the first column
+        mito_variants=$(grep '^chrM' "$~{input_vcf}")
+        # Count the number of mitochondrial variants
+        variant_count=$(echo "$mito_variants" | wc -l)
+
+        echo Number of mitochondrial variants: $variant_count
+        echo $variant_count > variant_count.txt
+
+    }
+    
+    output {
+        Int variant_count = read_int("variant_count.txt")
+    }
+
+    runtime {
+        docker: "broadinstitute/gatk3:3.8-1"
+        cpu: 1
+        runtime_minutes: 5
+    }            
+}
+
 
 
 ## An additional option for calculating coverage using GATK
@@ -90,16 +127,16 @@ task MitoMap {
 
     command <<<
     
-    #cp /usr/src/app/mitomap.py ./
-    wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/mitomap/mitomap.py
-    cp ~{mtDNA_fasta} ./
-    python mitomap.py > ~{sample_basename}_mitoResults.txt
-    cp ~{sample_basename}_mitoResults.txt ~{sample_basename}_mitoResults.xls
+      #cp /usr/src/app/mitomap.py ./
+      wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/mitomap/mitomap.py
+      cp ~{mtDNA_fasta} ./
+      python mitomap.py > ~{sample_basename}_mitoResults.txt
+      cp ~{sample_basename}_mitoResults.txt ~{sample_basename}_mitoResults.xls
     >>>
 
     output {
-    File mitoResults_txt = "~{sample_basename}_mitoResults.txt"
-    File mitoResults_xls = "~{sample_basename}_mitoResults.xls"
+      File mitoResults_txt = "~{sample_basename}_mitoResults.txt"
+      File mitoResults_xls = "~{sample_basename}_mitoResults.xls"
     }
 
     runtime {
