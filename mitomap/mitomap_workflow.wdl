@@ -53,6 +53,7 @@ workflow MitoMapWorkflow {
 
 # Let's check if input VCF file has any mitochondrial variants.
 # number greater than 1 means we have variants
+#
 
 task AnalyseInputVcf {
     input {
