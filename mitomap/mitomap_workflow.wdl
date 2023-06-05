@@ -36,12 +36,11 @@ workflow MitoMapWorkflow {
 
       docker = "broadinstitute/gatk3:3.8-1"
   }
-  if ( AnalyseInputVcf.variant_count > 0) {
+
   call MitoMap {
     input:
     mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
     sample_basename = sample_basename
-  }
   }
 
   output {
@@ -71,7 +70,6 @@ task AnalyseInputVcf {
     
     output {
         Int variant_count = read_int("variant_count.txt")
-        #Boolean variant_exists = read_boolean("variant_exists.txt")
     }
 
     runtime {
