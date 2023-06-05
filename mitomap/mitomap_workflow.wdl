@@ -65,8 +65,9 @@ task AnalyseInputVcf {
         echo Number of mitochondrial variants:
         cat variant_count.txt
         echo ---
-        filename=~{input_vcf}
-        variant_count=$(grep '^chrM' $filename | wc -l)
+        vcf_file=~{input_vcf}
+        mito_variants=$(grep '^chrM' "$vcf_file")
+        variant_count=$(echo "$mito_variants" | wc -l)
         echo $variant_count
         if [ $variant_count -gt 0 ]
         then
