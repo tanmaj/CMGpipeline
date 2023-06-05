@@ -52,8 +52,7 @@ workflow MitoMapWorkflow {
 
 
 # Let's check if input VCF file has any mitochondrial variants.
-# number greater than 1 means we have variants
-#
+# number greater than 0 means we have variants
 
 task AnalyseInputVcf {
     input {
@@ -61,13 +60,11 @@ task AnalyseInputVcf {
     }   
  
     command {
-        echo Analysing ~{input_vcf}
-        
-        mito_variants=$(grep '^chrM' "$~{input_vcf}")
-
-        variant_count=$(echo "$mito_variants" | wc -l)
-
-        echo Number of mitochondrial variants: $variant_count
+        echo Analysing ~{input_vcf}     
+        # mito_variants=$(grep '^chrM' "$~{input_vcf}")
+        # variant_count=$(echo "$mito_variants" | wc -l)
+        # echo Number of mitochondrial variants: $variant_count       
+        cat ~{input_vcf} | grep '^chrM' | wc -l > variant_count.txt
         echo $variant_count > variant_count.txt
 
     }
