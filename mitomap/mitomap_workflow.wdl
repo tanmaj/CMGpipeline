@@ -80,6 +80,7 @@ task AnalyseInputVcf {
     
     output {
         Int variant_count = read_int("variant_count.txt")
+        Boolean variant_exists = read_boolean("variant_exists.txt")
     }
 
     runtime {
