@@ -111,14 +111,23 @@ task CreateMitoFasta {
     }
 
     command {
-    set -e
-    java -Xmx3g -jar /usr/GenomeAnalysisTK.jar \
-      -T FastaAlternateReferenceMaker \
-      -R ~{reference_fa} \
-      --variant ~{input_vcf} \
-      -o mtDNA.fasta \
-      -L chrM
-     }
+      set -e
+      echo ~{variant_exists}
+      do_GenomeAnalysis=~{variant_exists}
+      echo $do_GenomeAnalysis
+      if [ "$do_GenomeAnalysis" = true ]
+      then
+        java -Xmx3g -jar /usr/GenomeAnalysisTK.jar \
+          -T FastaAlternateReferenceMaker \
+          -R ~{reference_fa} \
+          --variant ~{input_vcf} \
+          -o mtDNA.fasta \
+          -L chrM
+      else
+        touch mtDNA.fasta
+      fi
+      ls -ls mtDNA.fasta
+    }
     
     output {
     File mtDNA_fasta = "mtDNA.fasta"
