@@ -114,7 +114,7 @@ task CreateMitoFasta {
       set -e
       echo ~{variant_exists}
       do_GenomeAnalysis=~{variant_exists}
-      echo $do_GenomeAnalysis
+      echo Perform GenomeAnalysis: $do_GenomeAnalysis
       if [ "$do_GenomeAnalysis" = true ]
       then
         java -Xmx3g -jar /usr/GenomeAnalysisTK.jar \
@@ -150,12 +150,20 @@ task MitoMap {
     }
 
     command <<<
-    
-      #cp /usr/src/app/mitomap.py ./
-      wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/mitomap/mitomap.py
-      cp ~{mtDNA_fasta} ./
-      python mitomap.py > ~{sample_basename}_mitoResults.txt
+      echo ~{variant_exists}
+      do_mitomap=~{variant_exists}
+      echo Perform MitoMap: $do_mitomap
+      if [ "$do_mitomap" = true ]
+      then
+        #cp /usr/src/app/mitomap.py ./
+        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/mitomap/mitomap.py
+        cp ~{mtDNA_fasta} ./
+        python mitomap.py > ~{sample_basename}_mitoResults.txt
+      else
+        touch ~{sample_basename}_mitoResults.txt
+      fi
       cp ~{sample_basename}_mitoResults.txt ~{sample_basename}_mitoResults.xls
+      ls -ls ~{sample_basename}_mitoResults.*
     >>>
 
     output {
