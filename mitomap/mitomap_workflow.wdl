@@ -55,8 +55,6 @@ workflow MitoMapWorkflow {
 
 
 # Let's check if input VCF file has any mitochondrial variants.
-# number greater than 0 means we have variants
-
 task AnalyseInputVcf {
     input {
         File input_vcf
@@ -161,6 +159,7 @@ task MitoMap {
         python mitomap.py > ~{sample_basename}_mitoResults.txt
       else
         touch ~{sample_basename}_mitoResults.txt
+        echo "query	tpos	qpos	tnt	qnt	ntchange	allele	calc_locus	calc_aachange	conservation	haplogroup	verbose_haplogroup	patientphenotype	mmutid	rtmutid	polyid	subvar_cnt	is_polymorphism	is_mmut	is_rtmut	is_submitted	gb_cnt	gb_perc	hap_cnt	hap_perc" > ~{sample_basename}_mitoResults.txt 
       fi
       cp ~{sample_basename}_mitoResults.txt ~{sample_basename}_mitoResults.xls
       ls -ls ~{sample_basename}_mitoResults.*
