@@ -34,13 +34,16 @@ workflow MitoMapWorkflow {
       reference_fai = reference_fai,
       reference_dict = reference_dict,
 
-      docker = "broadinstitute/gatk3:3.8-1"
+      docker = "broadinstitute/gatk3:3.8-1",
+      
+      variant_exists = AnalyseInputVcf.variant_exists
   }
 
   call MitoMap {
     input:
-    mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
-    sample_basename = sample_basename
+      mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
+      sample_basename = sample_basename,
+      variant_exists = AnalyseInputVcf.variant_exists
   }
 
   output {
@@ -103,6 +106,8 @@ task CreateMitoFasta {
         File reference_dict
 
         String docker
+        
+        Boolean variant_exists
     }
 
     command {
@@ -132,6 +137,7 @@ task MitoMap {
     input {
         File mtDNA_fasta
         String sample_basename
+        Boolean variant_exists
     }
 
     command <<<
