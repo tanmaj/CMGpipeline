@@ -14,7 +14,8 @@ import "./Conifer.wdl" as Conifer
 import "./Qualimap.wdl" as Qualimap
 import "./ROH.wdl" as ROH
 import "./CreateInterpretationTable.wdl" as CreateInterpretationTable
-import "./MitoMap.wdl" as MitoMap
+## import "./MitoMap.wdl" as MitoMap
+import "./mitomap/mitomap_workflow.wdl" as MitoMap
 import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
 import "./Delly/DELLY_single3.wdl" as Delly
@@ -654,22 +655,31 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
-  call MitoMap.CreateMitoFasta as CreateMitoFasta {
+  #call MitoMap.CreateMitoFasta as CreateMitoFasta {
+  #  input:
+  #  input_vcf = SelectFinalVariants.output_vcf,
+  #  sample_basename = sample_basename,
+
+  #  reference_fa = reference_fa,
+  #  reference_fai = reference_fai,
+  #  reference_dict = reference_dict,
+
+  #  docker = "broadinstitute/gatk3:3.8-1"
+  #}
+
+  #call MitoMap.MitoMap as MitoMap {
+  #  input:
+  #  mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
+  #  sample_basename = sample_basename
+  #}
+  
+  call MitoMap.MitoMapWorkflow as MitoMapWorkflow  {
     input:
-    input_vcf = SelectFinalVariants.output_vcf,
-    sample_basename = sample_basename,
-
-    reference_fa = reference_fa,
-    reference_fai = reference_fai,
-    reference_dict = reference_dict,
-
-    docker = "broadinstitute/gatk3:3.8-1"
-  }
-
-  call MitoMap.MitoMap as MitoMap {
-    input:
-    mtDNA_fasta = CreateMitoFasta.mtDNA_fasta,
-    sample_basename = sample_basename
+      input_vcf = SelectFinalVariants.output_vcf,
+      sample_basename = sample_basename,
+      reference_fa = reference_fa,
+      reference_fai = reference_fai,
+      reference_dict = reference_dict,
   }
 
   call CreateInterpretationTable.CreateInterpretationTable as CreateInterpretationTable {
@@ -679,7 +689,7 @@ workflow FastqToVCF {
       relative_vcfs = relative_vcfs,
       relative_vcf_indexes = relative_vcf_indexes,
       panel_gene_list = panel_gene_list,
-      mitoResults_txt = MitoMap.mitoResults_txt
+      mitoResults_txt = MitoMapWorkflow.mitoResults_txt
   }
 
   if( defined(input_reference_rpkms) ){
@@ -995,8 +1005,10 @@ workflow FastqToVCF {
     File? ROH_annotSV_tsv = ROH_annotSV.sv_variants_tsv
     #File ROHplink_calls = CallPlink.ROHplink_calls
 
-    File? mitoResults_xls = MitoMap.mitoResults_xls
-    File? mitoResults_txt = MitoMap.mitoResults_txt
+    ##File? mitoResults_xls = MitoMap.mitoResults_xls
+    ##File? mitoResults_txt = MitoMap.mitoResults_txt
+    File? mitoResults_xls = MitoMapWorkflow.mitoResults_xls
+    File? mitoResults_txt = MitoMapWorkflow.mitoResults_txt
     
     File? optitype_tsv = Optitype.optitype_tsv
     File? optitype_plot = Optitype.optitype_plot
