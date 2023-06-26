@@ -68,7 +68,7 @@ task SCRAMBLE {
     String sample_basename
 
     # Runtime parameters
-    String docker = "alesmaver/scramble"
+    String docker = "alesmaver/scramble2"
   }
 
   command <<<
