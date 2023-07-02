@@ -142,6 +142,9 @@ task SoftSearch {
     # Generate the genome file
     awk -v OFS='\t' {'print $1,$2'} ~{ref_fasta_index} > hg19.genome
 
+    # Create an empty vcf file, so that the workflow continues in case a single shard fails (usually recurring problematic shards)
+    touch ~{sample_basename}.softSearch.vcf
+
     # Get population masked regions from the softsearch repository
     ## wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/svcalling/softsearch/breakpoint_mask.bed
     wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/softsearch/breakpoint_mask.bed
@@ -161,6 +164,7 @@ task SoftSearch {
   runtime {
     docker: "alesmaver/softsearch"
     maxRetries: 3
+    continueOnReturnCode: true
     requested_memory_mb_per_core: 5000
     cpu: 2
     runtime_minutes: 600
