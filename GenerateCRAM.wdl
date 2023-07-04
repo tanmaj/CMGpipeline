@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/FastqToVCFPipeline_3.wdl" as FastqToVcf
+import "./CRAM_conversions.wdl" as CramConversions 
 
 # WORKFLOW DEFINITION 
 workflow GenerateCRAM {
@@ -11,7 +11,7 @@ workflow GenerateCRAM {
     String sample_basename
   }
   
-call FastqToVcf.ConvertToCram as ConvertToCram {
+call CramConversions.ConvertToCram as ConvertToCram {
     input:
       input_bam = input_bam,
       ref_fasta = reference_fa,
