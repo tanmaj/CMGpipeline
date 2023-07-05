@@ -9,6 +9,7 @@ workflow RNA_seq {
 
         # data for AlignHisat2:
         Array[FastqPair]+ inputReads 
+        String outputDir = ".",
         String library
         Array[String] readgroups
         Array[File]+ indexFiles
@@ -21,7 +22,7 @@ workflow RNA_seq {
   call AlignHisat2 {
       input:
         inputReads = inputReads, 
-        ### String outputDir = ".",
+        outputDir = outputDir,
         sample = sample_basename,
         library = library,
         readgroups = readgroups,
