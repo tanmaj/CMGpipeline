@@ -21,12 +21,20 @@ workflow RNA_seq {
   call AlignHisat2 {
       input:
         inputReads = inputReads, 
-        String outputDir = ".",
+        ### String outputDir = ".",
         sample = sample_basename,
         library = library,
         readgroups = readgroups,
-        platform = "illumina",
+        ### platform = "illumina",
         indexFiles = indexFiles
+  }
+
+  call GenerateCRAM {
+      input:       
+        input_bam = AlignHisat2.bamFile["file"],
+        reference_fa = reference_fa,
+        reference_fai = reference_fai,
+        sample_basename = sample_basename
   }
 
   output {
