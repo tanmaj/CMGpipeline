@@ -8,7 +8,10 @@ workflow RNA_seq {
         String sample_basename
 
         # data for AlignHisat2:
-        Array[FastqPair]+ inputReads 
+        ### Array[FastqPair]+ inputReads 
+        File input_fq1
+        File input_fq2
+
         String outputDir = "."
         String library
         Array[String] readgroups
@@ -19,6 +22,8 @@ workflow RNA_seq {
         File reference_fai
   }
 
+  FastqPair inputReads = FastqPair { R1: input_fq1, R2: input_fq2 }
+  
   call AlignHisat2.AlignHisat2 as AlignHisat2 {
       input:
         inputReads = inputReads, 
@@ -45,4 +50,11 @@ workflow RNA_seq {
     File output_cram = GenerateCRAM.output_cram 
     File output_cram_index = GenerateCRAM.output_cram_index 
   }
+}
+
+struct FastqPair {
+    File R1
+    String? R1_md5
+    File? R2
+    String? R2_md5
 }
