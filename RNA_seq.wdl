@@ -22,7 +22,7 @@ workflow RNA_seq {
         File reference_fai
   }
 
-  FastqPair inputReads =  { 
+  Array[FastqPair]+ inputReads =  { 
               "R1": input_fq1,
               "R2": input_fq2 
             }
