@@ -27,8 +27,7 @@ workflow RNA_seq {
         library = library,
         readgroups = readgroups,
         ### platform = "illumina",
-        indexFiles = indexFiles,
-        hisat2.threads = 4
+        indexFiles = indexFiles
   }
 
   call GenerateCRAM.GenerateCRAM as GenerateCRAM {
