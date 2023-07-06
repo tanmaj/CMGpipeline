@@ -19,7 +19,7 @@ workflow RNA_seq {
         File reference_fai
   }
 
-  call AlignHisat2 {
+  call AlignHisat2.AlignHisat2 {
       input:
         inputReads = inputReads, 
         outputDir = outputDir,
@@ -30,7 +30,7 @@ workflow RNA_seq {
         indexFiles = indexFiles
   }
 
-  call GenerateCRAM {
+  call GenerateCRAM.GenerateCRAM {
       input:       
         input_bam = AlignHisat2.bamFile["file"],
         reference_fa = reference_fa,
