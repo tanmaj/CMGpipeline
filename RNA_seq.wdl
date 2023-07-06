@@ -22,7 +22,10 @@ workflow RNA_seq {
         File reference_fai
   }
 
-  FastqPair inputReads = FastqPair { R1: input_fq1, R2: input_fq2 }
+  FastqPair inputReads =  { 
+              "R1": input_fq1,
+              "R2": input_fq2 
+            }
   
   call AlignHisat2.AlignHisat2 as AlignHisat2 {
       input:
