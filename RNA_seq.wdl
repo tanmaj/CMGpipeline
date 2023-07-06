@@ -32,15 +32,15 @@ workflow RNA_seq {
 
   call GenerateCRAM {
       input:       
-        input_bam = AlignHisat2.IndexedBamFile.bamFile["file"],
+        input_bam = AlignHisat2.bamFile["file"],
         reference_fa = reference_fa,
         reference_fai = reference_fai,
         sample_basename = sample_basename
   }
 
   output {
-    File output_bam = AlignHisat2.IndexedBamFile.bamFile["file"] 
-    File output_bam_index = AlignHisat2.IndexedBamFile.bamFile["index"]
+    File output_bam = AlignHisat2.bamFile["file"] 
+    File output_bam_index = AlignHisat2.bamFile["index"]
     
     File output_cram = GenerateCRAM.output_cram 
     File output_cram_index = GenerateCRAM.output_cram_index 
