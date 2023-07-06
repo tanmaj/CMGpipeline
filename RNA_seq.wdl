@@ -9,7 +9,7 @@ workflow RNA_seq {
 
         # data for AlignHisat2:
         Array[FastqPair]+ inputReads 
-        String outputDir = ".",
+        String outputDir = "."
         String library
         Array[String] readgroups
         Array[File]+ indexFiles
