@@ -36,7 +36,8 @@ workflow AlignHisat2 {
                 library = library,
                 readgroup = readgroup,
                 platform = platform,
-                dockerImage = dockerImages["hisat2"]
+                dockerImage = dockerImages["hisat2"],
+                threads = 4
         }
     }
 
