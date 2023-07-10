@@ -1,6 +1,7 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/AlesMaver/bioWDL_RNAseq/develop/align-hisat2.wdl" as AlignHisat2
+## orig: import "https://raw.githubusercontent.com/AlesMaver/bioWDL_RNAseq/develop/align-hisat2.wdl" as AlignHisat2
+import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/RNA_seq/align-hisat2.wdl" as AlignHisat2
 import "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/GenerateCRAM.wdl" as GenerateCRAM
 
 workflow RNA_seq {
