@@ -24,3 +24,25 @@ task DownloadAndPrepareBed {
     }
 
 }
+
+task FilterGenesBED {
+    input {
+        File genes_bed
+        Array[String] filter_genes
+    }
+
+    command <<<
+        cat ~{genes_bed} | awk 'BEGIN{FS="\t"} FNR==NR{genes[$1]; next} $4 in genes' ~{write_lines(filter_genes)} - > filtered_genes.bed
+    >>>
+
+    output {
+        File filtered_genes_bed = "filtered_genes.bed"
+    }
+
+    runtime {
+        docker: "dceoy/bedops"
+        cpu: 1
+        memory: "4G"
+    }
+
+}
