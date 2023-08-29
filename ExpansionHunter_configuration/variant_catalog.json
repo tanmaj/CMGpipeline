@@ -6,6 +6,12 @@
     "VariantType": "Repeat"
   },
   {
+    "LocusId": "CSTB",
+    "LocusStructure": "(CGCGGGGCGGGG)*",
+    "ReferenceRegion": "chr21:45196324-45196360",
+    "VariantType": "Repeat"
+  },
+  {
     "LocusId": "AR",
     "LocusStructure": "(GCA)*",
     "ReferenceRegion": "chrX:66765158-66765227",
