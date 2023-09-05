@@ -188,15 +188,16 @@ task CompressAndIndexVCF {
         echo "Input file is not empty. Proceeding normally..."
     else
         echo "Input file is empty. Creating an output file with default content."
-        cat <<EOF > "~{input_vcf}"
-        ##fileformat=VCFv4.1
-        ##FILTER=<ID=PASS,Description="All filters passed">
-        ##fileDate=$(date +"%Y-%m-%d %H:%M:%S")
-        ##source=SoftSearch.pl
-        ##bcftools_viewVersion=1.14+htslib-1.14
-        ##bcftools_viewCommand=view test.vcf; Date=$(date)
-        #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	4
-        EOF
+        INPUT_VCF="~{input_vcf}"
+
+        # Redirect printf output to the file
+        printf "##fileformat=VCFv4.1\n" > "$INPUT_VCF"
+        printf "##FILTER=<ID=PASS,Description=\"All filters passed\">\n" >> "$INPUT_VCF"
+        printf "##fileDate=$(date +"%Y-%m-%d %H:%M:%S")\n" >> "$INPUT_VCF"
+        printf "##source=SoftSearch.pl\n" >> "$INPUT_VCF"
+        printf "##bcftools_viewVersion=1.14+htslib-1.14\n" >> "$INPUT_VCF"
+        printf "##bcftools_viewCommand=view test.vcf; Date=$(date)\n" >> "$INPUT_VCF"
+        printf "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t4\n" >> "$INPUT_VCF"
     fi
 
     # sorting the variants part of the input file
