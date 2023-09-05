@@ -207,7 +207,7 @@ task CompressAndIndexVCF {
     bcftools view -Oz ~{sample_basename}.sorted.vcf > ~{sample_basename}.vcf.gz
     bcftools index -t ~{sample_basename}.vcf.gz
   >>>
-  }
+  
   runtime {
     docker: docker
     maxRetries: 3
