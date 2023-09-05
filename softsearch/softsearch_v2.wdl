@@ -181,8 +181,24 @@ task CompressAndIndexVCF {
     String docker
   }
 
-  command {
+  command <<<
     set -e
+
+    if [ -s "~{input_vcf}" ]; then
+        echo "Input file is not empty. Proceeding normally..."
+    else
+        echo "Input file is empty. Creating an output file with default content."
+        cat <<EOF > "~{input_vcf}"
+        ##fileformat=VCFv4.1
+        ##FILTER=<ID=PASS,Description="All filters passed">
+        ##fileDate=$(date +"%Y-%m-%d %H:%M:%S")
+        ##source=SoftSearch.pl
+        ##bcftools_viewVersion=1.14+htslib-1.14
+        ##bcftools_viewCommand=view test.vcf; Date=$(date)
+        #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	4
+        EOF
+    fi
+
     # sorting the variants part of the input file
     cat ~{input_vcf} | bcftools view -h  > ~{sample_basename}.header.vcf 
     cat ~{input_vcf} | bcftools view -H | sort -k1,1V -k2,2n > ~{sample_basename}.variants.vcf
@@ -190,6 +206,7 @@ task CompressAndIndexVCF {
   
     bcftools view -Oz ~{sample_basename}.sorted.vcf > ~{sample_basename}.vcf.gz
     bcftools index -t ~{sample_basename}.vcf.gz
+  >>>
   }
   runtime {
     docker: docker
