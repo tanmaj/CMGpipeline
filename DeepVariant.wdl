@@ -29,7 +29,7 @@ workflow DeepVariant {
     File inputBam
     File inputBamIndex
     String modelType
-    String outputVcf
+    # String outputVcf
     Int? numShards
   }
 
@@ -52,7 +52,8 @@ workflow DeepVariant {
         inputBam = inputBam,
         inputBamIndex = inputBamIndex,
         modelType = modelType,
-        outputVcf = outputVcf,
+        # outputVcf = outputVcf,
+        outputVcf = sample_basename + ".DeepVariant.vcf.gz",
         numShards = numShards,
         sampleName = sample_basename
     }
