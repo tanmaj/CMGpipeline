@@ -23,6 +23,7 @@ version 1.0
 
 workflow DeepVariant {
   input {
+    String sample_basename
     File referenceFasta
     File referenceFastaIndex
     File inputBam
@@ -52,7 +53,8 @@ workflow DeepVariant {
         inputBamIndex = inputBamIndex,
         modelType = modelType,
         outputVcf = outputVcf,
-        numShards = numShards
+        numShards = numShards,
+        sampleName = sample_basename
     }
 
 }
@@ -105,7 +107,7 @@ task RunDeepVariant {
         File outputVCF = outputVcf
         File outputVCFIndex = outputVcf + ".tbi"
         ## Array[File] outputVCFStatsReport = glob("*.visual_report.html")
-        File? outputVCFStatsReport = outputVcf + ".visual_report.html"
+        File? outputVCFStatsReport = sampleName + ".DeepVariant.visual_report.html"
         File? outputGVCF = outputGVcf
         File? outputGVCFIndex = outputGVcfIndex
     }
