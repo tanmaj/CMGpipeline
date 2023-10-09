@@ -78,7 +78,7 @@ task RunDeepVariant {
         Boolean? VCFStatsReport = true
 
         String memory = "3GiB"
-        Int timeMinutes = 5000
+        Int timeMinutes = 2800
         String dockerImage = "google/deepvariant:1.0.0"
     }
 
@@ -106,7 +106,7 @@ task RunDeepVariant {
         docker: "google/deepvariant:1.0.0"
         requested_memory_mb_per_core: 2000
         cpu: 4
-        runtime_minutes: 6000
+        runtime_minutes: 2800
     }
 
     output {
