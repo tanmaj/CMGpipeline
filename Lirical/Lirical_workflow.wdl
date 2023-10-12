@@ -36,7 +36,7 @@ task Lirical {
     command {
         set -e
 
-        java -jar lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar \
+        java -jar /lirical/lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar \
             prioritize \
             -d ./data/ \
             -e19 ~{hg19_variants_mv_db} \
