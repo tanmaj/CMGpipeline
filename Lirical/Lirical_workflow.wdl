@@ -36,8 +36,9 @@ task Lirical {
     command {
         set -e
 
-        java -jar /lirical/lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar \
-            prioritize \
+        echo "java -jar /lirical/lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar prioritize -d ./data/ -e19 ~{hg19_variants_mv_db} --assembly hg19 -p ~{hpo_ids} --vcf ~{input_vcf} --sample-id ~{sample_basename} -o ./ -f html -f json -f tsv"
+
+        java -jar /lirical/lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar prioritize \
             -d ./data/ \
             -e19 ~{hg19_variants_mv_db} \
             --assembly hg19 \
