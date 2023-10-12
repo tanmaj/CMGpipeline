@@ -62,7 +62,7 @@ task Lirical {
 
     output {
         File lirical_tsv = output_prefix + ".tsv"
-        File lirical_json = output_prefix + ".lirical.json"
-        File lirical_html = output_prefix + ".lirical.html"
+        File lirical_json = output_prefix + ".json"
+        File lirical_html = output_prefix + ".html"
     }
 }
