@@ -5,23 +5,25 @@ workflow Lirical_workflow {
         String sample_basename
         String hpo_ids
         File hg19_variants_mv_db
-        File input_vcf
-
+        File? input_vcf
+        
     }
+
+    String output_prefix =  sample_basename + if ( defined(input_vcf) ) then ".vcf.lirical" else ".lirical"
 
     call Lirical {
         input:
             sample_basename = sample_basename,
             hpo_ids = hpo_ids,
             hg19_variants_mv_db = hg19_variants_mv_db,
-            input_vcf = input_vcf
+            input_vcf = input_vcf,
+            output_prefix = output_prefix
     }
 
     output {
         File lirical_tsv = Lirical.lirical_tsv
         File lirical_json = Lirical.lirical_json
         File lirical_html = Lirical.lirical_html
-
     }
 }
 
@@ -30,7 +32,8 @@ task Lirical {
         String sample_basename
         String hpo_ids
         File hg19_variants_mv_db
-        File input_vcf
+        File? input_vcf
+        String output_prefix
     }
 
     command {
@@ -41,15 +44,15 @@ task Lirical {
             -e19 ~{hg19_variants_mv_db} \
             --assembly hg19 \
             -p "~{hpo_ids}" \
-            --vcf ~{input_vcf} \
+            ~{"--vcf " + input_vcf} \
             -g --display-all-variants --ddndv -t 0 \
             --sample-id ~{sample_basename} \
             -o . \
             -f html -f json -f tsv
 
-        mv lirical.tsv  ~{sample_basename}.lirical.tsv
-        mv lirical.json  ~{sample_basename}.lirical.json
-        mv lirical.html  ~{sample_basename}.lirical.html
+        mv lirical.tsv ~{output_prefix}.tsv
+        mv lirical.json ~{output_prefix}.json
+        mv lirical.html ~{output_prefix}.html
     }
 
     runtime {
@@ -58,8 +61,8 @@ task Lirical {
     }
 
     output {
-        File lirical_tsv = sample_basename + ".lirical.tsv"
-        File lirical_json = sample_basename + ".lirical.json"
-        File lirical_html = sample_basename + ".lirical.html"
+        File lirical_tsv = output_prefix + ".tsv"
+        File lirical_json = output_prefix + ".lirical.json"
+        File lirical_html = output_prefix + ".lirical.html"
     }
 }
