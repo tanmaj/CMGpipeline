@@ -38,13 +38,17 @@ task Lirical {
         java -jar lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar \
             prioritize \
             -d ./data/ \
-            -e19 /cmg1scratch/cromwell/VariantAnnotationPipeline_databases/Exomizer/2302_hg19/2302_hg19_variants.mv.db \
+            -e19 ~{hg19_variants_mv_db} \
             --assembly hg19 \
-            -p "HP:0004322, HP:0000316, HP:0000369, HP:0000508,  HP:0000637,  HP:0006313, HP:0000470" \
-            --vcf /cmg1scratch/cromwell/PX12139.vcf \
-            --sample-id PX12139 \
-            -o /cmg1scratch/cromwell/ \
+            -p ~{hpo_ids} \
+            --vcf ~{input_vcf} \
+            --sample-id ~{sample_basename} \
+            -o ./ \
             -f html -f json -f tsv
+
+        mv lirical.tsv  ~{sample_basename}.lirical.tsv
+        mv lirical.json  ~{sample_basename}.lirical.json
+        mv lirical.html  ~{sample_basename}.lirical.html
     }
 
     runtime {
@@ -53,9 +57,9 @@ task Lirical {
     }
 
     output {
-        File lirical_tsv = optitype_name + ".optitype_result.tsv"
-        File lirical_json = optitype_name + ".optitype_result.tsv"
-        File lirical_html = sampleName + ".DeepVariant.visual_report.html"
+        File lirical_tsv = sample_basename + ".lirical.tsv"
+        File lirical_json = sample_basename + ".lirical.json"
+        File lirical_html = sample_basename + ".lirical.html"
     }
 
 }
