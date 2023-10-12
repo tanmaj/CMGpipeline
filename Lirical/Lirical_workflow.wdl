@@ -24,6 +24,7 @@ workflow Lirical_workflow {
         File lirical_tsv = Lirical.lirical_tsv
         File lirical_json = Lirical.lirical_json
         File lirical_html = Lirical.lirical_html
+        File small_lirical_html = Lirical.small_lirical_html
     }
 }
 
@@ -45,14 +46,26 @@ task Lirical {
             --assembly hg19 \
             -p "~{hpo_ids}" \
             ~{"--vcf " + input_vcf} \
-            -g --display-all-variants --ddndv \
+            -g --display-all-variants --ddndv -t 0 \
             --sample-id ~{sample_basename} \
             -o . \
             -f html -f json -f tsv
 
+        java -jar /lirical/lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar prioritize \
+            -d /lirical/data/ \
+            -e19 ~{hg19_variants_mv_db} \
+            --assembly hg19 \
+            -p "~{hpo_ids}" \
+            ~{"--vcf " + input_vcf} \
+            --sample-id ~{sample_basename} \
+            -o . \
+            -x small_lirical
+            -f html
+
         mv lirical.tsv ~{output_prefix}.tsv
         mv lirical.json ~{output_prefix}.json
         mv lirical.html ~{output_prefix}.html
+        mv small_lirical.html small_~{output_prefix}.html
     }
 
     runtime {
@@ -64,5 +77,6 @@ task Lirical {
         File lirical_tsv = output_prefix + ".tsv"
         File lirical_json = output_prefix + ".json"
         File lirical_html = output_prefix + ".html"
+        File small_lirical_html = "small_" + output_prefix + ".html"
     }
 }
