@@ -45,7 +45,7 @@ task Lirical {
             --assembly hg19 \
             -p "~{hpo_ids}" \
             ~{"--vcf " + input_vcf} \
-            -g --display-all-variants --ddndv -t 0 \
+            -g --display-all-variants --ddndv \
             --sample-id ~{sample_basename} \
             -o . \
             -f html -f json -f tsv
