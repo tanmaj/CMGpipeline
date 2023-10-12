@@ -23,6 +23,7 @@ workflow Lirical_workflow {
         File lirical_html = Lirical.lirical_html
 
     }
+}
 
 task Lirical {
     input {
@@ -61,5 +62,4 @@ task Lirical {
         File lirical_json = sample_basename + ".lirical.json"
         File lirical_html = sample_basename + ".lirical.html"
     }
-
 }
