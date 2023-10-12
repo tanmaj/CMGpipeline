@@ -59,7 +59,7 @@ task Lirical {
             ~{"--vcf " + input_vcf} \
             --sample-id ~{sample_basename} \
             -o . \
-            -x small_lirical
+            -x small_lirical \
             -f html
 
         mv lirical.tsv ~{output_prefix}.tsv
