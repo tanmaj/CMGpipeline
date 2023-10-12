@@ -39,13 +39,13 @@ task Lirical {
         echo "java -jar /lirical/lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar prioritize -d ./data/ -e19 ~{hg19_variants_mv_db} --assembly hg19 -p "~{hpo_ids}" --vcf ~{input_vcf} --sample-id ~{sample_basename} -o ./ -f html -f json -f tsv"
 
         java -jar /lirical/lirical-cli-2.0.0-RC2/lirical-cli-2.0.0-RC2.jar prioritize \
-            -d ./data/ \
+            -d /lirical/data/ \
             -e19 ~{hg19_variants_mv_db} \
             --assembly hg19 \
             -p "~{hpo_ids}" \
             --vcf ~{input_vcf} \
             --sample-id ~{sample_basename} \
-            -o ./ \
+            -o . \
             -f html -f json -f tsv
 
         mv lirical.tsv  ~{sample_basename}.lirical.tsv
