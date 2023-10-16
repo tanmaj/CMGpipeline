@@ -185,7 +185,7 @@ task CreateVCFfromString {
     String docker
   }
 
-  command {
+  command <<<
   wget -t 1 -T 20 ~{CreateVCFfromString_Rscript}
   # Repeat in case the proxy defined in the docker image would case problems accessing the GitHub repo
   unset https_proxy
@@ -196,7 +196,8 @@ task CreateVCFfromString {
   # Sort the VCF file to prevent issues with downstream commands
   mv ~{sample_basename}.vcf ~{sample_basename}.unsorted.vcf
   cat ~{sample_basename}.unsorted.vcf | awk '$1 ~ /^#/ {print $0;next} {print $0 | "sort -k1,1 -k2,2n"}' > ~{sample_basename}.vcf
-  }
+  >>>
+
   runtime {
     docker: docker
     requested_memory_mb_per_core: 1000
