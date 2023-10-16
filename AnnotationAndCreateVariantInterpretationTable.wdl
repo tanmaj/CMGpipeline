@@ -191,7 +191,11 @@ task CreateVCFfromString {
   unset https_proxy
   wget -t 1 -T 20 ~{CreateVCFfromString_Rscript}
 
-  Rscript SCRIPTS_createVCFfromVariantString.R --variant="~{input_variant_string}" --sample="~{sample_basename}"    
+  Rscript SCRIPTS_createVCFfromVariantString.R --variant="~{input_variant_string}" --sample="~{sample_basename}"
+
+  # Sort the VCF file to prevent issues with downstream commands
+  mv ~{sample_basename}.vcf ~{sample_basename}.unsorted.vcf
+  cat ~{sample_basename}.unsorted.vcf | awk '$1 ~ /^#/ {print $0;next} {print $0 | "sort -k1,1 -k2,2n"}' > ~{sample_basename}.vcf
   }
   runtime {
     docker: docker
