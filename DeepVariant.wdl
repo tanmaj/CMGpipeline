@@ -58,6 +58,13 @@ workflow DeepVariant {
         sampleName = sample_basename
     }
 
+  output {
+      File outputVCF = DeepVariant.RunDeepVariant.outputVCF
+      File outputVCFIndex = DeepVariant.RunDeepVariant.outputVCFIndex
+      File? outputVCFStatsReport = DeepVariant.RunDeepVariant.outputVCFStatsReport
+      File? outputGVCF = DeepVariant.RunDeepVariant.outputGVCF
+      File? outputGVCFIndex = DeepVariant.RunDeepVariant.outputGVCFIndex
+  }
 }
 
 task RunDeepVariant {
