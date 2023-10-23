@@ -19,6 +19,7 @@ import "./mitomap/mitomap_workflow.wdl" as MitoMap
 import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
 import "./Delly/DELLY_single3.wdl" as Delly
+import "./DeepVariant.wdl" as DeepVariant
 import "./optimised_optitypeDNA" as Optitype
 import "./SMN_caller/SMN_caller.wdl" as SMN
 import "./SCRAMBLE/scramble_v2.wdl" as Scramble
@@ -781,6 +782,21 @@ workflow FastqToVCF {
     }
   }
 
+  # Deep Variant 
+  if (defined(enrichment)) {
+    String model_type = if (enrichment == "WGS1Mb") then "WGS" else "WES"
+    call DeepVariant.DeepVariant as DeepVariant {
+       input:
+	  sampleName = sample_basename,
+          inputBam = SortSam.output_bam,
+          inputBamIndex = SortSam.output_bam_index,
+          referenceFasta = reference_fa,
+          referenceFastaIndex = reference_fai,
+	  modelType = model_type,
+          numShards = 128
+    }
+  }
+
   if ( defined(targetRegions) ){
     call RegionsToBed {
       input:
@@ -990,6 +1006,13 @@ workflow FastqToVCF {
     #File? unfiltered_population_bcf = Delly.sample_bcf_indices
     File? filtered_population_bcf = Delly.filtered_population_bcf
     File? delly_annotSV = Delly.delly_annotSV 
+
+    # Deep Variant
+    File outputVCF = DeepVariant.outputVCF
+    File outputVCFIndex = DeepVariant.outputVCFIndex
+    File? outputVCFStatsReport = DeepVariant.outputVCFStatsReport
+    File? outputGVCF = DeepVariant.outputGVCF
+    File? outputGVCFIndex = DeepVariant.outputGVCFIndex
 
     File? Qualimap_results = Qualimap.results
     File? QualimapWGS_results = QualimapWGS.results
