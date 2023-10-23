@@ -59,11 +59,11 @@ workflow DeepVariant {
     }
 
   output {
-      File outputVCF = DeepVariant.RunDeepVariant.outputVCF
-      File outputVCFIndex = DeepVariant.RunDeepVariant.outputVCFIndex
-      File? outputVCFStatsReport = DeepVariant.RunDeepVariant.outputVCFStatsReport
-      File? outputGVCF = DeepVariant.RunDeepVariant.outputGVCF
-      File? outputGVCFIndex = DeepVariant.RunDeepVariant.outputGVCFIndex
+      File outputVCF = RunDeepVariant.outputVCF
+      File outputVCFIndex = RunDeepVariant.outputVCFIndex
+      File? outputVCFStatsReport = RunDeepVariant.outputVCFStatsReport
+      File? outputGVCF = RunDeepVariant.outputGVCF
+      File? outputGVCFIndex = RunDeepVariant.outputGVCFIndex
   }
 }
 
