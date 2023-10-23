@@ -1008,11 +1008,11 @@ workflow FastqToVCF {
     File? delly_annotSV = Delly.delly_annotSV 
 
     # Deep Variant
-    #File outputVCF = DeepVariant.outputVCF
-    #File outputVCFIndex = DeepVariant.outputVCFIndex
-    #File? outputVCFStatsReport = DeepVariant.outputVCFStatsReport
-    #File? outputGVCF = DeepVariant.outputGVCF
-    #File? outputGVCFIndex = DeepVariant.outputGVCFIndex
+    File outputVCF = DeepVariant.outputVCF
+    File outputVCFIndex = DeepVariant.outputVCFIndex
+    File? outputVCFStatsReport = DeepVariant.outputVCFStatsReport
+    File? outputGVCF = DeepVariant.outputGVCF
+    File? outputGVCFIndex = DeepVariant.outputGVCFIndex
 
     File? Qualimap_results = Qualimap.results
     File? QualimapWGS_results = QualimapWGS.results
