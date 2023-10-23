@@ -787,7 +787,7 @@ workflow FastqToVCF {
     String model_type = if (enrichment == "WGS1Mb") then "WGS" else "WES"
     call DeepVariant.DeepVariant as DeepVariant {
        input:
-	  sampleName = sample_basename,
+	  sample_name = sample_basename,
           inputBam = SortSam.output_bam,
           inputBamIndex = SortSam.output_bam_index,
           referenceFasta = reference_fa,
