@@ -77,7 +77,7 @@ task RunDeepVariant {
         String outputVcf
         String? postprocessVariantsExtraArgs
         File? customizedModel
-        Int? numShards
+        Int? numShards = 32
         String? outputGVcf
         String? outputGVcfIndex
         File? regions
@@ -112,7 +112,7 @@ task RunDeepVariant {
 
         docker: "google/deepvariant:1.0.0"
         requested_memory_mb_per_core: 2000
-        cpu: 128
+        cpu: 32
         runtime_minutes: 2800
     }
 
