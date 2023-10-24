@@ -793,7 +793,7 @@ workflow FastqToVCF {
           referenceFasta = reference_fa,
           referenceFastaIndex = reference_fai,
 	  modelType = model_type,
-          numShards = 128
+          # numShards = 128
     }
   }
 
