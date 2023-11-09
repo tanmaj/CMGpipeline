@@ -13,6 +13,9 @@ workflow AnnotateVCF {
     File gnomADexomes_vcf
     File gnomADexomes_vcf_index
 
+    File TopMed_vcf
+    File TopMed_vcf_index
+
     File SLOpopulation_vcf
     File SLOpopulation_vcf_index
 
@@ -34,6 +37,9 @@ workflow AnnotateVCF {
     File CGD
     File CGD_index
     File bcftools_annotation_header
+
+    File pext_bed
+    File pext_bed_index
 
     File fasta_reference
     File fasta_reference_index
@@ -131,6 +137,9 @@ workflow AnnotateVCF {
         gnomADexomes_vcf = gnomADexomes_vcf,
         gnomADexomes_vcf_index = gnomADexomes_vcf_index,
 
+        TopMed_vcf = TopMed_vcf,
+        TopMed_vcf_index = TopMed_vcf_index,
+
         SLOpopulation_vcf = SLOpopulation_vcf,
         SLOpopulation_vcf_index = SLOpopulation_vcf_index, 
 
@@ -142,6 +151,9 @@ workflow AnnotateVCF {
 
         dbscSNV = dbscSNV,
         dbscSNV_index = dbscSNV_index,
+
+        pext_bed = pext_bed,
+        pext_bed_index = pext_bed_index,
         
         docker = vcfanno_docker
       }
@@ -349,6 +361,9 @@ task VCFANNO {
     File gnomAD_vcf
     File gnomAD_vcf_index
 
+    File TopMed_vcf
+    File TopMed_vcf_index
+
     File SLOpopulation_vcf
     File SLOpopulation_vcf_index
 
@@ -360,6 +375,9 @@ task VCFANNO {
 
     File dbscSNV
     File dbscSNV_index
+
+    File pext_bed
+    File pext_bed_index
 
     # Runtime parameters
     String docker
@@ -378,6 +396,12 @@ task VCFANNO {
   echo fields = [\"AC\",\"AF\",\"nhomalt\",\"AC_male\",\"nhomalt_male\",\"AC_female\",\"nhomalt_female\",\"AC_nfe_seu\",\"AC_raw\",\"AF_raw\"] >> conf.toml
   echo ops=[\"self\",\"self\",\"self\",\"self\",\"self\",\"self\",\"self\",\"self\",\"self\",\"self\"] >> conf.toml
   echo names=[\"gnomADexomes.AC\",\"gnomADexomes.AF\",\"gnomADexomes.nhomalt\",\"gnomADexomes.AC_male\",\"gnomADexomes.nhomalt_male\",\"gnomADexomes.AC_female\",\"gnomADexomes.nhomalt_female\",\"gnomADexomes.AC_nfe_seu\",\"gnomADexomes.AC_raw\",\"gnomADexomes.AF_raw\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{TopMed_vcf}\" >> conf.toml
+  echo fields = [\"AC\",\"AF\",\"AN\",\"Het\",\"Hom\"] >> conf.toml
+  echo ops=[\"self\",\"self\",\"self\",\"self\",\"self\"] >> conf.toml
+  echo names=[\"TopMed_AC\",\"TopMed_AF\",\"TopMed_AN\",\"TopMed_Het\",\"TopMed_Hom\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
   echo file=\"~{SLOpopulation_vcf}\" >> conf.toml
@@ -402,6 +426,12 @@ task VCFANNO {
   echo columns=[17,18] >> conf.toml
   echo ops=[\"self\",\"self\"] >> conf.toml
   echo names=[\"dbscSNV.ada_score\", \"dbscSNV.rf_score\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{pext_bed}\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"pext_score\"] >> conf.toml
 
   vcfanno -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
   }
