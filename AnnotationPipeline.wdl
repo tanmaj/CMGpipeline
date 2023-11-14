@@ -429,7 +429,7 @@ task VCFANNO {
 
   echo [[annotation]] >> conf.toml
   echo file=\"~{GnomAD4_exomes_vcf}\" >> conf.toml
-  echo fields = [\"AC_joint\",\"ALL_joint\",\"AN_joint\", \"nhomalt_joint\"] >> conf.toml
+  echo fields = [\"AC_joint\",\"AF_joint\",\"AN_joint\", \"nhomalt_joint\"] >> conf.toml
   echo ops=[\"self\",\"self\",\"self\",\"self\"] >> conf.toml
   echo names=[\"GnomAD4_exomes_AC\",\"GnomAD4_exomes_AF\",\"GnomAD4_exomes_AN\",\"GnomAD4_exomes_Hom\"] >> conf.toml
 
