@@ -154,6 +154,9 @@ workflow FastqToVCF {
     File Regeneron_vcf
     File Regeneron_vcf_index
 
+    File GnomAD4_exomes_vcf
+    File GnomAD4_exomes_vcf_index
+
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
@@ -629,6 +632,9 @@ workflow FastqToVCF {
 
       TopMed_vcf = TopMed_vcf,
       TopMed_vcf_index = TopMed_vcf_index,
+
+      GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
+      GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
 
       Regeneron_vcf = Regeneron_vcf,
       Regeneron_vcf_index = Regeneron_vcf_index,
