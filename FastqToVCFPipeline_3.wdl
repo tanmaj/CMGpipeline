@@ -151,6 +151,9 @@ workflow FastqToVCF {
     File pext_bed
     File pext_bed_index
 
+    File Regeneron_vcf
+    File Regeneron_vcf_index
+
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
     String cutadapt_docker = "kfdrc/cutadapt:latest"
@@ -626,6 +629,9 @@ workflow FastqToVCF {
 
       TopMed_vcf = TopMed_vcf,
       TopMed_vcf_index = TopMed_vcf_index,
+
+      Regeneron_vcf = Regeneron_vcf,
+      Regeneron_vcf_index = Regeneron_vcf_index,
 
       SLOpopulation_vcf = SLOpopulation_vcf,
       SLOpopulation_vcf_index = SLOpopulation_vcf_index,
