@@ -19,6 +19,9 @@ workflow AnnotateVCF {
     File Regeneron_vcf
     File Regeneron_vcf_index
 
+    File GnomAD4_exomes_vcf
+    File GnomAD4_exomes_vcf_index
+
     File SLOpopulation_vcf
     File SLOpopulation_vcf_index
 
@@ -142,6 +145,9 @@ workflow AnnotateVCF {
 
         TopMed_vcf = TopMed_vcf,
         TopMed_vcf_index = TopMed_vcf_index,
+
+        GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
+        GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
 
         Regeneron_vcf = Regeneron_vcf,
         Regeneron_vcf_index = Regeneron_vcf_index,
@@ -373,6 +379,9 @@ task VCFANNO {
     File Regeneron_vcf
     File Regeneron_vcf_index
 
+    File GnomAD4_exomes_vcf
+    File GnomAD4_exomes_vcf_index
+
     File SLOpopulation_vcf
     File SLOpopulation_vcf_index
 
@@ -417,6 +426,12 @@ task VCFANNO {
   echo fields = [\"ALL_AC\",\"ALL_AF\",\"ALL_AN\"] >> conf.toml
   echo ops=[\"self\",\"self\",\"self\"] >> conf.toml
   echo names=[\"Regeneron_AC\",\"Regeneron_AF\",\"Regeneron_AN\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{GnomAD4_exomes_vcf}\" >> conf.toml
+  echo fields = [\"AC_joint\",\"ALL_joint\",\"AN_joint\", \"nhomalt_joint\"] >> conf.toml
+  echo ops=[\"self\",\"self\",\"self\",\"self\"] >> conf.toml
+  echo names=[\"GnomAD4_exomes_AC\",\"GnomAD4_exomes_AF\",\"GnomAD4_exomes_AN\",\"GnomAD4_exomes_Hom\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
   echo file=\"~{SLOpopulation_vcf}\" >> conf.toml
