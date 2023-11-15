@@ -272,9 +272,12 @@ task NormalizeVCF {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 5000
-    cpu: 1
-    runtime_minutes: 90
+    #requested_memory_mb_per_core: 5000
+    #cpu: 1
+    #runtime_minutes: 90
+    requested_memory_mb_per_core: 2000
+    cpu: 4
+    runtime_minutes: 120
   }
   output {
     File output_vcf = "~{sample_basename}.normalized.vcf.gz"
