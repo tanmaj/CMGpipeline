@@ -469,10 +469,8 @@ task VCFANNO {
   runtime {
     docker: docker
     maxRetries: 3
-    #requested_memory_mb_per_core: 2000
-    #cpu: 4
-    memory_gb: 8
-    cpu: 8
+    requested_memory_mb_per_core: 2000
+    cpu: 4
     runtime_minutes: 240
   }
   output {
