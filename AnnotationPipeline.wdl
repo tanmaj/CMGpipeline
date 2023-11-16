@@ -272,9 +272,12 @@ task NormalizeVCF {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 5000
-    cpu: 1
-    runtime_minutes: 90
+    #requested_memory_mb_per_core: 5000
+    #cpu: 1
+    #runtime_minutes: 90
+    requested_memory_mb_per_core: 2000
+    cpu: 4
+    runtime_minutes: 120
   }
   output {
     File output_vcf = "~{sample_basename}.normalized.vcf.gz"
@@ -300,9 +303,12 @@ task CompressAndIndexVCF {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 5000
-    cpu: 1
-    runtime_minutes: 90
+    #requested_memory_mb_per_core: 5000
+    #cpu: 1
+    #runtime_minutes: 90
+    requested_memory_mb_per_core: 2000
+    cpu: 4
+    runtime_minutes: 120
   }
   output {
     File output_vcfgz = "~{sample_basename}.vcf.gz"
@@ -469,9 +475,12 @@ task VCFANNO {
   runtime {
     docker: docker
     maxRetries: 3
+    #requested_memory_mb_per_core: 2000
+    #cpu: 4
+    #runtime_minutes: 240
     requested_memory_mb_per_core: 2000
-    cpu: 4
-    runtime_minutes: 240
+    cpu: 8
+    runtime_minutes: 120
   }
   output {
     File output_vcfgz = "~{sample_basename}.vcf.gz"
@@ -538,9 +547,12 @@ task MergeVCFs {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 5000
-    cpu: 1
-    runtime_minutes: 60
+    #requested_memory_mb_per_core: 5000
+    #cpu: 1
+    #runtime_minutes: 60
+    requested_memory_mb_per_core: 2000
+    cpu: 4
+    runtime_minutes: 120
   }
   output {
     File output_vcfgz = "~{sample_basename}.annotated.vcf.gz"
@@ -568,9 +580,12 @@ task GenerateVariantTable {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 4000
-    cpu: 2
-    runtime_minutes: 60
+    #requested_memory_mb_per_core: 4000
+    #cpu: 2
+    #runtime_minutes: 60
+    requested_memory_mb_per_core: 2000
+    cpu: 4
+    runtime_minutes: 120
   }
   output {
     File output_table = " ~{sample_basename}.tab"
