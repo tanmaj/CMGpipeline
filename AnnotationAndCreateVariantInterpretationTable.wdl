@@ -21,6 +21,15 @@ workflow AnnotateAndTable {
     File SLOpopulation_vcf
     File SLOpopulation_vcf_index
 
+    File TopMed_vcf
+    File TopMed_vcf_index
+
+    File Regeneron_vcf
+    File Regeneron_vcf_index
+
+    File GnomAD4_exomes_vcf
+    File GnomAD4_exomes_vcf_index
+
     File ClinVar_vcf
     File ClinVar_vcf_index
 
@@ -39,6 +48,9 @@ workflow AnnotateAndTable {
     File CGD
     File CGD_index
     File bcftools_annotation_header
+
+    File pext_bed
+    File pext_bed_index
 
     File reference_fa
     File reference_fai
@@ -89,6 +101,15 @@ workflow AnnotateAndTable {
       SLOpopulation_vcf = SLOpopulation_vcf,
       SLOpopulation_vcf_index = SLOpopulation_vcf_index,
 
+      TopMed_vcf = TopMed_vcf,
+      TopMed_vcf_index = TopMed_vcf_index,
+
+      GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
+      GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
+
+      Regeneron_vcf = Regeneron_vcf,
+      Regeneron_vcf_index = Regeneron_vcf_index,
+
       ClinVar_vcf = ClinVar_vcf,
       ClinVar_vcf_index = ClinVar_vcf_index,
 
@@ -107,6 +128,9 @@ workflow AnnotateAndTable {
       CGD = CGD,
       CGD_index = CGD_index,
       bcftools_annotation_header = bcftools_annotation_header,
+
+      pext_bed = pext_bed,
+      pext_bed_index = pext_bed_index,
 
       fasta_reference = reference_fa,
       fasta_reference_index = reference_fai,
