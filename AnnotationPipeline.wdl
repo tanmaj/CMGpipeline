@@ -409,6 +409,10 @@ task VCFANNO {
   
   command {
   set -e
+
+  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_oe.bed
+  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_chisq.bed
+
   echo [[annotation]] > conf.toml
   echo file=\"~{gnomAD_vcf}\" >> conf.toml
   echo fields = [\"AC\",\"AF\",\"nhomalt\",\"AC_male\",\"nhomalt_male\",\"AC_female\",\"nhomalt_female\",\"AC_nfe_seu\",\"AC_raw\",\"AF_raw\"] >> conf.toml
@@ -468,6 +472,18 @@ task VCFANNO {
   echo columns=[4] >> conf.toml
   echo ops=[\"self\"] >> conf.toml
   echo names=[\"pext_score\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"missenseConstrained_oe.bed\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"RMC_OE\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"missenseConstrained_chisq.bed\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"RMC_CHISQ\"] >> conf.toml
 
   vcfanno -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
   }
