@@ -410,8 +410,10 @@ task VCFANNO {
   command {
   set -e
 
-  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_oe.bed
-  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_chisq.bed
+  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_oe.bed.gz
+  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_oe.bed.gz.tbi
+  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_chisq.bed.gz
+  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/missenseConstrained_chisq.bed.gz.tbi
 
   echo [[annotation]] > conf.toml
   echo file=\"~{gnomAD_vcf}\" >> conf.toml
@@ -474,13 +476,13 @@ task VCFANNO {
   echo names=[\"pext_score\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
-  echo file=\"missenseConstrained_oe.bed\" >> conf.toml
+  echo file=\"missenseConstrained_oe.bed.gz\" >> conf.toml
   echo columns=[4] >> conf.toml
   echo ops=[\"self\"] >> conf.toml
   echo names=[\"RMC_OE\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
-  echo file=\"missenseConstrained_chisq.bed\" >> conf.toml
+  echo file=\"missenseConstrained_chisq.bed.gz\" >> conf.toml
   echo columns=[4] >> conf.toml
   echo ops=[\"self\"] >> conf.toml
   echo names=[\"RMC_CHISQ\"] >> conf.toml
