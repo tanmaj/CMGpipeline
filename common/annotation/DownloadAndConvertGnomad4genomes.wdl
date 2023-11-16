@@ -285,14 +285,14 @@ task ConcatenateAndIndex {
     }
 
     command <<<
-        bcftools concat ~{sep=" " input_vcfs} -O z -o ~{output_vcf}
+        bcftools concat --naive --threads 20 ~{sep=" " input_vcfs} -O z -o ~{output_vcf}
         bcftools index -t ~{output_vcf}
     >>>
 
     runtime {
       docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
       requested_memory_mb_per_core: 1000
-      cpu: 10
+      cpu: 20
     }
 
     output {
