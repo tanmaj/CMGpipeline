@@ -294,7 +294,7 @@ task ConcatenateAndIndex {
     runtime {
       docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
       requested_memory_mb_per_core: 1000
-      cpu: 20
+      cpu: 10
     }
 
     output {
