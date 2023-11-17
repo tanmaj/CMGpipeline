@@ -117,10 +117,11 @@ task SortAndIndexVcf {
         String input_vcf
     }
 
-    command {
-        bcftools sort ~{input_vcf} -Oz -o sorted.vcf.gz
+    command <<<
+        bcftools annotate -x ^INFO/AC_joint,^INFO/AF_joint,^INFO/AN_joint,^INFO/nhomalt_joint ~{input_vcf} -Oz -o thin.vcf
+        bcftools sort thin.vcf -Oz -o sorted.vcf.gz
         bcftools index -t sorted.vcf.gz
-    }
+    >>>
 
     output {
         File output_vcf = "sorted.vcf.gz"
