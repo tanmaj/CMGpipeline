@@ -284,7 +284,7 @@ task ConcatenateAndIndex {
     }
 
     command <<<
-        bcftools concat ~{sep=" " input_vcfs} -O z -o ~{output_vcf}
+        bcftools concat --naive --threads 10 ~{sep=" " input_vcfs} -O z -o ~{output_vcf}
         bcftools index -t ~{output_vcf}
     >>>
 
