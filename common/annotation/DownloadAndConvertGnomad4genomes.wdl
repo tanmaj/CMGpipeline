@@ -238,7 +238,7 @@ task FilterVariants {
     }
 
     command <<<
-        bcftools concat -a -r ~{contig} ~{sep=" " input_vcfs} -Oz -o concatenated_~{output_vcf}
+        bcftools concat -a -r ~{contig} ~{sep=" " input_vcfs} | bcftools annotate -x ^INFO/AC_joint,^INFO/AF_joint,^INFO/AN_joint,^INFO/nhomalt_joint -Oz -o concatenated_~{output_vcf}
         bcftools sort concatenated_~{output_vcf} -Oz -o sorted_~{output_vcf}
         bcftools index -t sorted_~{output_vcf}
     >>>
