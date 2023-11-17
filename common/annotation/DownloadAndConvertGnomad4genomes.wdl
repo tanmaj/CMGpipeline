@@ -196,7 +196,7 @@ task picard {
         String chain_url
         File target_fasta
         String out_prefix
-        Int mem_gb = 16
+        Int mem_gb = 8
     }
 
     String chain_file = basename(chain_url)
@@ -225,7 +225,8 @@ task picard {
 
     runtime {
         docker: "broadinstitute/picard:2.27.5"
-        memory: "~{mem_gb}GB"
+        requested_memory_mb_per_core: 1000
+        cpu: 10
     }
 }
 
