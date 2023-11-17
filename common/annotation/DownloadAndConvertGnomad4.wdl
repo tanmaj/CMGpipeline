@@ -49,7 +49,7 @@ workflow DownloadAndConvertGnomad4 {
     }
 
     scatter (chromosome in chromosomes) {
-        call FilterVariants as FilterVariantsChromosome {
+        call FilterVariantsChromosome {
             input:
                 input_vcfs = SortAndIndexVcf.output_vcf,
                 input_vcfs_indices = SortAndIndexVcf.output_vcf_index,
@@ -238,6 +238,31 @@ task FilterVariants {
 
     command <<<
         bcftools concat -a -r ~{contig} ~{sep=" " input_vcfs} | bcftools annotate -x ^INFO/AC_joint,^INFO/AF_joint,^INFO/AN_joint,^INFO/nhomalt_joint -Oz -o concatenated_~{output_vcf}
+        bcftools sort concatenated_~{output_vcf} -Oz -o sorted_~{output_vcf}
+        bcftools index -t sorted_~{output_vcf}
+    >>>
+
+    runtime {
+      docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
+      requested_memory_mb_per_core: 1000
+      cpu: 10
+  }
+  output {
+    File output_vcf = "sorted_~{output_vcf}"
+    File output_vcf_index = "sorted_~{output_vcf}.tbi"
+  }
+}
+
+task FilterVariantsChromosome {
+    input {
+        Array[String] input_vcfs
+        Array[String] input_vcfs_indices
+        String contig
+        String output_vcf
+    }
+
+    command <<<
+        bcftools concat -a -r ~{contig} ~{sep=" " input_vcfs} -Oz -o concatenated_~{output_vcf}
         bcftools sort concatenated_~{output_vcf} -Oz -o sorted_~{output_vcf}
         bcftools index -t sorted_~{output_vcf}
     >>>
