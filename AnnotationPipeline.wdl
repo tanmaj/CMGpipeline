@@ -523,7 +523,7 @@ task VCFANNO {
   echo [[annotation]] >> conf.toml
   echo file=\"~{blacklisted_regions_bed}\" >> conf.toml
   echo columns=[4] >> conf.toml
-  echo ops=[\"self\"] >> conf.toml
+  echo ops=[\"lua:function replaceSpacesWithUnderscores(s) return string.gsub(s, \' \', \'_\') end\"] >> conf.toml
   echo names=[\"blacklisted_regions\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
