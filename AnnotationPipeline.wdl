@@ -22,6 +22,15 @@ workflow AnnotateVCF {
     File GnomAD4_exomes_vcf
     File GnomAD4_exomes_vcf_index
 
+    File GnomAD4_genomes_vcf
+    File GnomAD4_genomes_vcf_index
+
+    File blacklisted_regions_bed
+    File blacklisted_regions_bed_index
+
+    File GERP_bed
+    File GERP_bed_index
+
     File SLOpopulation_vcf
     File SLOpopulation_vcf_index
 
@@ -148,6 +157,15 @@ workflow AnnotateVCF {
 
         GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
         GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
+
+        GnomAD4_genomes_vcf = GnomAD4_genomes_vcf,
+        GnomAD4_genomes_vcf_index = GnomAD4_genomes_vcf_index,
+
+        blacklisted_regions_bed = blacklisted_regions_bed,
+        blacklisted_regions_bed_index = blacklisted_regions_bed_index,
+
+        GERP_bed = GERP_bed,
+        GERP_bed_index = GERP_bed_index,
 
         Regeneron_vcf = Regeneron_vcf,
         Regeneron_vcf_index = Regeneron_vcf_index,
@@ -388,6 +406,15 @@ task VCFANNO {
     File GnomAD4_exomes_vcf
     File GnomAD4_exomes_vcf_index
 
+    File GnomAD4_genomes_vcf
+    File GnomAD4_genomes_vcf_index
+
+    File blacklisted_regions_bed
+    File blacklisted_regions_bed_index
+
+    File GERP_bed
+    File GERP_bed_index
+
     File SLOpopulation_vcf
     File SLOpopulation_vcf_index
 
@@ -446,11 +473,17 @@ task VCFANNO {
   echo names=[\"GnomAD4_exomes_AC\",\"GnomAD4_exomes_AF\",\"GnomAD4_exomes_AN\",\"GnomAD4_exomes_Hom\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
+  echo file=\"~{GnomAD4_genomes_vcf}\" >> conf.toml
+  echo fields = [\"AC_joint\",\"AF_joint\",\"AN_joint\", \"nhomalt_joint\"] >> conf.toml
+  echo ops=[\"self\",\"self\",\"self\",\"self\"] >> conf.toml
+  echo names=[\"GnomAD4_genomes_AC\",\"GnomAD4_genomes_AF\",\"GnomAD4_genomes_AN\",\"GnomAD4_genomes_Hom\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
   echo file=\"~{SLOpopulation_vcf}\" >> conf.toml
   echo fields = [\"AC\",\"AC_Het\",\"AC_Hom\",\"AC_Hemi\",\"AC_Het\"] >> conf.toml
   echo ops=[\"self\",\"self\",\"self\",\"self\",\"self\"] >> conf.toml
   echo names=[\"SLOpopulation.AC\",\"SLOpopulation.AC_Het\",\"SLOpopulation.AC_Hom\",\"SLOpopulation.AC_Hemi\",\"SLOpopulation.AC_Het\"] >> conf.toml
- 
+
   echo [[annotation]] >> conf.toml
   echo file=\"~{ClinVar_vcf}\" >> conf.toml
   echo fields = [\"ID\",\"CLNDN\",\"CLNSIG\",\"CLNHGVS\",\"CLNSIGCONF\",\"CLNSIGINCL\"] >> conf.toml
@@ -486,6 +519,18 @@ task VCFANNO {
   echo columns=[4] >> conf.toml
   echo ops=[\"self\"] >> conf.toml
   echo names=[\"RMC_CHISQ\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{blacklisted_regions_bed}\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"blacklisted_regions\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{GERP_bed}\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"GERP_RS\"] >> conf.toml
 
   vcfanno -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
   }
