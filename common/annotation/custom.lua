@@ -1,8 +1,8 @@
-function replaceSpacesWithUnderscores(arr)
-    if type(arr[1]) == "string" then
-        return string.gsub(arr[1], ' ', '_')
+function replaceSpacesWithUnderscores(vals)
+    if type(avalsrr[1]) == "string" then
+        return string.gsub(vals[1], ' ', '_')
     else
-        return arr[1]
+        return vals[1]
     end
 end
 
