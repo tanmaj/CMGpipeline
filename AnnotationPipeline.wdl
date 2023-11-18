@@ -523,7 +523,7 @@ task VCFANNO {
   echo [[annotation]] >> conf.toml
   echo file=\"~{blacklisted_regions_bed}\" >> conf.toml
   echo columns=[4] >> conf.toml
-  echo ops=[\"lua:function replaceSpacesWithUnderscores\(s\) return string.gsub\(s, \' \', \'_\'\) end\"] >> conf.toml
+  echo ops=[\"lua:replaceSpacesWithUnderscores\(vals\)\"] >> conf.toml
   echo names=[\"blacklisted_regions\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
@@ -532,7 +532,8 @@ task VCFANNO {
   echo ops=[\"self\"] >> conf.toml
   echo names=[\"GERP_RS\"] >> conf.toml
 
-  vcfanno -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
+  https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/common/annotation/custom.lua
+  vcfanno -lua custom.lua -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
   }
   
   runtime {
