@@ -1,8 +1,34 @@
-function replaceSpacesWithUnderscores(vals)
-    if type(avalsrr[1]) == "string" then
-        return string.gsub(vals[1], ' ', '_')
+function replaceSpacesWithUnderscores(arr)
+    if arr and type(arr[1]) == "string" then
+        local modifiedString = string.gsub(arr[1], ' ', '_')
+        return modifiedString
     else
-        return vals[1]
+        return arr and arr[1] or nil
+    end
+end
+
+function calculateMean(arr)
+    if arr == nil then
+        print("Error: Input array is nil")
+        return 0
+    end
+
+    local sum = 0
+    local count = 0
+
+    for i, v in ipairs(arr) do
+        local value = tonumber(v)
+        if value then
+            sum = sum + value
+            count = count + 1
+        end
+    end
+
+    if count > 0 then
+        return sum / count
+    else
+        print("Error: No valid numbers found in the array")
+        return 0  -- or handle the case when no valid numbers are found
     end
 end
 

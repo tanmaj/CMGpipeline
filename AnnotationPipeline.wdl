@@ -528,8 +528,8 @@ task VCFANNO {
 
   echo [[annotation]] >> conf.toml
   echo file=\"~{GERP_bed}\" >> conf.toml
-  echo columns=[4] >> conf.toml
-  echo ops=[\"self\"] >> conf.toml
+  echo columns=[5] >> conf.toml
+  echo ops=[\"lua:calculateMean\(vals\)\"] >> conf.toml
   echo names=[\"GERP_RS\"] >> conf.toml
 
   wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/common/annotation/custom.lua
