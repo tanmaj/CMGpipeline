@@ -532,7 +532,7 @@ task VCFANNO {
   echo ops=[\"self\"] >> conf.toml
   echo names=[\"GERP_RS\"] >> conf.toml
 
-  https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/common/annotation/custom.lua
+  wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/common/annotation/custom.lua
   vcfanno -lua custom.lua -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
   }
   
