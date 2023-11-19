@@ -53,6 +53,12 @@ workflow AnnotateVCF {
     File CGD_index
     File bcftools_annotation_header
 
+    File gnomAD_pLi_bed
+    File gnomAD_pLi_bed_index
+
+    File gnomAD_misz_bed
+    File gnomAD_misz_bed_index
+
     File pext_bed
     File pext_bed_index
 
@@ -184,6 +190,12 @@ workflow AnnotateVCF {
 
         pext_bed = pext_bed,
         pext_bed_index = pext_bed_index,
+
+        gnomAD_pLi_bed = gnomAD_pLi_bed,
+        gnomAD_pLi_bed_index = gnomAD_pLi_bed_index,
+
+        gnomAD_misz_bed = gnomAD_misz_bed,
+        gnomAD_misz_bed_index = gnomAD_misz_bed_index,
         
         docker = vcfanno_docker
       }
@@ -430,6 +442,12 @@ task VCFANNO {
     File pext_bed
     File pext_bed_index
 
+    File gnomAD_pLi_bed
+    File gnomAD_pLi_bed_index
+
+    File gnomAD_misz_bed
+    File gnomAD_misz_bed_index
+
     # Runtime parameters
     String docker
   }
@@ -513,6 +531,18 @@ task VCFANNO {
   echo columns=[4] >> conf.toml
   echo ops=[\"self\"] >> conf.toml
   echo names=[\"RMC_OE\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{gnomAD_pLi_bed}\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"gnomAD_pLi\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{gnomAD_misz_bed}\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"gnomAD_misz\"] >> conf.toml
 
   echo [[annotation]] >> conf.toml
   echo file=\"missenseConstrained_chisq.bed.gz\" >> conf.toml
