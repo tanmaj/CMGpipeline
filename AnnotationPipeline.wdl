@@ -563,7 +563,7 @@ task VCFANNO {
   echo names=[\"GERP_RS\"] >> conf.toml
 
   wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/common/annotation/custom.lua
-  vcfanno -lua custom.lua -p 4 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
+  vcfanno -lua custom.lua -p 16 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
   }
   
   runtime {
@@ -572,9 +572,9 @@ task VCFANNO {
     #requested_memory_mb_per_core: 2000
     #cpu: 4
     #runtime_minutes: 240
-    requested_memory_mb_per_core: 2000
+    requested_memory_mb_per_core: 1000
     cpu: 8
-    runtime_minutes: 120
+    runtime_minutes: 300
   }
   output {
     File output_vcfgz = "~{sample_basename}.vcf.gz"
