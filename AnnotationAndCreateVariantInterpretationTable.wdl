@@ -138,6 +138,9 @@ workflow AnnotateAndTable {
       SLOpopulation_vcf = SLOpopulation_vcf,
       SLOpopulation_vcf_index = SLOpopulation_vcf_index, 
 
+      ClinVar_vcf = ClinVar_vcf,
+      ClinVar_vcf_index = ClinVar_vcf_index,
+
       SpliceAI = SpliceAI,
       SpliceAI_index = SpliceAI_index,
 
