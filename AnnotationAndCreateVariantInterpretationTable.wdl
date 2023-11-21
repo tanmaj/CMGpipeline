@@ -123,6 +123,12 @@ workflow AnnotateAndTable {
       GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
       GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
 
+      GnomAD4_genomes_vcf = GnomAD4_genomes_vcf,
+      GnomAD4_genomes_vcf_index = GnomAD4_genomes_vcf_index,
+
+      blacklisted_regions_bed = blacklisted_regions_bed,
+      blacklisted_regions_bed_index = blacklisted_regions_bed_index,
+
       GERP_bed = GERP_bed,
       GERP_bed_index = GERP_bed_index,
 
@@ -131,12 +137,6 @@ workflow AnnotateAndTable {
 
       SLOpopulation_vcf = SLOpopulation_vcf,
       SLOpopulation_vcf_index = SLOpopulation_vcf_index, 
-
-      Regeneron_vcf = Regeneron_vcf,
-      Regeneron_vcf_index = Regeneron_vcf_index,
-
-      ClinVar_vcf = ClinVar_vcf,
-      ClinVar_vcf_index = ClinVar_vcf_index,
 
       SpliceAI = SpliceAI,
       SpliceAI_index = SpliceAI_index,
