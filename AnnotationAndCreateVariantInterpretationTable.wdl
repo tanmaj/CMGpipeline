@@ -30,6 +30,16 @@ workflow AnnotateAndTable {
     File GnomAD4_exomes_vcf
     File GnomAD4_exomes_vcf_index
 
+
+    File GnomAD4_genomes_vcf
+    File GnomAD4_genomes_vcf_index
+
+    File blacklisted_regions_bed
+    File blacklisted_regions_bed_index
+
+    File GERP_bed
+    File GERP_bed_index
+
     File ClinVar_vcf
     File ClinVar_vcf_index
 
@@ -51,6 +61,12 @@ workflow AnnotateAndTable {
 
     File pext_bed
     File pext_bed_index
+
+    File gnomAD_pLi_bed
+    File gnomAD_pLi_bed_index
+
+    File gnomAD_misz_bed
+    File gnomAD_misz_bed_index
 
     File reference_fa
     File reference_fai
@@ -107,6 +123,15 @@ workflow AnnotateAndTable {
       GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
       GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
 
+      GERP_bed = GERP_bed,
+      GERP_bed_index = GERP_bed_index,
+
+      Regeneron_vcf = Regeneron_vcf,
+      Regeneron_vcf_index = Regeneron_vcf_index,
+
+      SLOpopulation_vcf = SLOpopulation_vcf,
+      SLOpopulation_vcf_index = SLOpopulation_vcf_index, 
+
       Regeneron_vcf = Regeneron_vcf,
       Regeneron_vcf_index = Regeneron_vcf_index,
 
@@ -131,6 +156,12 @@ workflow AnnotateAndTable {
 
       pext_bed = pext_bed,
       pext_bed_index = pext_bed_index,
+
+      gnomAD_pLi_bed = gnomAD_pLi_bed,
+      gnomAD_pLi_bed_index = gnomAD_pLi_bed_index,
+
+      gnomAD_misz_bed = gnomAD_misz_bed,
+      gnomAD_misz_bed_index = gnomAD_misz_bed_index,
 
       fasta_reference = reference_fa,
       fasta_reference_index = reference_fai,
