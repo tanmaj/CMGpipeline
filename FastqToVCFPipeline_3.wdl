@@ -167,6 +167,9 @@ workflow FastqToVCF {
     File gnomAD_misz_bed
     File gnomAD_misz_bed_index
 
+    File metaDome_bed
+    File metaDome_bed_index
+
     File Regeneron_vcf
     File Regeneron_vcf_index
 
@@ -694,6 +697,9 @@ workflow FastqToVCF {
 
       gnomAD_misz_bed = gnomAD_misz_bed,
       gnomAD_misz_bed_index = gnomAD_misz_bed_index,
+
+      metaDome_bed = metaDome_bed,
+      metaDome_bed_index = metaDome_bed_index,
 
       fasta_reference = reference_fa,
       fasta_reference_index = reference_fai,

@@ -59,6 +59,9 @@ workflow AnnotateVCF {
     File gnomAD_misz_bed
     File gnomAD_misz_bed_index
 
+    File metaDome_bed
+    File metaDome_bed_index
+
     File pext_bed
     File pext_bed_index
 
@@ -196,7 +199,10 @@ workflow AnnotateVCF {
 
         gnomAD_misz_bed = gnomAD_misz_bed,
         gnomAD_misz_bed_index = gnomAD_misz_bed_index,
-        
+
+        metaDome_bed = metaDome_bed,
+        metaDome_bed_index = metaDome_bed_index,
+
         docker = vcfanno_docker
       }
 
@@ -448,6 +454,9 @@ task VCFANNO {
     File gnomAD_misz_bed
     File gnomAD_misz_bed_index
 
+    File metaDome_bed
+    File metaDome_bed_index
+
     # Runtime parameters
     String docker
   }
@@ -561,6 +570,12 @@ task VCFANNO {
   echo columns=[5] >> conf.toml
   echo ops=[\"lua:calculateMean\(vals\)\"] >> conf.toml
   echo names=[\"GERP_RS\"] >> conf.toml
+
+  echo [[annotation]] >> conf.toml
+  echo file=\"~{metaDome_bed}\" >> conf.toml
+  echo columns=[4] >> conf.toml
+  echo ops=[\"self\"] >> conf.toml
+  echo names=[\"metaDome\"] >> conf.toml
 
   wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/common/annotation/custom.lua
   vcfanno -lua custom.lua -p 16 conf.toml ~{input_vcf} | gzip > ~{sample_basename}.vcf.gz
