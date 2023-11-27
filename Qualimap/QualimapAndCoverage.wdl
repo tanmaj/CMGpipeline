@@ -43,8 +43,8 @@ workflow QualimapAndCoverage {
   if( defined(enrichment_bed) || defined(maskedGenomeFasta.targetRegions_bed) || defined(RegionsToBed.targetRegions_bed) ){
     call Qualimap.bamqc as Qualimap {
     input:
-      bam = SortSam.output_bam,
-      sample_basename=sample_basename,
+      bam = input_bam,
+      sample_basename = sample_basename,
       
       enrichment_bed = select_first([maskedGenomeFastaTargetRegions_bed, RegionsToBed.targetRegions_bed, enrichment_bed]),
 
@@ -57,7 +57,7 @@ workflow QualimapAndCoverage {
        call Qualimap.DownsampleBED as DownsampleBED {
         input:
            bed_file = enrichment_bed,
-           reference_fai=reference_fai
+           reference_fai = reference_fai
       }
     }
   }
@@ -90,8 +90,7 @@ workflow QualimapAndCoverage {
     call Qualimap.bamqc as QualimapWGS {
       input:
         bam = input_bam,
-        sample_basename=sample_basename,
-
+        sample_basename = sample_basename,
         ncpu = 8
     }
   
