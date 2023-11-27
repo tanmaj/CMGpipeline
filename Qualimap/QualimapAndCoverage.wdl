@@ -113,18 +113,13 @@ workflow QualimapAndCoverage {
     }
   }
 
-
-
-
-
   output {
+    File? Qualimap_results = Qualimap.results
+    File? QualimapWGS_results = QualimapWGS.results
 
-
-
-
+    File? DepthOfCoverage_output = DepthOfCoverage.DepthOfCoverage_output
+    File? DepthOfCoverageWGS_output = DepthOfCoverageWGS.DepthOfCoverage_output
   }
-
-
 
 }
 
