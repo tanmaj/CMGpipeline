@@ -13,6 +13,9 @@ workflow QualimapAndCoverageWrapper {
     File input_bam
     File input_bam_index
 
+    File reference_fixed_fa
+    File reference_fixed_fai
+
     File reference_fa
     File reference_fai
     File reference_dict
