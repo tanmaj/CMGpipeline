@@ -40,7 +40,7 @@ workflow QualimapAndCoverage {
     }
   }
 
-  if( defined(enrichment_bed) || defined(maskedGenomeFasta.targetRegions_bed) || defined(RegionsToBed.targetRegions_bed) ){
+  if( defined(enrichment_bed) || defined(maskedGenomeFastaTargetRegions_bed) || defined(RegionsToBed.targetRegions_bed) ){
     call Qualimap.bamqc as Qualimap {
     input:
       bam = input_bam,
