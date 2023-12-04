@@ -49,11 +49,9 @@ task RunTask {
 
     echo ~{input_dir}/yq e '.analysis.hpoIds = [~{hpo_ids}]' -i ~{input_dir}/examples/test-analysis-exome.yml
     ~{input_dir}/yq e '.analysis.hpoIds = [~{hpo_ids}]' -i ~{input_dir}/examples/test-analysis-exome.yml
-
-    # Test commands
-    echo java -Xmx4g -jar ~{input_dir}/exomiser-cli-13.3.0.jar --analysis ~{input_dir}/examples/test-analysis-exome.yml --spring.config.location=~{input_dir}/
     
-    java -Xmx4g -jar ~{input_dir}/exomiser-cli-13.3.0.jar --analysis ~{input_dir}/examples/test-analysis-exome.yml --spring.config.location=~{input_dir}/
+    java -Xmx24g -XX:+UseG1GC -jar ~{input_dir}/exomiser-cli-13.3.0.jar --analysis ~{input_dir}/examples/test-analysis-exome.yml --spring.config.location=~{input_dir}/
+    java -Xmx24g -XX:+UseG1GC -jar ~{input_dir}/exomiser-cli-13.3.0.jar --analysis ~{input_dir}/examples/test-analysis-exome-small.yml --spring.config.location=~{input_dir}/
     
     # Move the results from the default output folder to the executions dir
     mv results/* ./
