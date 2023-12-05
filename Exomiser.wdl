@@ -20,6 +20,7 @@ workflow Exomiser {
     File exomiser_output_vcf_index = RunTask.output_vcf_index
     File exomiser_output_json= RunTask.output_json
     File exomiser_output_html = RunTask.output_html
+    File exomiser_output_small_html = RunTask.output_small_html
     File exomiser_output_genes_tsv = RunTask.output_genes_tsv
     File exomiser_output_variants_tsv = RunTask.output_variants_tsv
   }
@@ -67,6 +68,7 @@ task RunTask {
     File output_vcf_index = "~{sample_basename}-exomiser.vcf.gz.tbi"
     File output_json = "~{sample_basename}-exomiser.json"
     File output_html = "~{sample_basename}-exomiser.html"
+    File output_small_html = "~{sample_basename}-exomiser-small.html"
     File output_genes_tsv = "~{sample_basename}-exomiser.genes.tsv"
     File output_variants_tsv = "~{sample_basename}-exomiser.variants.tsv"
   }
