@@ -39,6 +39,7 @@ task RunTask {
     ls ~{input_dir}  # You can replace this with any command you want to run on the file
     echo ~{input_dir}
     echo ~{hpo_ids}
+    echo ~{sample_basename}
 
     # Update file locations
     sed -i 's|^exomiser\.data-directory=.*|exomiser.data-directory=~{input_dir}/data|' ~{input_dir}/application.properties
@@ -46,16 +47,16 @@ task RunTask {
     # Download the yq directly if needed
     # curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.40.3/yq_linux_amd64 -o yq && chmod +x yq
     ~{input_dir}/yq e '.analysis.vcf = "~{input_vcf}"' -i ~{input_dir}/examples/test-analysis-exome.yml
+    ~{input_dir}/yq e '.analysis.vcf = "~{input_vcf}"' -i ~{input_dir}/examples/test-analysis-exome-small.yml
+    ~{input_dir}/yq e '.outputOptions.outputFileName = "~{sample_basename}-exomiser-small"' -i ~{input_dir}/examples/test-analysis-exome-small.yml
 
     echo ~{input_dir}/yq e '.analysis.hpoIds = [~{hpo_ids}]' -i ~{input_dir}/examples/test-analysis-exome.yml
     ~{input_dir}/yq e '.analysis.hpoIds = [~{hpo_ids}]' -i ~{input_dir}/examples/test-analysis-exome.yml
     
     java -Xmx24g -XX:+UseG1GC -jar ~{input_dir}/exomiser-cli-13.3.0.jar --analysis ~{input_dir}/examples/test-analysis-exome.yml --spring.config.location=~{input_dir}/
     java -Xmx24g -XX:+UseG1GC -jar ~{input_dir}/exomiser-cli-13.3.0.jar --analysis ~{input_dir}/examples/test-analysis-exome-small.yml --spring.config.location=~{input_dir}/
-    
-    # Move the results from the default output folder to the executions dir
     mv results/* ./
-
+    
     # Clean up the large copied annotation dir for exomiser immediately as hard links are not available for directory inputs
     rm -rf ~{input_dir}
   >>>
