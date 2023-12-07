@@ -149,10 +149,13 @@ task AlignAndMarkDuplicates {
       MAX_RECORDS_IN_RAM=300000
   >>>
   runtime {
-    preemptible: select_first([preemptible_tries, 5])
+    # preemptible: select_first([preemptible_tries, 5])
     # memory: "6 GB"
-    cpu: 2
+    # cpu: "2"
     # disks: "local-disk " + disk_size + " HDD"
+    cpu: 2
+    requested_memory_mb_per_core: 3000
+    maxRetries: 1
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.2-1552931386"
   }
   output {
