@@ -57,18 +57,18 @@ task RunExpansionHunter {
   }
 
   command <<<
-    echo "[ PREPARATION ] Downloading variant catalog JSON"
-    wget "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ExpansionHunter_configuration/variant_catalog.json"
-    unset https_proxy
-    wget "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ExpansionHunter_configuration/variant_catalog.json"
+    #echo "[ PREPARATION ] Downloading variant catalog JSON"
+    #wget "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ExpansionHunter_configuration/variant_catalog.json"
+    #unset https_proxy
+    #wget "https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/ExpansionHunter_configuration/variant_catalog.json"
 
-    echo "Tik za wgetom"
-    ls -ls .
+    #echo "Tik za wgetom"
+    #ls -ls .
 
-    # echo "[ PREPARATION ] Fixing BAI file ending to BAM.BAI as required for the ExpansionHunter"
-    # BAIFILE=~{bai_file}
-    # BAMBAIFILE=${BAIFILE%.bai}.bam.bai
-    # cp "$BAIFILE" "$BAMBAIFILE"
+    echo "[ PREPARATION ] Fixing BAI file ending to BAM.BAI as required for the ExpansionHunter"
+    BAIFILE=~{bai_file}
+    BAMBAIFILE=${BAIFILE%.bai}.bam.bai
+    cp "$BAIFILE" "$BAMBAIFILE"
 
     # echo "[ RUNNING ] expansion hunter on sample ~{sample_id}"
     # ExpansionHunter \
