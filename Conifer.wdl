@@ -357,6 +357,7 @@ task GenerateAnnotatedIntervalFile {
     requested_memory_mb_per_core: 3000
     cpu: 1
     runtime_minutes: 30
+    continueOnReturnCode: true
   }
   output {
     File AnnotatedInterval_file = "ANNOTATED_~{bedtools_annotated_filename}"
