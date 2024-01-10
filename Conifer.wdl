@@ -360,6 +360,6 @@ task GenerateAnnotatedIntervalFile {
     continueOnReturnCode: true
   }
   output {
-    File AnnotatedInterval_file = "ANNOTATED_~{bedtools_annotated_filename}"
+    File? AnnotatedInterval_file = "ANNOTATED_~{bedtools_annotated_filename}"
   }
 }
