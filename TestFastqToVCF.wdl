@@ -26,6 +26,7 @@ import "./SCRAMBLE/scramble_v2.wdl" as Scramble
 import "./softsearch/softsearch_v2.wdl" as Softsearch
 import "./bigWig/wigToBigWig_conversion" as BigWig
 import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
+import "./MitochondriaPipeline/MitochondriaPipeline.wdl" as MitochondriaPipeline
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -175,6 +176,33 @@ workflow FastqToVCF {
 
     File GnomAD4_exomes_vcf
     File GnomAD4_exomes_vcf_index
+
+    # Mitochondria pipeline 
+    Boolean do_MitochondriaPipeline = true
+    File mt_dict
+    File mt_fasta
+    File mt_fasta_index
+    File mt_amb
+    File mt_ann
+    File mt_bwt
+    File mt_pac
+    File mt_sa
+    File blacklisted_sites
+    File blacklisted_sites_index
+    File mt_shifted_dict
+    File mt_shifted_fasta
+    File mt_shifted_fasta_index
+    File mt_shifted_amb
+    File mt_shifted_ann
+    File mt_shifted_bwt
+    File mt_shifted_pac
+    File mt_shifted_sa
+    File shift_back_chain
+    File control_region_shifted_reference_interval_list
+    File non_control_region_interval_list
+    File gnomad_mito_sites_vcf
+    File gnomad_mito_sites_vcf_index
+
 
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
@@ -490,6 +518,40 @@ workflow FastqToVCF {
       }
     }
   }
+
+  # Mitochondria pipeline 
+  if (do_MitochondriaPipeline) {
+      call MitochondriaPipeline.MitochondriaPipeline as MitochondriaPipeline {
+        input:
+          wgs_aligned_input_bam_or_cram = SortSam.output_bam,
+          wgs_aligned_input_bam_or_cram_index = SortSam.output_bam_index,
+          # mt_fasta = reference_fa,
+          # mt_fasta_index = reference_fai,
+          # mt_dict = reference_dict,
+          sample_basename = sample_basename
+          mt_amb = mt_amb
+          mt_ann = mt_ann 
+          mt_bwt = mt_bwt 
+          mt_pac = mt_pac 
+          mt_sa = mt_sa 
+          blacklisted_sites = blacklisted_sites 
+          blacklisted_sites_index = blacklisted_sites_index 
+          mt_shifted_dict = mt_shifted_dict 
+          mt_shifted_fasta = mt_shifted_fasta 
+          mt_shifted_fasta_index = mt_shifted_fasta_index 
+          mt_shifted_amb = mt_shifted_amb 
+          mt_shifted_ann = mt_shifted_ann 
+          mt_shifted_bwt = mt_shifted_bwt 
+          mt_shifted_pac = mt_shifted_pac 
+          mt_shifted_sa = mt_shifted_sa 
+          shift_back_chain = shift_back_chain 
+          control_region_shifted_reference_interval_list = control_region_shifted_reference_interval_list 
+          non_control_region_interval_list = non_control_region_interval_list 
+          gnomad_mito_sites_vcf = gnomad_mito_sites_vcf 
+          gnomad_mito_sites_vcf_index = gnomad_mito_sites_vcf_index 
+      }
+  }
+
 
   if( defined(targetRegions) ) {
     call StringToArray {
@@ -1117,6 +1179,22 @@ workflow FastqToVCF {
     
     ## Array[File] bigWig_files = BigWig.bigWig_files
     File? bigWig_tar_file = BigWig.bigWig_tar_file
+
+    # Mitochondria pipeline
+    File? mt_aligned_bam = MitochondriaPipeline.mt_aligned_bam
+    File? mt_aligned_bai = MitochondriaPipeline.mt_aligned_bai
+    File? split_vcf = MitochondriaPipeline.split_vcf
+    File? split_vcf_index = MitochondriaPipeline.split_vcf_index
+    File? input_vcf_for_haplochecker = MitochondriaPipeline.input_vcf_for_haplochecker
+    File? duplicate_metrics = MitochondriaPipeline.duplicate_metrics
+    File? coverage_metrics = MitochondriaPipeline.coverage_metrics
+    File? coverage_mean_metrics = MitochondriaPipeline.coverage_mean_metrics
+    File? coverage_median_metrics = MitochondriaPipeline.coverage_median_metrics
+    File? major_haplogroup_file = MitochondriaPipeline.major_haplogroup_file
+    File? base_level_coverage_metrics = MitochondriaPipeline.base_level_coverage_metrics
+    File? filterVCF_output_vcf = MitochondriaPipeline.filterVCF_output_vcf
+    File? filterVCF_mito_table = MitochondriaPipeline.filterVCF_mito_table
+
   }
 }
 
