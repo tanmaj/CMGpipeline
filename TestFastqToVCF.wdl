@@ -525,9 +525,9 @@ workflow FastqToVCF {
         input:
           wgs_aligned_input_bam_or_cram = SortSam.output_bam,
           wgs_aligned_input_bam_or_cram_index = SortSam.output_bam_index,
-          # mt_fasta = reference_fa,
-          # mt_fasta_index = reference_fai,
-          # mt_dict = reference_dict,
+          mt_fasta = reference_fa,
+          mt_fasta_index = reference_fai,
+          mt_dict = reference_dict,
           sample_basename = sample_basename,
           mt_amb = mt_amb,
           mt_ann = mt_ann,
