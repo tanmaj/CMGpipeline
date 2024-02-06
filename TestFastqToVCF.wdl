@@ -523,12 +523,15 @@ workflow FastqToVCF {
   if (do_MitochondriaPipeline) {
       call MitochondriaPipeline.MitochondriaPipeline as MitochondriaPipeline {
         input:
+          sample_basename = sample_basename,
           wgs_aligned_input_bam_or_cram = SortSam.output_bam,
           wgs_aligned_input_bam_or_cram_index = SortSam.output_bam_index,
-          mt_fasta = reference_fa,
-          mt_fasta_index = reference_fai,
-          mt_dict = reference_dict,
-          sample_basename = sample_basename,
+          ref_fasta = reference_fa,
+          ref_fasta_index = reference_fai,
+          ref_dict = reference_dict,
+          mt_fasta = mt_fasta,
+          mt_fasta_index = mt_fasta_index,
+          mt_dict = mt_dict,
           mt_amb = mt_amb,
           mt_ann = mt_ann,
           mt_bwt = mt_bwt, 
