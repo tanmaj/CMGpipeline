@@ -82,7 +82,7 @@ task RunExpansionHunter {
     maxRetries: 1
     requested_memory_mb_per_core: 1000
     cpu: 1
-    runtime_minutes: 30
+    runtime_minutes: 120
   }
 
 }
