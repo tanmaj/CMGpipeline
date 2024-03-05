@@ -16,7 +16,7 @@ import "./ROH.wdl" as ROH
 import "./CreateInterpretationTable.wdl" as CreateInterpretationTable
 ## import "./MitoMap.wdl" as MitoMap
 import "./mitomap/mitomap_workflow.wdl" as MitoMap
-import "./exp_hunter.wdl" as ExpansionHunter
+#import "./exp_hunter.wdl" as ExpansionHunter
 import "./manta/manta_workflow.wdl" as Manta
 import "./Delly/DELLY_single3.wdl" as Delly
 import "./DeepVariant.wdl" as DeepVariant
@@ -1174,7 +1174,7 @@ workflow FastqToVCF {
     File? softsearch_filter_vcf = SoftsearchWF.output_vcf
     File? softsearch_annotSV = SoftsearchWF.output_tsv_name
 
-    File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
+    #File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
     
     # merged haplotype caller bamout:
     File? bamout = MergeBamOuts.merged_bam_out
