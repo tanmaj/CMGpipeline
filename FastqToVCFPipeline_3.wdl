@@ -1063,14 +1063,14 @@ workflow FastqToVCF {
     }
   #}
 
-  call ExpansionHunter.ExpansionHunter as ExpansionHunter {
-    input:
-      sample_id = sample_basename,
-      bam_file = SortSam.output_bam,
-      bai_file = SortSam.output_bam_index,
-      reference_fasta = reference_fa,
-      expansion_hunter_docker = expansion_hunter_docker
-  }
+  #call ExpansionHunter.ExpansionHunter as ExpansionHunter {
+  #  input:
+  #    sample_id = sample_basename,
+  #    bam_file = SortSam.output_bam,
+  #    bai_file = SortSam.output_bam_index,
+  #    reference_fasta = reference_fa,
+  #    expansion_hunter_docker = expansion_hunter_docker
+  #}
 
   #call ROH.CallPlink as CallPlink {
   #input:
