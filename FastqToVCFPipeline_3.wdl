@@ -1235,7 +1235,6 @@ task MergeFastqFiles {
 
   command {
   set -e
-     # cat ${sep = ' ' input_fq} > ~{sample_basename}_~{read}.fq.gz
      cat ${sep = ' ' input_fq} > {sample_basename_}_{read_}.fq.gz
   }
   runtime {
