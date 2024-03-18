@@ -1234,8 +1234,8 @@ task MergeFastqFiles {
   }
 
   command {
-  set -e
-     cat ~{sep = ' ' input_fq} > ~{sample_basename}_~{read}.fq.gz
+    set -e
+    cat ${sep = ' ' input_fq} > ~{sample_basename}_~{read}.fq.gz
   }
   runtime {
     docker: docker
