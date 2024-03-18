@@ -29,7 +29,7 @@ import "./softsearch/softsearch_v2.wdl" as Softsearch
 import "./bigWig/wigToBigWig_conversion" as BigWig
 import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
 import "./MitochondriaPipeline/MitochondriaPipeline.wdl" as MitochondriaPipeline
-import "./Exomiser.wdl" as Exomiser
+### import "./Exomiser.wdl" as Exomiser
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -207,8 +207,8 @@ workflow FastqToVCF {
     File gnomad_mito_sites_vcf_index
 
     # exomiser
-    Directory? exomiser_input_dir
-    String? hpo_ids
+    # Directory? exomiser_input_dir
+    # String? hpo_ids
 
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
@@ -790,14 +790,14 @@ workflow FastqToVCF {
   }
 
   # Exomiser
-  if ( defined(hpo_ids) ) {
-    call Exomiser.Exomiser as Exomiser {
-      input:
-	 input_dir = exomiser_input_dir,
-         input_vcf = SelectFinalVariants.output_vcf,
-         hpo_ids = hpo_ids
-    }
-  }
+  # if ( defined(hpo_ids) ) {
+  #   call Exomiser.Exomiser as Exomiser {
+  #     input:
+  #	  input_dir = exomiser_input_dir,
+  #       input_vcf = SelectFinalVariants.output_vcf,
+  #       hpo_ids = hpo_ids
+  #   }
+  # }
 
   #call MitoMap.CreateMitoFasta as CreateMitoFasta {
   #  input:
