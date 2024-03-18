@@ -1,4 +1,6 @@
-version 1.0
+version development
+# version 1.0
+
 ## Copyright CMG@KIGM, Ales Maver and Tanja Majnik
 
 ## Usage
