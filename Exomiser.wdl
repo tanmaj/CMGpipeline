@@ -1,4 +1,5 @@
-version development
+version 2.0
+#version development
 
 # Define the input parameter for the directory
 workflow Exomiser {
