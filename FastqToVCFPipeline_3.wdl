@@ -1657,8 +1657,8 @@ task GatherSortedBamFiles {
     maxRetries: 3
     memory: "3 GiB"
     disks: "local-disk " + disk_size + " HDD"
-    requested_memory_mb_per_core: 4000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 4
     runtime_minutes: 120
   }
   output {
