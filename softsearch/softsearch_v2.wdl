@@ -167,8 +167,8 @@ task SoftSearch {
     docker: "alesmaver/softsearch"
     maxRetries: 3
     continueOnReturnCode: true
-    requested_memory_mb_per_core: 5000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 5
     runtime_minutes: 600
   }
   output {
@@ -214,8 +214,8 @@ task CompressAndIndexVCF {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 5000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 5
     runtime_minutes: 90
   }
   output {
@@ -250,8 +250,8 @@ task MergeVCFs {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 4000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 4
     runtime_minutes: 60
   }
   output {
@@ -277,8 +277,8 @@ task SoftSearch_filter {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 5000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 5
     runtime_minutes: 30
   }
   output {
