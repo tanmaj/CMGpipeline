@@ -2096,8 +2096,8 @@ task PairedFastQsToUnmappedBAM {
     disks: "local-disk " + disk_space_gb + " HDD"
     preemptible: preemptible_attempts
     maxRetries: 3
-    requested_memory_mb_per_core: 6000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 700
   }
   output {
