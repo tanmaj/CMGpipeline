@@ -1616,7 +1616,6 @@ task GatherBqsrReports {
   runtime {
     docker: gatk_docker
     preemptible: preemptible_tries
-    memory: "3500 MiB"
     disks: "local-disk 20 HDD"
     requested_memory_mb_per_core: 1000
     cpu: 4
