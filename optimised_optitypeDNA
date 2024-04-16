@@ -54,8 +54,8 @@ task BamToFastq {
   
   runtime {
     docker: "alesmaver/bwa_samtools_picard"
-    requested_memory_mb_per_core: 8000
-    cpu: 2
+    requested_memory_mb_per_core: 2000
+    cpu: 8
     runtime_minutes: 700
     continueOnReturnCode: true
   }
@@ -84,7 +84,8 @@ task OptitypeDnaPrepareHLA {
 
   #Int space_needed_gb = 10 + round(5*size([input_fq1, input_fq2], "GB"))
   runtime {
-    memory: "64GB"
+    requested_memory_mb_per_core: 1000
+    cpu: 32
     docker: "mgibio/immuno_tools-cwl:1.0.1"
     #disks: "local-disk ~{space_needed_gb} SSD"
     #bootDiskSizeGb: 3*space_needed_gb

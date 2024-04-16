@@ -1,6 +1,4 @@
 version 1.0
-# version 1.0
-
 ## Copyright CMG@KIGM, Ales Maver and Tanja Majnik
 
 ## Usage
@@ -29,7 +27,6 @@ import "./softsearch/softsearch_v2.wdl" as Softsearch
 import "./bigWig/wigToBigWig_conversion" as BigWig
 import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_wdl/mutect2.wdl" as Mutect2
 import "./MitochondriaPipeline/MitochondriaPipeline.wdl" as MitochondriaPipeline
-### import "./Exomiser.wdl" as Exomiser
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -206,9 +203,6 @@ workflow FastqToVCF {
     File gnomad_mito_sites_vcf
     File gnomad_mito_sites_vcf_index
 
-    # exomiser
-    # Directory? exomiser_input_dir
-    # String? hpo_ids
 
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
@@ -525,7 +519,6 @@ workflow FastqToVCF {
     }
   }
 
-
   # Mitochondria pipeline 
   if (do_MitochondriaPipeline) {
       call MitochondriaPipeline.MitochondriaPipeline as MitochondriaPipeline {
@@ -788,16 +781,6 @@ workflow FastqToVCF {
       gatk_path = gatk_path,
       vcfanno_docker = vcfanno_docker
   }
-
-  # Exomiser
-  # if ( defined(hpo_ids) ) {
-  #   call Exomiser.Exomiser as Exomiser {
-  #     input:
-  #	  input_dir = exomiser_input_dir,
-  #       input_vcf = SelectFinalVariants.output_vcf,
-  #       hpo_ids = hpo_ids
-  #   }
-  # }
 
   #call MitoMap.CreateMitoFasta as CreateMitoFasta {
   #  input:
@@ -1234,8 +1217,8 @@ task MergeFastqFiles {
   }
 
   command {
-    set -e
-    cat ${sep = ' ' input_fq} > ~{sample_basename}_~{read}.fq.gz
+  set -e
+     cat ${sep = ' ' input_fq} > ~{sample_basename}_~{read}.fq.gz
   }
   runtime {
     docker: docker
@@ -1520,8 +1503,8 @@ task BaseRecalibrator {
     memory: "6 GiB"
     disks: "local-disk " + disk_size + " HDD"
     maxRetries: 3
-    requested_memory_mb_per_core: 1000
-    cpu: 6
+    requested_memory_mb_per_core: 6000
+    cpu: 1
     runtime_minutes: 120
   }
   output {
@@ -2096,8 +2079,8 @@ task PairedFastQsToUnmappedBAM {
     disks: "local-disk " + disk_space_gb + " HDD"
     preemptible: preemptible_attempts
     maxRetries: 3
-    requested_memory_mb_per_core: 1000
-    cpu: 6
+    requested_memory_mb_per_core: 6000
+    cpu: 1
     runtime_minutes: 700
   }
   output {
