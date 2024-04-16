@@ -659,8 +659,8 @@ task MergeVCFs {
     #requested_memory_mb_per_core: 5000
     #cpu: 1
     #runtime_minutes: 60
-    requested_memory_mb_per_core: 2000
-    cpu: 4
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 120
   }
   output {
