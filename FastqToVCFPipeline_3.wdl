@@ -1618,8 +1618,8 @@ task GatherBqsrReports {
     preemptible: preemptible_tries
     memory: "3500 MiB"
     disks: "local-disk 20 HDD"
-    requested_memory_mb_per_core: 3500
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 4
     runtime_minutes: 60
   }
   output {

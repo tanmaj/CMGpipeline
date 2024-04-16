@@ -179,7 +179,8 @@ task GetBwaVersion {
     sed 's/Version: //'
   }
   runtime {
-    memory: "1 GB"
+    requested_memory_mb_per_core: 1000
+    cpu: 1
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.2-1552931386"
   }
   output {
