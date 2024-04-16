@@ -1768,8 +1768,8 @@ task HaplotypeCaller {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
-    requested_memory_mb_per_core: 6000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 1200
   }
 }
@@ -1932,8 +1932,8 @@ task VariantFiltrationSNP {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
-    requested_memory_mb_per_core: 6000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 60
   }
 }
@@ -1973,8 +1973,8 @@ task VariantFiltrationINDEL {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
-    requested_memory_mb_per_core: 6000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 60
   }
 }
@@ -2007,8 +2007,8 @@ task CombineSNPindel {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
-    requested_memory_mb_per_core: 6000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 60
   }
 }
@@ -2046,8 +2046,8 @@ task SelectFinalVariants {
   runtime {
     docker: "~{docker}"
     maxRetries: 3
-    requested_memory_mb_per_core: 6000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 60
   }
 }

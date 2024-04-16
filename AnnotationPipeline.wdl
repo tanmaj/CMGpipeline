@@ -392,8 +392,8 @@ task bcftoolsAnnotate {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 2000
-    cpu: 6
+    requested_memory_mb_per_core: 1000
+    cpu: 12
     runtime_minutes: 120
   }
   output {
@@ -622,8 +622,8 @@ task runSnpEff {
   runtime {
     docker: docker
     maxRetries: 3
-    requested_memory_mb_per_core: 2000
-    cpu: 8
+    requested_memory_mb_per_core: 1000
+    cpu: 16
     runtime_minutes: 120
   }
   output {
