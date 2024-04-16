@@ -63,8 +63,8 @@ task MitoMap {
     runtime {
         docker: "alesmaver/mitomap"
         maxRetries: 3
-        requested_memory_mb_per_core: 3000
-        cpu: 1
+        requested_memory_mb_per_core: 1000
+        cpu: 3
         runtime_minutes: 60
     }
 }
