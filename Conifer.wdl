@@ -153,7 +153,7 @@ task CONIFER_Analyze {
     docker: docker
     requested_memory_mb_per_core: 1000
     cpu: 6
-    runtime_minutes: 120
+    runtime_minutes: 240
     docker_user: "root"
   }
   output {
