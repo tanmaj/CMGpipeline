@@ -248,8 +248,8 @@ task CONIFER_Plotcalls {
 
   runtime {
     docker: docker
-    requested_memory_mb_per_core: 9000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 18
     runtime_minutes: 600
     docker_user: "root"    
   }

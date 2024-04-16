@@ -692,8 +692,8 @@ task GenerateVariantTable {
     #requested_memory_mb_per_core: 4000
     #cpu: 2
     #runtime_minutes: 60
-    requested_memory_mb_per_core: 2000
-    cpu: 4
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 120
   }
   output {

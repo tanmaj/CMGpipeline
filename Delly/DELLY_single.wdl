@@ -71,8 +71,8 @@ task DELLY_call {
 
   runtime {
     docker: "alesmaver/delly"
-    requested_memory_mb_per_core: 4000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 200
   }
   output {
@@ -91,8 +91,8 @@ task DELLY_merge {
 
   runtime {
     docker: "alesmaver/delly"
-    requested_memory_mb_per_core: 4000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 200
   }
   output {
@@ -117,8 +117,8 @@ task DELLY_genotype {
 
   runtime {
     docker: "alesmaver/delly"
-    requested_memory_mb_per_core: 4000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 200
   }
   output {
@@ -139,8 +139,8 @@ task DELLY_merge_genotype {
 
   runtime {
     docker: "biocontainers/bcftools:v1.9-1-deb_cv1"
-    requested_memory_mb_per_core: 4000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 200
   }
   output {
@@ -161,8 +161,8 @@ task DELLY_filter {
 
   runtime {
     docker: "alesmaver/delly"
-    requested_memory_mb_per_core: 4000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 8
     runtime_minutes: 200
   }
   output {
