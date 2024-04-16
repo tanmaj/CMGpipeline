@@ -14,8 +14,8 @@ task wigToBigWig {
     
   runtime {
     docker: "abralab/wigtobigwig:v4"
-    requested_memory_mb_per_core: 8000
-    cpu: 2
+    requested_memory_mb_per_core: 2000
+    cpu: 8
     runtime_minutes: 700
   }
   

@@ -151,8 +151,8 @@ task CONIFER_Analyze {
 
   runtime {
     docker: docker
-    requested_memory_mb_per_core: 3000
-    cpu: 2
+    requested_memory_mb_per_core: 2000
+    cpu: 3
     runtime_minutes: 120
     docker_user: "root"
   }
@@ -284,8 +284,8 @@ task CONIFER_Export {
 
   runtime {
     docker: docker
-    requested_memory_mb_per_core: 4000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 4
     runtime_minutes: 60
     docker_user: "root"
   }
@@ -323,8 +323,8 @@ task CONIFER_Annotate {
 
   runtime {
     docker: docker
-    requested_memory_mb_per_core: 4000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 4
     runtime_minutes: 60
   }
   output {
