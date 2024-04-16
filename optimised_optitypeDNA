@@ -126,6 +126,8 @@ task OptitypeDnaPipeline {
   #Int space_needed_gb = 10 + round(5*size([hla_fwd_fastq, hla_rev_fastq], "GB"))
   runtime {
     memory: "64GB"
+    requested_memory_mb_per_core: 1000
+    cpu: 64
     docker: "mgibio/immuno_tools-cwl:1.0.1"
     #disks: "local-disk ~{space_needed_gb} SSD"
     #bootDiskSizeGb: 3*space_needed_gb
