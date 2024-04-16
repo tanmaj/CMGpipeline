@@ -526,7 +526,8 @@ task  variantEffectPredictor {
         #docker: "ensemblorg/ensembl-vep:release_95.1"
         #docker: "ensemblorg/ensembl-vep:release_106.1"
         docker: "alesmaver/vep:testing"
-        cpu: "1"
+        requested_memory_mb_per_core: 1000
+        cpu: 6
         bootDiskSizeGb: "150"
     }
 
