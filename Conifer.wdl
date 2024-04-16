@@ -151,8 +151,8 @@ task CONIFER_Analyze {
 
   runtime {
     docker: docker
-    requested_memory_mb_per_core: 2000
-    cpu: 3
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 120
     docker_user: "root"
   }
@@ -198,8 +198,8 @@ task CONIFER_Call {
 
   runtime {
     docker: docker
-    requested_memory_mb_per_core: 3000
-    cpu: 2
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 120
     docker_user: "root"
   }
