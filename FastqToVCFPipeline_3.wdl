@@ -1520,8 +1520,8 @@ task BaseRecalibrator {
     memory: "6 GiB"
     disks: "local-disk " + disk_size + " HDD"
     maxRetries: 3
-    requested_memory_mb_per_core: 6000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 120
   }
   output {
