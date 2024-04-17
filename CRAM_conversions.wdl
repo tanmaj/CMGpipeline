@@ -71,8 +71,8 @@ task ConvertToCram {
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330"
     maxRetries: 3
-    requested_memory_mb_per_core: 5000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 6
     runtime_minutes: 360
   }
   output {

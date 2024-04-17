@@ -169,8 +169,8 @@ task DepthOfCoverage {
     runtime {
         docker: "~{docker}"
         maxRetries: 3
-        requested_memory_mb_per_core: 9000
-        cpu: 1
+        requested_memory_mb_per_core: 1000
+        cpu: 12
         #runtime_minutes: 6000
         runtime_minutes: 9000
     }
@@ -250,8 +250,8 @@ task DepthOfCoverage34 {
     runtime {
         docker: "~{docker}"
         maxRetries: 3
-        requested_memory_mb_per_core: 9000
-        cpu: 1
+        requested_memory_mb_per_core: 1000
+        cpu: 12
         runtime_minutes: 2400
     }
 }

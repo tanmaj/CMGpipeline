@@ -1517,11 +1517,10 @@ task BaseRecalibrator {
   runtime {
     docker: gatk_docker
     preemptible: preemptible_tries
-    memory: "6 GiB"
     disks: "local-disk " + disk_size + " HDD"
     maxRetries: 3
     requested_memory_mb_per_core: 1000
-    cpu: 6
+    cpu: 12
     runtime_minutes: 120
   }
   output {
