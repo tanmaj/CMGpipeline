@@ -1588,8 +1588,8 @@ task ApplyBQSR {
     maxRetries: 3
     memory: "~{memory_size} MiB"
     disks: "local-disk " + disk_size + " HDD"
-    requested_memory_mb_per_core: 3000
-    cpu: 1
+    requested_memory_mb_per_core: 1000
+    cpu: 4
     runtime_minutes: 90
   }
   output {
