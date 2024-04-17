@@ -455,7 +455,8 @@ task LiftoverAndCombineVcfs {
     >>>
     runtime {
       disks: "local-disk " + disk_size + " HDD"
-      memory: "1200 MB"
+      requested_memory_mb_per_core: 1000
+      cpu: 2
       docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.2-1552931386"
       preemptible: select_first([preemptible_tries, 5])
     }
@@ -526,7 +527,8 @@ task M2 {
       memory: machine_mem + " MB"
       disks: "local-disk " + disk_size + " HDD"
       preemptible: select_first([preemptible_tries, 5])
-      cpu: 2
+      requested_memory_mb_per_core: 1000
+      cpu: 4
   }
   output {
       File raw_vcf = "~{output_vcf}"
@@ -611,10 +613,10 @@ task Filter {
   >>>
   runtime {
       docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])
-      memory: "4 MB"
+      requested_memory_mb_per_core: 1000
+      cpu: 2
       disks: "local-disk " + disk_size + " HDD"
       preemptible: select_first([preemptible_tries, 5])
-      cpu: 2
   }
   output {
       File filtered_vcf = "~{output_vcf}"
@@ -644,7 +646,8 @@ task MergeStats {
   }
   runtime {
       docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])
-      memory: "3 MB"
+      requested_memory_mb_per_core: 1000
+      cpu: 2
       disks: "local-disk 20 HDD"
       preemptible: select_first([preemptible_tries, 5])
   }
@@ -684,7 +687,8 @@ task SplitMultiAllelicsAndRemoveNonPassSites {
   }
   runtime {
       docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])
-      memory: "3 MB"
+      requested_memory_mb_per_core: 1000
+      cpu: 2
       disks: "local-disk 20 HDD"
       preemptible: select_first([preemptible_tries, 5])
   } 
@@ -727,7 +731,8 @@ task FilterNuMTs {
   }
   runtime {
       docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])
-      memory: "3 MB"
+      requested_memory_mb_per_core: 1000
+      cpu: 2
       disks: "local-disk 20 HDD"
       preemptible: select_first([preemptible_tries, 5])
   } 
@@ -767,7 +772,8 @@ task FilterLowHetSites {
   }
   runtime {
       docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])
-      memory: "3 MB"
+      requested_memory_mb_per_core: 1000
+      cpu: 2
       disks: "local-disk 20 HDD"
       preemptible: select_first([preemptible_tries, 5])
   } 
