@@ -75,6 +75,9 @@ task RunTask {
 
   runtime {
       docker: "openjdk:22-jdk"
+      requested_memory_mb_per_core: 1000
+      cpu: 30
+      runtime_minutes: 240
   }
 
 }
