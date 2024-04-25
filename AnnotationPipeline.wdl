@@ -82,13 +82,18 @@ workflow AnnotateVCF {
     String gatk_docker = "broadinstitute/gatk:latest"
     String gatk_path = "/gatk/gatk"
     String vcfanno_docker = "clinicalgenomics/vcfanno:0.3.2"
+
+    String sample_basename
+    String output_filename = sample_basename + ".annotated.vcf"
+
   }  
 
   Array[String] chromosomes = read_lines(chromosome_list)
 
-  String sample_basename = basename(input_vcf, ".vcf")
-  String output_filename = sample_basename + ".annotated.vcf"
-  String output_filename_gz = sample_basename + ".annotated.vcf.gz"
+  #String sample_basename = basename(input_vcf, ".vcf")
+  #String output_filename = sample_basename + ".annotated.vcf"
+  #String output_filename_gz = sample_basename + ".annotated.vcf.gz"
+  String output_filename_gz = output_filename + ".gz"
 
   # Workflow calls begin here
   #call LeftAlignAndTrimVariants {
@@ -231,6 +236,7 @@ workflow AnnotateVCF {
       input_vcfs = CompressAndIndexVCF2.output_vcfgz,
       input_vcfs_indexes = CompressAndIndexVCF2.output_vcfgz_index,
       sample_basename = sample_basename,
+      output_filename_gz = output_filename_gz,
       docker = gatk_docker,
       gatk_path = gatk_path
   }
@@ -248,7 +254,7 @@ workflow AnnotateVCF {
   output {
     File output_vcf = MergeVCFs.output_vcfgz
     File output_vcf_index = MergeVCFs.output_vcfgz_index
-    File output_table = GenerateVariantTable.output_table
+    #File output_table = GenerateVariantTable.output_table
   }
 }
 
@@ -638,6 +644,7 @@ task MergeVCFs {
     Array[File] input_vcfs
     Array[File] input_vcfs_indexes
     String sample_basename
+    String output_filename_gz
 
     String gatk_path
 
@@ -651,7 +658,7 @@ task MergeVCFs {
     ~{gatk_path} --java-options -Xmx4G  \
       MergeVcfs \
       --INPUT ~{sep=' --INPUT ' input_vcfs} \
-      --OUTPUT ~{sample_basename}.annotated.vcf.gz
+      --OUTPUT ~{output_filename_gz}
   }
   runtime {
     docker: docker
@@ -664,8 +671,8 @@ task MergeVCFs {
     runtime_minutes: 120
   }
   output {
-    File output_vcfgz = "~{sample_basename}.annotated.vcf.gz"
-    File output_vcfgz_index = "~{sample_basename}.annotated.vcf.gz.tbi"
+    File output_vcfgz = "~{output_filename_gz}"
+    File output_vcfgz_index = "~{output_filename_gz}.tbi"
   }
 }
 
