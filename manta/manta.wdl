@@ -69,6 +69,8 @@ task Germline {
         memory: "~{memoryGb}G"
         docker: dockerImage
         time_minutes: timeMinutes
+        requested_memory_mb_per_core: 1000
+        cpu: 40
     }
 
     parameter_meta {

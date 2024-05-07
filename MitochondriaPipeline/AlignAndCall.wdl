@@ -398,6 +398,8 @@ task CollectWgsMetrics {
     memory: "3 GB"
     disks: "local-disk " + disk_size + " HDD"
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.2-1552931386"
+    requested_memory_mb_per_core: 1000
+    cpu: 6
   }
   output {
     File metrics = "~{base_name}.coverage_metrics.txt"

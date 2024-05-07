@@ -86,7 +86,8 @@ task AnalyseInputVcf {
 
     runtime {
         docker: "broadinstitute/gatk3:3.8-1"
-        cpu: 1
+        cpu: 2
+        requested_memory_mb_per_core: 1000
         runtime_minutes: 5
     }            
 }

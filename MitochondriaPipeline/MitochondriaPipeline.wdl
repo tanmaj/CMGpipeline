@@ -273,6 +273,8 @@ task SubsetBamToChrM {
     disks: "local-disk " + disk_size + " HDD"
     docker: select_first([gatk_docker_override, "us.gcr.io/broad-gatk/gatk:4.1.7.0"])
     preemptible: select_first([preemptible_tries, 5])
+    requested_memory_mb_per_core: 1000
+    cpu: 6
   }
   output {
     File output_bam = "~{basename}.bam"
@@ -313,6 +315,8 @@ task RevertSam {
     memory: "2 GB"
     docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.2-1552931386"
     preemptible: select_first([preemptible_tries, 5])
+    requested_memory_mb_per_core: 1000
+    cpu: 3
   }
   output {
     File unmapped_bam = "~{basename}.bam"
