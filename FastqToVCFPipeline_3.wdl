@@ -1051,7 +1051,7 @@ workflow FastqToVCF {
        call Qualimap.DownsampleBED as DownsampleBED {
         input:
            ## bed_file = enrichment_bed,
-           bed_file = select_first([coverage_bed_name, enrichment_bed])
+           bed_file = select_first([coverage_bed_name, enrichment_bed]),
            reference_fai=reference_fai
       }
     }
