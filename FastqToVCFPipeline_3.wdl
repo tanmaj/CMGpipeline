@@ -136,6 +136,7 @@ workflow FastqToVCF {
 
     String? enrichment
     File? enrichment_bed
+    File? coverage_bed_name
 
     Array[File]? input_reference_rpkms 
     Int? CONIFER_svd
@@ -1039,8 +1040,8 @@ workflow FastqToVCF {
       bam = SortSam.output_bam,
       sample_basename=sample_basename,
       
-      enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, enrichment_bed]),
-
+      ## enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, enrichment_bed]),
+      enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, coverage_bed_name, enrichment_bed]),
       ncpu = 8
     }
   }
@@ -1049,7 +1050,8 @@ workflow FastqToVCF {
     if( enrichment=="WGS1Mb" ){
        call Qualimap.DownsampleBED as DownsampleBED {
         input:
-           bed_file = enrichment_bed,
+           ## bed_file = enrichment_bed,
+           bed_file = select_first([coverage_bed_name, enrichment_bed]),
            reference_fai=reference_fai
       }
     }
@@ -1067,8 +1069,8 @@ workflow FastqToVCF {
         reference_fai=reference_fai,
         reference_dict=reference_dict,
 
-        enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, DownsampleBED.downsampled_bed_file, enrichment_bed]),
-
+        ## enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, DownsampleBED.downsampled_bed_file, enrichment_bed]),
+        enrichment_bed = select_first([PrepareMaskedGenomeFasta.targetRegions_bed, RegionsToBed.targetRegions_bed, DownsampleBED.downsampled_bed_file, coverage_bed_name, enrichment_bed]),
         refSeqFile = refSeqFile,
 
         threads = threads,
