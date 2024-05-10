@@ -108,6 +108,8 @@ workflow AnnotateAndTable {
 
   call Annotation.AnnotateVCF as AnnotateVCF {
     input:
+      sample_basename = sample_basename,
+
       input_vcf = CreateVCFfromString.output_vcf,
       chromosome_list = chromosome_list,
       
