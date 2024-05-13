@@ -1,65 +1,119 @@
 version 1.0
 
+import "./manta/manta_workflow.wdl" as Manta
+
 workflow ExomeDepth {
   input {
+    String sample_name
     File target_bed
-    Array[File] baseline_samples
-    Array[File] baseline_samples_bais
-    Array[File] test_samples
-    Array[File] test_samples_bais
-    String chr
-    File ref
-    Float transition_probability
+    File input_bam
+    File input_bam_index
+    Array[File]? reference_counts_files
   }
 
-  call EXOME_DEPTH {
+  call GetCounts {
     input:
+        sample_name = sample_name,
         target_bed = target_bed,
-        test_samples = test_samples,
-        test_samples_bais = test_samples_bais,
-        baseline_samples = baseline_samples,
-        baseline_samples_bais = baseline_samples_bais,
-        ref = ref,
-        transition_probability = transition_probability
+        input_bam = input_bam,
+        input_bam_index = input_bam_index
+  }
+
+  if(defined(reference_counts_files)) {
+    call ExomeDepth {
+      input:
+        sample_name = sample_name,
+        target_bed = target_bed,
+        test_counts_file = GetCounts.exome_depth_counts,
+        reference_counts_files = select_first([reference_counts_files])
+    }
+
+    call Manta.annotSV as annotSV {
+      input:
+        genome_build = "GRCh37",
+        input_vcf = ExomeDepth.exome_depth_cnv_calls_bed,
+        output_tsv_name = sample_name + ".ExomeDepth.annotSV.tsv"
+    }
   }
 
   output {
-    File exome_depth_tsv = EXOME_DEPTH.exome_depth_tsv
+    File exome_depth_counts = GetCounts.exome_depth_counts
+    File? exome_depth_cnv_calls_bed = ExomeDepth.exome_depth_cnv_calls_bed
+    File? exome_depth_cnv_calls_csv = ExomeDepth.exome_depth_cnv_calls_csv
+    File? exome_depth_ratios_all_wig_gz = ExomeDepth.exome_depth_ratios_all_wig_gz
+    File? exome_depth_ratios_all_wig_gz_tbi = ExomeDepth.exome_depth_ratios_all_wig_gz_tbi
+    File? exome_depth_rolling_ratios_wig = ExomeDepth.exome_depth_rolling_ratios_wig
+    File? exome_depth_rolling_ratios_wig_gz_tbi = ExomeDepth.exome_depth_rolling_ratios_wig_gz_tbi
+    File? exome_depth_ratios_wig_gz = ExomeDepth.exome_depth_ratios_wig_gz
+    File? exome_depth_ratios_wig_gz_tbi = ExomeDepth.exome_depth_ratios_wig_gz_tbi
   }
 }
 
 
-task EXOME_DEPTH {
+task GetCounts {
   input {
+    String sample_name
     File target_bed
-    Array[File] test_samples
-    Array[File] test_samples_bais
-    Array[File] baseline_samples
-    Array[File] baseline_samples_bais
-    File ref
-    Float transition_probability
+    File input_bam
+    File input_bam_index
   }
 
   command <<<
-    sed -i 's/^chr//' ~{target_bed}
+    wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Dockers/ExomeDepth/ExomeDepth.R
 
-    wget https://raw.githubusercontent.com/egustavsson/runExomeDepth/master/ExomeDepth.R
     Rscript ExomeDepth.R \
         --targets ~{target_bed} \
-        --test-samples ~{write_lines(test_samples)} \
-        --baseline-samples ~{write_lines(baseline_samples)} \
-        --output-directory ./
+        --test-sample-bam ~{input_bam}
   >>>
+
+  runtime {
+        docker: "alesmaver/exome_depth"
+        maxRetries: 3
+        requested_memory_mb_per_core: 1000
+        cpu: 6
+        runtime_minutes: 180
+    }
+
+  output {
+        File exome_depth_counts = "~{sample_name}_ExomeDepth_counts.tsv"
+  }
+}
+
+task ExomeDepth {
+  input {
+    String sample_name
+    File target_bed
+    File test_counts_file
+    Array[File] reference_counts_files
+  }
+
+  command <<<
+    wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/Dockers/ExomeDepth/ExomeDepth.R
+
+    Rscript ExomeDepth.R \
+        --test-counts-file ~{test_counts_file} \
+        --reference-counts-file-list ~{write_lines(reference_counts_files)}
+    >>>
 
     runtime {
         docker: "alesmaver/exome_depth"
         maxRetries: 3
-        requested_memory_mb_per_core: 6000
-        cpu: 1
-        runtime_minutes: 60
-    }
-
+        requested_memory_mb_per_core: 1000
+        cpu: 6
+        runtime_minutes: 180
+        }
+        
     output {
-        File exome_depth_tsv = "exome_depth.tsv"
-  }
+      File exome_depth_cnv_calls_bed = "~{sample_name}_ExomeDepth_CNV.bed"
+      File exome_depth_cnv_calls_csv = "~{sample_name}_ExomeDepth_CNV.csv"
+
+      File exome_depth_ratios_all_wig_gz = "~{sample_name}_ExomeDepth_ratios_all.wig.gz"
+      File exome_depth_ratios_all_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_all.wig.gz.tbi"
+
+      File exome_depth_rolling_ratios_wig = "~{sample_name}_ExomeDepth_rolling_ratios.wig"
+      File exome_depth_rolling_ratios_wig_gz_tbi = "~{sample_name}_ExomeDepth_rolling_ratios.wig.gz.tbi"
+
+      File exome_depth_ratios_wig_gz = "~{sample_name}_ExomeDepth_ratios.wig.gz"
+      File exome_depth_ratios_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios.wig.gz.tbi"
+    }
 }
