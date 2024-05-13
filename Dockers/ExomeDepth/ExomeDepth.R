@@ -9,35 +9,119 @@ library(ExomeDepth)
 library(GenomicRanges)
 library(tidyverse)
 library(rtracklayer)
+library(doParallel)
+library(RcppRoll)
 
 # Function Definitions -----------------------------------------------------
-createReferenceSet <- function(targets, baseline_samples) {
-  output_name <- gsub("([0-z]*).(.*)", "\\1", basename(targets))
+createReferenceSet <- function(targets, baseline_samples) { 
   # Check if targets are provided; if not, generate exons.hg19 object
   if (missing(targets) || is.null(targets)) {
     data("exons.hg19")
     targets <- exons.hg19
   } else {
-    targets <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end", "info"))
+    targets <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end", "info"), sep="\t")
   }
   
   Reference_Counts <- getBamCounts(bed.frame = targets,
                          bam.files = baseline_samples,
                          include.chr = FALSE) 
 
-  save(Reference_Counts, file = file.path(paste0(output_name, ".ExomeDepth.RData")))
+  return(Reference_Counts)
 }
 
-callCNVs <- function(targets, annotation, test_sample, baseline_samples, reference_counts_file) {
+# Parallel creation of counts files
+createReferenceCounts = function(samples, targets, ncores=10) {
+# Create a cluster with the specified number of cores
+  registerDoParallel(cores = ncores)
 
+  # Use parallel::foreach to parallelize the for loop
+  foreach(sample = samples) %dopar% {
+    counts <- createReferenceSet(
+      targets = opt$targets,
+      baseline_samples = sample
+    )
+    sample_name = gsub("([A-z0-9]*)\\..*", "\\1", basename(sample))
+    write.table(counts, file = paste0(working_directory, sample_name, "_ExomeDepth_counts.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
+  }
+}
+
+get_reference_ratio_sd <- function(reference_logratios_files){
+  reference_logratios_files <- read.table(opt$reference_logratios_file_list , col.names = "baseline_sample_path")[,1]
+  reference_logratios<-list()
+  for (i in seq_along(reference_logratios_files)) {
+      ratios <- read.table(reference_logratios_files[i], header = TRUE, sep = " ")[,4]
+      reference_logratios[[basename(reference_logratios_files[i])]] <- ratios
+  }
+
+  lengths <- lapply(reference_logratios, function(x) length(x))
+  acceptable_length <- max(unlist(lengths))
+  reference_logratios[lengths != acceptable_length] <- NULL
+
+  reference_logratios_df <- as.data.frame(reference_logratios)
+  my.reference.selected.sd <- apply(X = reference_logratios_df, MAR = 1, FUN = sd)
+  return(my.reference.selected.sd)
+}
+
+# Function to convert, gzip and tabix index a file
+compress_and_index <- function(file_path) {
+  # Convert space-delimited file to tab-delimited in-place
+  system(paste("sed -i 's/ /\\t/g' ", file_path))
+  cat("File converted to tab-delimited:", file_path, "\n")
+  
+  # Check if gzipped file already exists
+  gz_file <- paste0(file_path, ".gz")
+  if (file.exists(gz_file)) {
+    cat("Gzipped file already exists:", gz_file, "\n")
+  } else {
+    # Compress the file using bgzip
+    system(paste("bgzip", file_path))
+    cat("File gzipped:", gz_file, "\n")
+  }
+  
+  # Check if index file already exists
+  index_file <- paste0(file_path, ".gz.tbi")
+  if (file.exists(index_file)) {
+    cat("Index file already exists:", index_file, "\n")
+  } else {
+    # Index the compressed file using tabix
+    system(paste("tabix -p bed", gz_file))
+    cat("Index created for:", gz_file, "\n")
+  }
+}
+
+# Function to process WIG files and call compress_and_index
+process_wig_files <- function(working_directory, sample_name) {
+  # List of WIG files
+  wig_files <- list.files(working_directory, pattern = paste0(sample_name, "_ExomeDepth", "_.*\\.wig$"), full.names = TRUE)
+  
+  # Iterate through each WIG file
+  for (wig_file in wig_files) {
+    # Read the WIG file
+    wig <- read.table(wig_file, header = FALSE, quote = "", sep = "\t", stringsAsFactors = FALSE)
+    
+    # Compress and index the WIG file
+    compress_and_index(wig_file)
+  }
+}
+
+# CNV calling function
+callCNVs <- function(targets, annotation, test_counts_file, reference_counts_files, probes_variance = NULL, probes_variance_cutoff=1) {
+  sample_name = gsub("_(.*)", "", basename(test_counts_file))
+
+  ########################
+  # TARGETS
+  ########################
   # Check if targets are provided; if not, generate exons.hg19 object
   if (missing(targets) || is.null(targets)) {
     data("exons.hg19")
-    targets <- exons.hg19
+    targets_df <- exons.hg19
   } else {
-    targets <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end", "info"))
+    targets_df <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end", "info"), sep="\t")
   }
   
+  ########################
+  # ANNOTATION
+  ########################
   # Check if annotations are provided; if not, generate genes.hg19 object
   if (missing(annotation) || is.null(annotation)) {
     data("genes.hg19")
@@ -49,38 +133,52 @@ callCNVs <- function(targets, annotation, test_sample, baseline_samples, referen
     annotation <- rtracklayer::import(opt$annotation) %>% .[.$type == "gene"] %>% unique() # This needs to have "chr" within seqnames
   }
 
-  if (exits(reference_counts_file)) {
-    load(reference_counts_file)
-  } else {
-    error("Reference counts file not defined. Please generate a reference file before running this command.")
+  ########################
+  # REFERENCE COUNTS
+  ########################
+  for (i in seq_along(reference_counts_files)) {
+    if (i == 1) {
+      df <- read.table(reference_counts_files[i], header = TRUE, sep = "\t")
+    } else {
+      df_current <- read.table(reference_counts_files[i], header = TRUE, sep = "\t")
+      
+      df_current[1:4]<-NULL # Skip first four columns that repeat in each file
+      print(head(df_current))
+      df <- cbind(df, df_current)
+    }
   }
+  reference_counts = df
+  ###
 
-  Reference_Counts <- getBamCounts(bed.frame = targets,
-                         bam.files = baseline_samples,
-                         include.chr = FALSE) 
+  ########################
+  # TEST COUNTS
+  ########################
+  test_counts <- read.table(test_counts_file, header = TRUE, sep = "\t")
 
+  ########################
+  # REFERENCE AND TEST VECTORS
+  ########################
+  my.reference.set <- as.matrix(reference_counts[,5:ncol(reference_counts)])
+  # Remove any samples from the references if they are in the test set
+  my.reference.set <- my.reference.set[, !colnames(my.reference.set) %in% colnames(test_counts)]
+  
+  my.test <- test_counts[,5]
 
-  Test_Counts <- getBamCounts(bed.frame = targets,
-                         bam.files = c(test_sample, baseline_samples),
-                         include.chr = TRUE) 
-                         
-                    cbind()     %>%
-    setNames(gsub("^X(\\d+)", "\\1", names(.))) # Remove 'X' from column names starting with a number. 
-  
-  Counts.df <- as.data.frame(Counts)
-  
-  my.reference.set <- as.matrix(Counts.df[, basename(baseline_samples)])
-  
-  my.test <- Counts[, basename(test_sample)]
-    
+  ########################
+  # CHOOSE THE APPROPRIATE SAMPLES FOR THE REFERENCE
+  ########################
   my.choice <- select.reference.set(test.counts = my.test,
                                     reference.counts = my.reference.set,
-                                    bin.length = (Counts.df$end - Counts.df$start) / 1000,
+                                    bin.length = (df$end - df$start) / 1000,
                                     n.bins.reduced = 10000)
     
-  my.matrix <- as.matrix(Counts.df[, my.choice$reference.choice, drop = FALSE])
+  my.matrix <- as.matrix(df[, my.choice$reference.choice, drop = FALSE])
   my.reference.selected <- apply(X = my.matrix, MAR = 1, FUN = sum)
-    
+  my.reference.selected.variance <- apply(X = my.matrix, MAR = 1, FUN = var)
+  
+  ########################
+  # PERFORM EXOME DEPTH ANALYSIS
+  ########################
   all.exons <- new('ExomeDepth', 
                    test = my.test,
                    reference = my.reference.selected,
@@ -88,107 +186,160 @@ callCNVs <- function(targets, annotation, test_sample, baseline_samples, referen
 
   all.exons <- CallCNVs(x = all.exons,
                         transition.probability = 10^-4,
-                        chromosome = Counts$chromosome,
-                        start = Counts$start,
-                        end = Counts$end,
-                        name = Counts$exon)
+                        chromosome = reference_counts$chromosome,
+                        start = reference_counts$start,
+                        end = reference_counts$end,
+                        name = reference_counts$exon)
 
   # sort by BF value and annotate
   CNV_calls <- all.exons@CNV.calls %>% arrange(desc(BF)) %>% GRanges()
 
   # Find overlaps using "any" method to handle partial overlaps
-overlap_hits <- findOverlaps(CNV_calls, annotation, type = "any")
+  overlap_hits <- findOverlaps(CNV_calls, annotation, type = "any")
 
-# Combine gene names for overlapping ranges
-combine_gene_names <- function(gene_names) {
-  return(paste(unique(gene_names), collapse = ","))
-}
-
-# Initialize a list to store gene names for each CNV_calls entry
-gene_names_list <- vector("list", length(CNV_calls))
-
-# Loop through the overlaps and update the gene_names_list
-for (i in seq_along(gene_names_list)) {
-  # Find all overlaps for the current CNV_calls entry
-  current_overlap_indices <- subjectHits(overlap_hits)[queryHits(overlap_hits) == i]
-  
-  if (length(current_overlap_indices) > 0) {
-    # Extract the gene names from annotation for the current overlaps
-    overlapping_genes <- mcols(annotation[current_overlap_indices])$gene_name
-    
-    # Combine gene names with commas and store them in the gene_names_list
-    gene_names_list[[i]] <- combine_gene_names(overlapping_genes)
+  # Combine gene names for overlapping ranges
+  combine_gene_names <- function(gene_names) {
+    return(paste(unique(gene_names), collapse = ","))
   }
-}
 
-# Update the "CNV_calls" object with the combined gene names, preserving NA values
-CNV_calls$gene_name <- CNV_calls$gene_name <- unlist(lapply(gene_names_list, function(x) if (is.null(x)) NA else x))
-  
-  # Generate the output filename based on the test sample name
-  sample_name <- gsub("\\.bam$", "", basename(test_sample))
-  output_file <- file.path(output_directory, paste0(sample_name, "_CNV.csv"))
+  # Initialize a list to store gene names for each CNV_calls entry
+  gene_names_list <- vector("list", length(CNV_calls))
+
+  # Loop through the overlaps and update the gene_names_list
+  for (i in seq_along(gene_names_list)) {
+    # Find all overlaps for the current CNV_calls entry
+    current_overlap_indices <- subjectHits(overlap_hits)[queryHits(overlap_hits) == i]
     
-  write.csv(file = output_file,
+    if (length(current_overlap_indices) > 0) {
+      # Extract the gene names from annotation for the current overlaps
+      overlapping_genes <- mcols(annotation[current_overlap_indices])$gene_name
+      
+      # Combine gene names with commas and store them in the gene_names_list
+      gene_names_list[[i]] <- combine_gene_names(overlapping_genes)
+    }
+  }
+
+  # Update the "CNV_calls" object with the combined gene names, preserving NA values
+  CNV_calls$gene_name <- CNV_calls$gene_name <- unlist(lapply(gene_names_list, function(x) if (is.null(x)) NA else x))
+  
+  all.exons@CNV.calls = all.exons@CNV.calls[ order ( all.exons@CNV.calls$BF, decreasing = TRUE),]
+
+  # Write the CNV calls to a CSV file
+  output_file_csv <- file.path(working_directory, paste0(sample_name, "_ExomeDepth_CNV.csv"))
+  write.csv(file = output_file_csv,
             x = CNV_calls,
             row.names = FALSE)
   
+  # Write the CNV calls to a BED file
+  output_file_bed <- file.path(working_directory, paste0(sample_name, "_ExomeDepth_CNV.bed"))
+  write.table(file = output_file_bed,
+              x = as.data.frame(CNV_calls)[,c("seqnames", "start", "end", "BF", "gene_name")],
+              quote = FALSE,
+              col.names = FALSE,
+              row.names = FALSE,
+              sep = "\t")
+  
+  # WIG FILE - TEST SAMPLE
+  all.exons_freq = all.exons@test/(all.exons@test + all.exons@reference)
+  all.exons_oe = all.exons_freq/all.exons@expected
+  wig = cbind(reference_counts[,1:3], all.exons_oe)
+  # wig = cbind(reference_counts[,1:3], all.exons@likelihood)
+  # wig[,4] <- format(wig[,4], scientific = FALSE)
+  # Save to a wig file without quotes and without column names
+  write.table(wig, file = file.path(working_directory, paste0(sample_name, "_ExomeDepth", "_ratios_all.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
+  
+  if (!is.null(probes_variance)) {
+      wig_clean <- wig[probes_variance<probes_variance_cutoff,]
+      wig_clean <- subset(wig_clean, !is.na(wig_clean[,4]))
+      write.table(wig_clean, file = file.path(working_directory, paste0(sample_name, "_ExomeDepth", "_ratios_clean.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
+  } 
+
+  wig = wig[-which(is.nan(wig[,4])),]
+  write.table(wig, file = file.path(working_directory, paste0(sample_name, "_ExomeDepth", "_ratios_nomissing.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+  rolling_probes = 10
+  wig_rolling = cbind(reference_counts[,1:3], all.exons_oe)
+  wig_rolling <- subset(wig_rolling, !is.nan(wig_rolling[,4]))
+  # We want to roll over cleaned probes to enhance the signal
+  if (!is.null(probes_variance)) {
+    wig_rolling <- wig_rolling[probes_variance<probes_variance_cutoff,]
+  }
+  wig_rolling[,4] <- roll_mean(wig_rolling[,4], n = rolling_probes, align = "center", fill = NA)
+  wig_rolling <- subset(wig_rolling, !is.na(wig_rolling[,4]))
+  wig_rolling[,4] <- format(wig_rolling[,4], digits = 3, scientific=FALSE)
+  write.table(wig_rolling, file = file.path(working_directory, paste0(sample_name, "_ExomeDepth", "_rolling_ratios.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+  # # WIG FILE - REFERENCE SAMPLES
+  # all.exons_freq = all.exons@test/(all.exons@test + all.exons@reference)
+  # all.exons_oe = all.exons_freq/all.exons@expected
+  # wig = cbind(df[,1:3], all.exons_oe)
+  # wig = wig[-which(is.nan(wig[,4])),]
+  # # Save to a wig file without quotes and without column names
+  # write.table(wig, file = file.path(working_directory, paste0("ExomeDepth", "_CNV.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+  process_wig_files(working_directory=working_directory, sample_name=sample_name)
+
   # Print completion message for the test sample
   cat("Analysis completed for", sample_name, "\n")
 }
 
 # Parse command-line options
 option_list <- list(
-  make_option("--test-samples", dest="test_samples", type="character"),
-  make_option("--baseline-samples", dest="baseline_samples", type="character"),
+  make_option("--test-sample-bam", dest="test_sample_bam", type="character"),
+  make_option("--baseline-sample-bam_list", dest="baseline_samples_bam_list", type="character", default=NULL),
   make_option("--targets", dest="targets", type="character"),
   make_option("--annotation", dest="annotation", type="character"),
-  make_option("--output-directory", dest="output_directory", type="character"),
-  make_option("--create-reference-set", dest="create_reference_set", type="boolean", default=FALSE) 
+  make_option("--output-directory", dest="output_directory", type="character", default="./"),
+  make_option("--working-directory", dest="working_directory", type="character", default="./"),
+  make_option("--test-counts-file", dest="test_counts_file", type="character", default=NULL),
+  make_option("--reference-counts-file-list", dest="reference_counts_file_list", type="character", default=NULL),
+  make_option("--reference-logratios-file-list", dest="reference_logratios_file_list", type="character", default=NULL)
 )
 
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
+working_directory = "/mnt/dataSeq/RESULT_REPOSITORY/ExomeDepth/"
+print(opt)
+
 # Redirect output to a log file to suppress warnings and messages
 log_file <- file.path(opt$output_directory, "exomedepth_log.txt")
 sink(log_file, append = FALSE)
 
-# Read test samples from TSV
-test_samples <- read_tsv(opt$test_samples, col_names = "test_sample_path", show_col_types = F)
+# OPTION ONE - a single BAM file is provided
+# DO: Create a counts file for downstream use
+if (!is.null(opt$test_sample_bam)){
+  print("You have provided a single test sample bam, so we will generate counts file for downstream use. ")
+  createReferenceCounts(samples=opt$test_sample_bam, opt$targets, ncores=1)
+  print("Counts file generated for the test sample.")
+}
 
-# Read baseline samples from TSV
-baseline_samples <- read_tsv(opt$baseline_samples, col_names = "baseline_sample_path", show_col_types = F)
+# OPTION TWO - a list of locations for multiple bam files is provided
+# DO: Create multiple counts files for use in a reference set
+if (!is.null(opt$baseline_samples_bam_list)){
+  print("You have provided multiple baseline samples - will generate count files for all now... ")
+  bam_files <- read.table(opt$baseline_samples_bam_list, col.names = "baseline_sample_path")[,1]
 
-# Run the analysis for each test sample
-if(create_reference_set){
-    createReferenceSet(
-        targets = opt$targets,
-        baseline_samples = opt$baseline_sample_path 
-    )
-} else {
-    for (test_sample_path in test_samples$test_sample_path) {
-        callCNVs(
-            targets = opt$targets,
-            annotation = opt$annotation,
-            test_sample = test_sample_path,
-            baseline_samples = baseline_samples$baseline_sample_path,
-            output_directory = opt$output_directory  # Updated argument name
-            )
-    }
+  createReferenceCounts(samples=bam_files, opt$targets, ncores=30)
+  print("Counts files generated for all baseline samples.")
+}
+
+# OPTION THREE - a file with test counts and a list of files with reference counts is provided
+# DO: Perform Exome Depth analysis
+if (!is.null(opt$test_counts_file) & !is.null(opt$reference_counts_file_list)){
+
+  # Find probes with a high rate of variation in the reference population of ratio values
+  if(!is.null(opt$reference_logratios_file_list)){
+    reference_sd <- get_reference_ratio_sd(opt$reference_logratios_file_list)
+  } else {
+    reference_sd <- NULL
+  }
+
+  reference_counts_files <- read.table(opt$reference_counts_file_list, col.names = "baseline_sample_path")[,1]
+  callCNVs(targets=opt$targets, annotation= NULL, test_counts_file=opt$test_counts_file, reference_counts_files = reference_counts_files, probes_variance = reference_sd, probes_variance_cutoff=0.2)
+  print("Exome Depth analysis completed.")
 }
 
 # Close the sink to restore the standard output
 sink()
 
-#
-targets = '/cmg1scratch/cromwell/FastqToVCFPipelineDatasets/ENRICHMENTS//nexteraExome_nochrYM.bed'
-test_sample = '/mnt/dataSeq/DATA_REPOSITORY/BAMS_HG19/PX13069.marked.bam'
-baseline_samples = c('/mnt/dataSeq/DATA_REPOSITORY/BAMS_HG19/PX13871.marked.bam', 
-                     '/mnt/dataSeq/DATA_REPOSITORY/BAMS_HG19/PX13872.marked.bam', 
-                     '/mnt/dataSeq/DATA_REPOSITORY/BAMS_HG19/PX14310.marked.bam')
-annotation = NULL
-
-opt=c()
-opt$targets = targets
-opt$test_samples = test_sample
-opt$baseline_sample_path = baseline_samples

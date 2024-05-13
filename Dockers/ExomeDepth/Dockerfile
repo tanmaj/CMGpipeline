@@ -9,6 +9,8 @@ RUN Rscript -e "install.packages('BiocManager')" && \
 	Rscript -e "install.packages('dplyr')" && \
 	Rscript -e "install.packages('tidyverse')" && \
 	Rscript -e "install.packages('optparse')" && \
+	Rscript -e "install.packages('doParallel')" && \
+	Rscript -e "install.packages('RcppRoll')" && \
 	Rscript -e "install.packages(pkgs = 'https://cran.r-project.org/package=ExomeDepth&version=1.1.16', repos = NULL)"
 
 CMD ["/bin/bash"]
