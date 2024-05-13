@@ -233,10 +233,11 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   CNV_table$type <- gsub("duplication", "DUP", CNV_table$type)
   # Write the CNV calls to a CSV file
   output_file_csv <- file.path(working_directory, paste0(sample_name, "_ExomeDepth_CNV.csv"))
-  write.csv(file = output_file_csv,
+  write.table(file = output_file_csv,
             x = CNV_table,
             quote = FALSE,
-            row.names = FALSE)
+            row.names = FALSE,
+            sep = "\t")
 
   # Write the CNV calls to a BED file
   output_file_bed <- file.path(working_directory, paste0(sample_name, "_ExomeDepth_CNV.bed"))
