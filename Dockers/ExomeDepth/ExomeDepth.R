@@ -224,12 +224,17 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   
   all.exons@CNV.calls = all.exons@CNV.calls[ order ( all.exons@CNV.calls$BF, decreasing = TRUE),]
 
+  # Order columns in the desired manner
+  CNV_table <- CNV_calls[, c("seqnames", "start", "end", "type", "gene_name", colnames(CNV_calls)[!(colnames(CNV_calls) %in% c("seqnames", "start", "end", "type", "gene_name"))])]
+  CNV_table$type <- gsub("deletion", "DEL", CNV_bed$type)
+  CNV_table$type <- gsub("duplication", "DUP", CNV_bed$type)
   # Write the CNV calls to a CSV file
   output_file_csv <- file.path(working_directory, paste0(sample_name, "_ExomeDepth_CNV.csv"))
   write.csv(file = output_file_csv,
-            x = CNV_calls,
+            x = CNV_table,
+            quote = FALSE,
             row.names = FALSE)
-  
+            
   # Write the CNV calls to a BED file
   output_file_bed <- file.path(working_directory, paste0(sample_name, "_ExomeDepth_CNV.bed"))
   CNV_bed = as.data.frame(CNV_calls)[,c("seqnames", "start", "end", "type", "gene_name")]
