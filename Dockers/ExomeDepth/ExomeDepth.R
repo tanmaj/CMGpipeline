@@ -30,7 +30,7 @@ createReferenceSet <- function(targets, baseline_samples) {
 }
 
 # Parallel creation of counts files
-createReferenceCounts = function(samples, targets, ncores=10) {
+createReferenceCounts = function(samples, targets, working_directory, ncores=10) {
 # Create a cluster with the specified number of cores
   registerDoParallel(cores = ncores)
 
@@ -299,7 +299,7 @@ option_list <- list(
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
-working_directory = "/mnt/dataSeq/RESULT_REPOSITORY/ExomeDepth/"
+working_directory = opt$working_directory
 print(opt)
 
 # Redirect output to a log file to suppress warnings and messages
@@ -310,7 +310,7 @@ sink(log_file, append = FALSE)
 # DO: Create a counts file for downstream use
 if (!is.null(opt$test_sample_bam)){
   print("You have provided a single test sample bam, so we will generate counts file for downstream use. ")
-  createReferenceCounts(samples=opt$test_sample_bam, opt$targets, ncores=1)
+  createReferenceCounts(samples=opt$test_sample_bam, opt$targets, working_directory=opt$working_directory, ncores=1)
   print("Counts file generated for the test sample.")
 }
 
@@ -320,7 +320,7 @@ if (!is.null(opt$baseline_samples_bam_list)){
   print("You have provided multiple baseline samples - will generate count files for all now... ")
   bam_files <- read.table(opt$baseline_samples_bam_list, col.names = "baseline_sample_path")[,1]
 
-  createReferenceCounts(samples=bam_files, opt$targets, ncores=30)
+  createReferenceCounts(samples=bam_files, opt$targets, working_directory=opt$working_directory, ncores=30)
   print("Counts files generated for all baseline samples.")
 }
 
