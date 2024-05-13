@@ -250,9 +250,11 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   
   if (!is.null(probes_variance)) {
       wig_clean <- wig[probes_variance<probes_variance_cutoff,]
-      wig_clean <- subset(wig_clean, !is.na(wig_clean[,4]))
-      write.table(wig_clean, file = file.path(working_directory, paste0(sample_name, "_ExomeDepth", "_ratios_clean.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
-  } 
+  else {
+      wig_clean <- wig
+  }
+  wig_clean <- subset(wig_clean, !is.na(wig_clean[,4]))
+  write.table(wig_clean, file = file.path(working_directory, paste0(sample_name, "_ExomeDepth", "_ratios_clean.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
 
   wig = wig[-which(is.nan(wig[,4])),]
   write.table(wig, file = file.path(working_directory, paste0(sample_name, "_ExomeDepth", "_ratios_nomissing.wig")), quote = FALSE, col.names = FALSE, row.names = FALSE)
