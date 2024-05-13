@@ -31,7 +31,7 @@ workflow ExomeDepth {
     call Manta.annotSV as annotSV {
       input:
         genome_build = "GRCh37",
-        input_vcf = ExomeDepth.exome_depth_cnv_calls_bed,
+        input_vcf = ExomeDepth.exome_depth_cnv_calls_csv,
         output_tsv_name = sample_name + ".ExomeDepth.annotSV.tsv"
     }
   }
@@ -44,8 +44,8 @@ workflow ExomeDepth {
     File? exome_depth_ratios_all_wig_gz_tbi = ExomeDepth.exome_depth_ratios_all_wig_gz_tbi
     File? exome_depth_rolling_ratios_wig = ExomeDepth.exome_depth_rolling_ratios_wig
     File? exome_depth_rolling_ratios_wig_gz_tbi = ExomeDepth.exome_depth_rolling_ratios_wig_gz_tbi
-    File? exome_depth_ratios_wig_gz = ExomeDepth.exome_depth_ratios_wig_gz
-    File? exome_depth_ratios_wig_gz_tbi = ExomeDepth.exome_depth_ratios_wig_gz_tbi
+    File? exome_depth_ratios_clean_wig_gz = ExomeDepth.exome_depth_ratios_clean_wig_gz
+    File? exome_depth_ratios_clean_wig_gz_tbi = ExomeDepth.exome_depth_ratios_clean_wig_gz_tbi
   }
 }
 
@@ -105,15 +105,15 @@ task ExomeDepth {
         
     output {
       File exome_depth_cnv_calls_bed = "~{sample_name}_ExomeDepth_CNV.bed"
-      File exome_depth_cnv_calls_csv = "~{sample_name}_ExomeDepth_CNV.csv"
+      File exome_depth_cnv_calls_csv = "~{sample_name}_ExomeDepth_CNV_annotSV.bed"
 
       File exome_depth_ratios_all_wig_gz = "~{sample_name}_ExomeDepth_ratios_all.wig.gz"
       File exome_depth_ratios_all_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_all.wig.gz.tbi"
 
-      File exome_depth_rolling_ratios_wig = "~{sample_name}_ExomeDepth_rolling_ratios.wig"
+      File exome_depth_rolling_ratios_wig = "~{sample_name}_ExomeDepth_rolling_ratios.wig.gz"
       File exome_depth_rolling_ratios_wig_gz_tbi = "~{sample_name}_ExomeDepth_rolling_ratios.wig.gz.tbi"
 
-      File exome_depth_ratios_wig_gz = "~{sample_name}_ExomeDepth_ratios.wig.gz"
-      File exome_depth_ratios_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios.wig.gz.tbi"
+      File exome_depth_ratios_clean_wig_gz = "~{sample_name}_ExomeDepth_ratios_clean.wig.gz"
+      File exome_depth_ratios_clean_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_clean.wig.gz.tbi"
     }
 }
