@@ -253,7 +253,7 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   
   if (!is.null(probes_variance)) {
       wig_clean <- wig[probes_variance<probes_variance_cutoff,]
-  else {
+  } else {
       wig_clean <- wig
   }
   wig_clean <- subset(wig_clean, !is.na(wig_clean[,4]))
