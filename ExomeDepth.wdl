@@ -49,6 +49,8 @@ workflow ExomeDepth {
     File? exome_depth_rolling_ratios_wig_gz_tbi = ExomeDepth.exome_depth_rolling_ratios_wig_gz_tbi
     File? exome_depth_ratios_clean_wig_gz = ExomeDepth.exome_depth_ratios_clean_wig_gz
     File? exome_depth_ratios_clean_wig_gz_tbi = ExomeDepth.exome_depth_ratios_clean_wig_gz_tbi
+    File? exome_depth_ratios_nomissing_wig_gz = ExomeDepth.exome_depth_ratios_nomissing_wig_gz
+    File? exome_depth_ratios_nomissing_wig_gz_tbi = ExomeDepth.exome_depth_ratios_nomissing_wig_gz_tbi
     File? exome_depth_annotSV_tsv = annotSV.sv_variants_tsv
   }
 }
@@ -120,7 +122,7 @@ task ExomeDepth {
       File exome_depth_ratios_clean_wig_gz = "~{sample_name}_ExomeDepth_ratios_clean.wig.gz"
       File exome_depth_ratios_clean_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_clean.wig.gz.tbi"
 
-      File exome_depth_ratios_clean_wig_gz = "~{sample_name}_ExomeDepth_ratios_nomissing.wig.gz"
-      File exome_depth_ratios_clean_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_nomissing.wig.gz.tbi"
+      File exome_depth_ratios_nomissing_wig_gz = "~{sample_name}_ExomeDepth_ratios_nomissing.wig.gz"
+      File exome_depth_ratios_nomissing_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_nomissing.wig.gz.tbi"
     }
 }
