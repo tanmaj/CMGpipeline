@@ -216,7 +216,7 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
                     )
     }
 
-  if (nrow(all.exons@CNV.calls)) == 0 {
+  if (nrow(all.exons@CNV.calls) == 0) {
     all.exons@CNV.calls <- data.frame(chromosome = c("chr1"),
                       start = c(1),
                       end = c(2),
@@ -226,7 +226,6 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   }
   # sort by BF value and annotate
   CNV_calls <- all.exons@CNV.calls %>% arrange(desc(BF)) %>% GRanges()
-  CNV_calls <- all.exons@CNV.calls %>% GRanges()
 
   # Find overlaps using "any" method to handle partial overlaps
   overlap_hits <- findOverlaps(CNV_calls, annotation, type = "any")
