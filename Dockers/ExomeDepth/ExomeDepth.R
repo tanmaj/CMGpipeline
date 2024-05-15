@@ -145,7 +145,7 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
     } else {
       df_current <- read.table(reference_counts_files[i], header = TRUE, sep = "\t")
       
-      df_current[1:ncol(df_current)]<-NULL # Skip first four columns that repeat in each file
+      df_current[1:targets_ncol]<-NULL # Skip first four columns that repeat in each file
       print(head(df_current))
       df <- cbind(df, df_current)
     }
