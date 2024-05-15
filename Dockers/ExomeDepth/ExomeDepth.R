@@ -19,7 +19,10 @@ createReferenceSet <- function(targets, baseline_samples) {
     data("exons.hg19")
     targets <- exons.hg19
   } else {
-    targets <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end", "info"), sep="\t")
+    targets <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end"), sep="\t")
+    if (ncol(targets) >= 4) {
+      colnames(targets) <- c("chrom", "start", "end", "info")
+    } 
   }
   
   Reference_Counts <- getBamCounts(bed.frame = targets,
