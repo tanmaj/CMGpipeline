@@ -205,13 +205,15 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
                           start = reference_counts$start,
                           end = reference_counts$end,
                           name = rep("NA", nrow(reference_counts))
-    } else if {
+                          )
+    } else {
     all.exons <- CallCNVs(x = all.exons,
                     transition.probability = 10^-4,
                     chromosome = reference_counts$chromosome,
                     start = reference_counts$start,
                     end = reference_counts$end,
-                    name = reference_counts$info)
+                    name = reference_counts$info
+                    )
     }
 
   # sort by BF value and annotate
