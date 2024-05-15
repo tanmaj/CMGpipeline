@@ -69,20 +69,10 @@ compress_and_index <- function(file_path) {
   cat("File converted to tab-delimited:", file_path, "\n")
   
   # Sort the file
-  sorted_file <- paste0(file_path, ".sorted")
-  system(paste("sort -k1,1 -k2,2n", file_path, ">", sorted_file))
-  cat("File sorted:", sorted_file, "\n")
-  
-  # Check if gzipped file already exists
   gz_file <- paste0(file_path, ".gz")
-  if (file.exists(gz_file)) {
-    cat("Gzipped file already exists:", gz_file, "\n")
-  } else {
-    # Compress the sorted file using bgzip
-    system(paste("bgzip", sorted_file, ">", gz_file))
-    cat("File gzipped:", gz_file, "\n")
-  }
-  
+  system(paste("sort -k1,1 -k2,2n", file_path, " | bgzip > ", gz_file))
+  cat("File sorted:", gz_file, "\n")
+
   # Check if index file already exists
   index_file <- paste0(gz_file, ".tbi")
   if (file.exists(index_file)) {
