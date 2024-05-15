@@ -19,9 +19,12 @@ createReferenceSet <- function(targets, baseline_samples) {
     data("exons.hg19")
     targets <- exons.hg19
   } else {
-    targets <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end"), sep="\t")
+    targets <- read.table(targets, header = FALSE, sep="\t")
+    if (ncol(targets_df) == 3) {
+      colnames(targets) <- c("chrom", "start", "end")
+    } 
     if (ncol(targets) >= 4) {
-      colnames(targets) <- c("chrom", "start", "end", "info")
+      colnames(targets)[1:4] <- c("chrom", "start", "end", "info")
     } 
   }
   
