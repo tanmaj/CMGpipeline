@@ -62,24 +62,29 @@ get_reference_ratio_sd <- function(reference_logratios_files){
   return(my.reference.selected.sd)
 }
 
-# Function to convert, gzip and tabix index a file
+# Function to convert, sort, gzip, and tabix index a file
 compress_and_index <- function(file_path) {
   # Convert space-delimited file to tab-delimited in-place
   system(paste("sed -i 's/ /\\t/g' ", file_path))
   cat("File converted to tab-delimited:", file_path, "\n")
+  
+  # Sort the file
+  sorted_file <- paste0(file_path, ".sorted")
+  system(paste("sort -k1,1 -k2,2n", file_path, ">", sorted_file))
+  cat("File sorted:", sorted_file, "\n")
   
   # Check if gzipped file already exists
   gz_file <- paste0(file_path, ".gz")
   if (file.exists(gz_file)) {
     cat("Gzipped file already exists:", gz_file, "\n")
   } else {
-    # Compress the file using bgzip
-    system(paste("bgzip", file_path))
+    # Compress the sorted file using bgzip
+    system(paste("bgzip", sorted_file, ">", gz_file))
     cat("File gzipped:", gz_file, "\n")
   }
   
   # Check if index file already exists
-  index_file <- paste0(file_path, ".gz.tbi")
+  index_file <- paste0(gz_file, ".tbi")
   if (file.exists(index_file)) {
     cat("Index file already exists:", index_file, "\n")
   } else {
