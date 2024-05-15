@@ -114,9 +114,12 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
     data("exons.hg19")
     targets_df <- exons.hg19
   } else {
-    targets_df <- read.table(targets, header = FALSE, col.names = c("chrom", "start", "end"), sep="\t")
+    targets_df <- read.table(targets, header = FALSE, sep="\t")
+    if (ncol(targets_df) == 3) {
+      colnames(targets_df) <- c("chrom", "start", "end")
+    } 
     if (ncol(targets_df) >= 4) {
-      colnames(targets_df) <- c("chrom", "start", "end", "info")
+      colnames(targets_df)[1:4] <- c("chrom", "start", "end", "info")
     } 
   }
 
