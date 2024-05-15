@@ -119,18 +119,13 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
     targets_df <- exons.hg19
   } else {
     targets_df <- read.table(targets, header = FALSE, sep="\t")
-    if (ncol(targets_df) == 3) {
-      print("Adding column names - 3 columns")
-      colnames(targets_df) <- c("chrom", "start", "end")
-    } 
-    if (ncol(targets_df) >= 4) {
-      print("Adding column names - 4 columns")
-      colnames(targets_df)[1:4] <- c("chrom", "start", "end", "info")
+    targets_ncol = ncol(targets_df)
+    if (ncol(targets_df) == 3) {    
+      targets_df$info <- "NA"
     } 
   }
+  colnames(targets_df)[1:4] <- c("chrom", "start", "end", "info")
 
-  targets_ncol = ncol(targets_df)
-  
   ########################
   # ANNOTATION
   ########################
@@ -151,7 +146,7 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   ########################
   print("Reading reference counts files")
   for (i in seq_along(reference_counts_files)) {
-    print(paste0("Reading reference counts file ", reference_counts_files[i])
+    print(paste0("Reading reference counts file ", reference_counts_files[i]))
     if (i == 1) {
       df <- read.table(reference_counts_files[i], header = TRUE, sep = "\t")
     } else {
@@ -203,12 +198,21 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
                    reference = my.reference.selected,
                    formula = 'cbind(test, reference) ~ 1')
 
-  all.exons <- CallCNVs(x = all.exons,
-                        transition.probability = 10^-4,
-                        chromosome = reference_counts$chromosome,
-                        start = reference_counts$start,
-                        end = reference_counts$end,
-                        name = reference_counts$exon)
+  if (targets_ncol==3){
+    all.exons <- CallCNVs(x = all.exons,
+                          transition.probability = 10^-4,
+                          chromosome = reference_counts$chromosome,
+                          start = reference_counts$start,
+                          end = reference_counts$end,
+                          name = rep("NA", nrow(reference_counts))
+    } else if {
+    all.exons <- CallCNVs(x = all.exons,
+                    transition.probability = 10^-4,
+                    chromosome = reference_counts$chromosome,
+                    start = reference_counts$start,
+                    end = reference_counts$end,
+                    name = reference_counts$info)
+    }
 
   # sort by BF value and annotate
   CNV_calls <- all.exons@CNV.calls %>% arrange(desc(BF)) %>% GRanges()
