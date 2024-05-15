@@ -20,7 +20,7 @@ createReferenceSet <- function(targets, baseline_samples) {
     targets <- exons.hg19
   } else {
     targets <- read.table(targets, header = FALSE, sep="\t")
-    if (ncol(targets_df) == 3) {
+    if (ncol(targets) == 3) {
       colnames(targets) <- c("chrom", "start", "end")
     } 
     if (ncol(targets) >= 4) {
