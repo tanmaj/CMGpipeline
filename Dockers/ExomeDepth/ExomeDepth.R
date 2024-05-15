@@ -113,15 +113,18 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   # TARGETS
   ########################
   # Check if targets are provided; if not, generate exons.hg19 object
+  print("Reading targets file")
   if (missing(targets) || is.null(targets)) {
     data("exons.hg19")
     targets_df <- exons.hg19
   } else {
     targets_df <- read.table(targets, header = FALSE, sep="\t")
     if (ncol(targets_df) == 3) {
+      print("Adding column names - 3 columns")
       colnames(targets_df) <- c("chrom", "start", "end")
     } 
     if (ncol(targets_df) >= 4) {
+      print("Adding column names - 4 columns")
       colnames(targets_df)[1:4] <- c("chrom", "start", "end", "info")
     } 
   }
@@ -131,6 +134,7 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   ########################
   # ANNOTATION
   ########################
+  print("Reading annotation file")
   # Check if annotations are provided; if not, generate genes.hg19 object
   if (missing(annotation) || is.null(annotation)) {
     data("genes.hg19")
@@ -145,7 +149,9 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   ########################
   # REFERENCE COUNTS
   ########################
+  print("Reading reference counts files")
   for (i in seq_along(reference_counts_files)) {
+    print(paste0("Reading reference counts file ", reference_counts_files[i])
     if (i == 1) {
       df <- read.table(reference_counts_files[i], header = TRUE, sep = "\t")
     } else {
@@ -162,12 +168,15 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   ########################
   # TEST COUNTS
   ########################
+  print("Reading test counts file")
   test_counts <- read.table(test_counts_file, header = TRUE, sep = "\t")
 
   ########################
   # REFERENCE AND TEST VECTORS
   ########################
+  print("Creating reference and test vectors")
   my.reference.set <- as.matrix(reference_counts[,(targets_ncol+1):ncol(reference_counts)])
+  head(my.reference.set)
   # Remove any samples from the references if they are in the test set
   my.reference.set <- my.reference.set[, !colnames(my.reference.set) %in% colnames(test_counts)]
   
@@ -176,6 +185,7 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   ########################
   # CHOOSE THE APPROPRIATE SAMPLES FOR THE REFERENCE
   ########################
+  print("Choosing the appropriate samples for the reference")
   my.choice <- select.reference.set(test.counts = my.test,
                                     reference.counts = my.reference.set,
                                     bin.length = (df$end - df$start) / 1000,
