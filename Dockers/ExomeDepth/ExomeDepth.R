@@ -119,6 +119,8 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
       colnames(targets_df) <- c("chrom", "start", "end", "info")
     } 
   }
+
+  targets_ncol = ncol(targets_df)
   
   ########################
   # ANNOTATION
@@ -159,11 +161,11 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
   ########################
   # REFERENCE AND TEST VECTORS
   ########################
-  my.reference.set <- as.matrix(reference_counts[,5:ncol(reference_counts)])
+  my.reference.set <- as.matrix(reference_counts[,(targets_ncol+1):ncol(reference_counts)])
   # Remove any samples from the references if they are in the test set
   my.reference.set <- my.reference.set[, !colnames(my.reference.set) %in% colnames(test_counts)]
   
-  my.test <- test_counts[,5]
+  my.test <- test_counts[,(targets_ncol+1)]
 
   ########################
   # CHOOSE THE APPROPRIATE SAMPLES FOR THE REFERENCE
