@@ -6,17 +6,20 @@ workflow ExomeDepth {
   input {
     String sample_name
     File target_bed
-    File input_bam
-    File input_bam_index
+    File? input_bam
+    File? input_bam_index
+    File? exome_depth_counts_input
     Array[File]? reference_counts_files
   }
 
-  call GetCounts {
-    input:
-        sample_name = sample_name,
-        target_bed = target_bed,
-        input_bam = input_bam,
-        input_bam_index = input_bam_index
+  if(!defined(exome_depth_counts_input)) {
+    call GetCounts {
+      input:
+          sample_name = sample_name,
+          target_bed = target_bed,
+          input_bam = select_first([input_bam]),
+          input_bam_index = select_first([input_bam_index])
+    }
   }
 
   if(defined(reference_counts_files)) {
@@ -24,7 +27,7 @@ workflow ExomeDepth {
       input:
         sample_name = sample_name,
         target_bed = target_bed,
-        test_counts_file = GetCounts.exome_depth_counts,
+        test_counts_file = select_first([exome_depth_counts_input, GetCounts.exome_depth_counts]),
         reference_counts_files = select_first([reference_counts_files])
     }
 
@@ -37,7 +40,7 @@ workflow ExomeDepth {
   }
 
   output {
-    File exome_depth_counts = GetCounts.exome_depth_counts
+    File? exome_depth_counts = GetCounts.exome_depth_counts
     File? exome_depth_cnv_calls_bed = ExomeDepth.exome_depth_cnv_calls_bed
     File? exome_depth_cnv_calls_csv = ExomeDepth.exome_depth_cnv_calls_csv
     File? exome_depth_ratios_all_wig_gz = ExomeDepth.exome_depth_ratios_all_wig_gz
@@ -46,6 +49,7 @@ workflow ExomeDepth {
     File? exome_depth_rolling_ratios_wig_gz_tbi = ExomeDepth.exome_depth_rolling_ratios_wig_gz_tbi
     File? exome_depth_ratios_clean_wig_gz = ExomeDepth.exome_depth_ratios_clean_wig_gz
     File? exome_depth_ratios_clean_wig_gz_tbi = ExomeDepth.exome_depth_ratios_clean_wig_gz_tbi
+    File? exome_depth_annotSV_tsv = annotSV.sv_variants_tsv
   }
 }
 
@@ -115,5 +119,8 @@ task ExomeDepth {
 
       File exome_depth_ratios_clean_wig_gz = "~{sample_name}_ExomeDepth_ratios_clean.wig.gz"
       File exome_depth_ratios_clean_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_clean.wig.gz.tbi"
+
+      File exome_depth_ratios_clean_wig_gz = "~{sample_name}_ExomeDepth_ratios_nomissing.wig.gz"
+      File exome_depth_ratios_clean_wig_gz_tbi = "~{sample_name}_ExomeDepth_ratios_nomissing.wig.gz.tbi"
     }
 }
