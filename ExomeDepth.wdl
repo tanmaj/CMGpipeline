@@ -98,7 +98,8 @@ task ExomeDepth {
 
     Rscript ExomeDepth.R \
         --test-counts-file ~{test_counts_file} \
-        --reference-counts-file-list ~{write_lines(reference_counts_files)}
+        --reference-counts-file-list ~{write_lines(reference_counts_files)} \
+        --targets ~{target_bed}
     >>>
 
     runtime {
