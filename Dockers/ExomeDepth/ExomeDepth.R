@@ -212,7 +212,7 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
                     chromosome = reference_counts$chromosome,
                     start = reference_counts$start,
                     end = reference_counts$end,
-                    name = reference_counts$info
+                    name = reference_counts[,4]
                     )
     }
 
