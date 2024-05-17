@@ -210,6 +210,7 @@ workflow FastqToVCF {
     # exomiser
     # Directory? exomiser_input_dir
     # String? hpo_ids
+    Boolean do_DeepVariant = false
 
     # Here are the global docker environment variables for tools used in this workflow
     # TO DO: Move the other task-specific docker definitions here for clarity, unless necessary
@@ -928,98 +929,100 @@ workflow FastqToVCF {
   }
 
   # Deep Variant 
-  if (defined(enrichment)) {
-    String model_type = if (enrichment == "WGS1Mb") then "WGS" else "WES"
-    call DeepVariant.DeepVariant as DeepVariant {
-       input:
-	  sample_basename = sample_basename,
-          inputBam = SortSam.output_bam,
-          inputBamIndex = SortSam.output_bam_index,
-          referenceFasta = reference_fa,
-          referenceFastaIndex = reference_fai,
-	  modelType = model_type,
-          # numShards = 128
-    }
+  if (do_DeepVariant) {
+    if (defined(enrichment)) {
+      String model_type = if (enrichment == "WGS1Mb") then "WGS" else "WES"
+      call DeepVariant.DeepVariant as DeepVariant {
+        input:
+      sample_basename = sample_basename,
+            inputBam = SortSam.output_bam,
+            inputBamIndex = SortSam.output_bam_index,
+            referenceFasta = reference_fa,
+            referenceFastaIndex = reference_fai,
+      modelType = model_type,
+            # numShards = 128
+      }
 
-    call Annotation.AnnotateVCF as AnnotateVCF_DeepVariant{
-      input:
-	sample_basename = sample_basename,
-	output_filename = sample_basename + ".DeepVariant.annotated.vcf",
-        input_vcf = DeepVariant.outputVCF,
-        chromosome_list = chromosome_list,
-      
-        gnomAD_vcf = gnomAD_vcf,
-        gnomAD_vcf_index = gnomAD_vcf_index,
+      call Annotation.AnnotateVCF as AnnotateVCF_DeepVariant{
+        input:
+    sample_basename = sample_basename,
+    output_filename = sample_basename + ".DeepVariant.annotated.vcf",
+          input_vcf = DeepVariant.outputVCF,
+          chromosome_list = chromosome_list,
+        
+          gnomAD_vcf = gnomAD_vcf,
+          gnomAD_vcf_index = gnomAD_vcf_index,
 
-        gnomADexomes_vcf = gnomADexomes_vcf,
-        gnomADexomes_vcf_index = gnomADexomes_vcf_index,
+          gnomADexomes_vcf = gnomADexomes_vcf,
+          gnomADexomes_vcf_index = gnomADexomes_vcf_index,
 
-        TopMed_vcf = TopMed_vcf,
-        TopMed_vcf_index = TopMed_vcf_index,
+          TopMed_vcf = TopMed_vcf,
+          TopMed_vcf_index = TopMed_vcf_index,
 
-        GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
-        GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
+          GnomAD4_exomes_vcf = GnomAD4_exomes_vcf,
+          GnomAD4_exomes_vcf_index = GnomAD4_exomes_vcf_index,
 
-        GnomAD4_genomes_vcf = GnomAD4_genomes_vcf,
-        GnomAD4_genomes_vcf_index = GnomAD4_genomes_vcf_index,
+          GnomAD4_genomes_vcf = GnomAD4_genomes_vcf,
+          GnomAD4_genomes_vcf_index = GnomAD4_genomes_vcf_index,
 
-        blacklisted_regions_bed = blacklisted_regions_bed,
-        blacklisted_regions_bed_index = blacklisted_regions_bed_index,
+          blacklisted_regions_bed = blacklisted_regions_bed,
+          blacklisted_regions_bed_index = blacklisted_regions_bed_index,
 
-        GERP_bed = GERP_bed,
-        GERP_bed_index = GERP_bed_index,
+          GERP_bed = GERP_bed,
+          GERP_bed_index = GERP_bed_index,
 
-        Regeneron_vcf = Regeneron_vcf,
-        Regeneron_vcf_index = Regeneron_vcf_index,
+          Regeneron_vcf = Regeneron_vcf,
+          Regeneron_vcf_index = Regeneron_vcf_index,
 
-        SLOpopulation_vcf = SLOpopulation_vcf,
-        SLOpopulation_vcf_index = SLOpopulation_vcf_index,
+          SLOpopulation_vcf = SLOpopulation_vcf,
+          SLOpopulation_vcf_index = SLOpopulation_vcf_index,
 
-        ClinVar_vcf = ClinVar_vcf,
-        ClinVar_vcf_index = ClinVar_vcf_index,
+          ClinVar_vcf = ClinVar_vcf,
+          ClinVar_vcf_index = ClinVar_vcf_index,
 
-        SpliceAI = SpliceAI,
-        SpliceAI_index = SpliceAI_index,
+          SpliceAI = SpliceAI,
+          SpliceAI_index = SpliceAI_index,
 
-        dbscSNV = dbscSNV,
-        dbscSNV_index = dbscSNV_index,
+          dbscSNV = dbscSNV,
+          dbscSNV_index = dbscSNV_index,
 
-        HPO = HPO,
-        HPO_index = HPO_index,
-        OMIM = OMIM,
-        OMIM_index = OMIM_index,
-        gnomadConstraints = gnomadConstraints,
-        gnomadConstraints_index = gnomadConstraints_index,
-        CGD = CGD,
-        CGD_index = CGD_index,
-        bcftools_annotation_header = bcftools_annotation_header,
+          HPO = HPO,
+          HPO_index = HPO_index,
+          OMIM = OMIM,
+          OMIM_index = OMIM_index,
+          gnomadConstraints = gnomadConstraints,
+          gnomadConstraints_index = gnomadConstraints_index,
+          CGD = CGD,
+          CGD_index = CGD_index,
+          bcftools_annotation_header = bcftools_annotation_header,
 
-        pext_bed = pext_bed,
-        pext_bed_index = pext_bed_index,
+          pext_bed = pext_bed,
+          pext_bed_index = pext_bed_index,
 
-        gnomAD_pLi_bed = gnomAD_pLi_bed,
-        gnomAD_pLi_bed_index = gnomAD_pLi_bed_index,
+          gnomAD_pLi_bed = gnomAD_pLi_bed,
+          gnomAD_pLi_bed_index = gnomAD_pLi_bed_index,
 
-        gnomAD_misz_bed = gnomAD_misz_bed,
-        gnomAD_misz_bed_index = gnomAD_misz_bed_index,
+          gnomAD_misz_bed = gnomAD_misz_bed,
+          gnomAD_misz_bed_index = gnomAD_misz_bed_index,
 
-        metaDome_bed = metaDome_bed,
-        metaDome_bed_index = metaDome_bed_index,
+          metaDome_bed = metaDome_bed,
+          metaDome_bed_index = metaDome_bed_index,
 
-        fasta_reference = reference_fa,
-        fasta_reference_index = reference_fai,
-        fasta_reference_dict = reference_dict,
+          fasta_reference = reference_fa,
+          fasta_reference_index = reference_fai,
+          fasta_reference_dict = reference_dict,
 
-        dbNSFP = dbNSFP,
-        dbNSFP_index = dbNSFP_index,
+          dbNSFP = dbNSFP,
+          dbNSFP_index = dbNSFP_index,
 
-        targetRegions = targetRegions,
+          targetRegions = targetRegions,
 
-        #bcftools_docker = bcftools_docker,
-        #SnpEff_docker = SnpEff_docker,
-        gatk_docker = gatk_docker,
-        gatk_path = gatk_path,
-        vcfanno_docker = vcfanno_docker
+          #bcftools_docker = bcftools_docker,
+          #SnpEff_docker = SnpEff_docker,
+          gatk_docker = gatk_docker,
+          gatk_path = gatk_path,
+          vcfanno_docker = vcfanno_docker
+      }
     }
   }
 
