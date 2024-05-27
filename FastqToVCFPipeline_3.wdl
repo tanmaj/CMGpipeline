@@ -482,7 +482,7 @@ workflow FastqToVCF {
         sample_basename = sample_basename,
         input_fq1 = CutAdapters_fq1.output_fq_trimmed,
         input_fq2 = CutAdapters_fq2.output_fq_trimmed,
-	input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam])
+	input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam], "")
         ### input_bam = input_bam
     }
   }
