@@ -477,13 +477,15 @@ workflow FastqToVCF {
   
   # Calculate Optitype only if targetRegions are not present
   if ( !defined(targetRegions) ) {
+    File input_file = if ( defined(input_cram_hg38) || defined(input_cram) ) then select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam]) else input_bam
     call Optitype.Optimised_OptitypeDna as Optitype {
       input:
         sample_basename = sample_basename,
         input_fq1 = CutAdapters_fq1.output_fq_trimmed,
         input_fq2 = CutAdapters_fq2.output_fq_trimmed,
-	input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam, ""])
+	### input_bam = select_first([Cram_hg38_ToBam.output_bam, Cram_hg19_ToBam.output_bam, input_bam, ""])
         ### input_bam = input_bam
+        input_bam = input_file
     }
   }
   
