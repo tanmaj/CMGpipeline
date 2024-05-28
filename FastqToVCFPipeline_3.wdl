@@ -1485,7 +1485,7 @@ task Align {
   }
   
   command {
-    java -Xms1000m -Xmx1000m -jar ~{picard_path} SamToFastq INPUT=~{input_bam} FASTQ=/dev/stdout INTERLEAVE=true | bwa mem -p -t ~{threads} ~{reference_fixed_fa} /dev/stdin | samtools sort -@ ~{threads} - | java -jar ~{picard_path} AddOrReplaceReadGroups I=/dev/stdin O=/dev/stdout RGID=4 RGLB=~{sample_basename} RGPL=illumina RGPU=unit1 RGSM=~{sample_basename} | java -jar ~{picard_path} ReorderSam I=/dev/stdin O=~{sample_basename}.sorted.bam REFERENCE_SEQUENCE=~{reference_fa} SEQUENCE_DICTIONARY=~{reference_dict}
+    java -Xms8000m -Xmx8000m -jar ~{picard_path} SamToFastq INPUT=~{input_bam} FASTQ=/dev/stdout INTERLEAVE=true | bwa mem -p -t ~{threads} ~{reference_fixed_fa} /dev/stdin | samtools sort -@ ~{threads} - | java -jar ~{picard_path} AddOrReplaceReadGroups I=/dev/stdin O=/dev/stdout RGID=4 RGLB=~{sample_basename} RGPL=illumina RGPU=unit1 RGSM=~{sample_basename} | java -jar ~{picard_path} ReorderSam I=/dev/stdin O=~{sample_basename}.sorted.bam REFERENCE_SEQUENCE=~{reference_fa} SEQUENCE_DICTIONARY=~{reference_dict}
 
     java -jar ~{picard_path} MarkDuplicates  I=~{sample_basename}.sorted.bam O=~{sample_basename}.marked.bam M=~{sample_basename}.metrics.txt CREATE_INDEX=true
   }
