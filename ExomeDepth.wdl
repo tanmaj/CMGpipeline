@@ -75,7 +75,7 @@ task GetCounts {
   runtime {
         docker: "alesmaver/exome_depth"
         maxRetries: 3
-        requested_memory_mb_per_core: 1000
+        requested_memory_mb_per_core: 3000
         cpu: 6
         runtime_minutes: 180
     }
