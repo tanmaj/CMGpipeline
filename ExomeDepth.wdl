@@ -5,7 +5,7 @@ import "./manta/manta_workflow.wdl" as Manta
 workflow ExomeDepth {
   input {
     String sample_name
-    File target_bed
+    File? target_bed
     File? input_bam
     File? input_bam_index
     File? exome_depth_counts_input
@@ -59,7 +59,7 @@ workflow ExomeDepth {
 task GetCounts {
   input {
     String sample_name
-    File target_bed
+    File? target_bed
     File input_bam
     File input_bam_index
   }
@@ -75,7 +75,7 @@ task GetCounts {
   runtime {
         docker: "alesmaver/exome_depth"
         maxRetries: 3
-        requested_memory_mb_per_core: 1000
+        requested_memory_mb_per_core: 3000
         cpu: 6
         runtime_minutes: 180
     }
@@ -88,7 +88,7 @@ task GetCounts {
 task ExomeDepth {
   input {
     String sample_name
-    File target_bed
+    File? target_bed
     File test_counts_file
     Array[File] reference_counts_files
   }
