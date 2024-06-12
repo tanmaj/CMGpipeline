@@ -50,6 +50,14 @@ workflow SoftSearchWF {
       gatk_path = "/gatk/gatk"
   }
   
+  call MergeVCFsBcftools as MergeVCFsBcftools {
+    input:
+      input_vcfs = CompressAndIndexVCF.output_vcfgz,
+      input_vcfs_indexes = CompressAndIndexVCF.output_vcfgz_index,
+      reference_dict = reference_dict,
+      sample_basename = sample_basename
+  }
+
   call SoftSearch_filter as SoftSearch_filter {
     input:
       input_vcf = MergeVCFs.output_vcf,
@@ -253,6 +261,38 @@ task MergeVCFs {
     requested_memory_mb_per_core: 1000
     cpu: 4
     runtime_minutes: 1800
+  }
+  output {
+    File output_vcf = "~{sample_basename}.softSearch.vcf.gz"
+    File output_vcf_index = "~{sample_basename}.softSearch.vcf.gz.tbi"
+  }
+}
+
+# Merge GVCFs generated per-interval for the same sample using bcftools
+task MergeVCFsBcftools {
+  input {
+    # Command parameters
+    Array[File] input_vcfs
+    Array[File] input_vcfs_indexes
+    String sample_basename
+    File? reference_dict
+
+    # Runtime parameters
+    String bcftools_path = "bcftools"
+    String docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
+  }
+  
+  command {
+    set -e
+    ~{bcftools_path} merge -Oz -o ~{sample_basename}.softSearch.vcf.gz ~{sep=' ' input_vcfs}
+    ~{bcftools_path} index -t ~{sample_basename}.softSearch.vcf.gz
+  }
+  runtime {
+    docker: docker
+    maxRetries: 3
+    requested_memory_mb_per_core: 1000
+    cpu: 4
+    runtime_minutes: 180
   }
   output {
     File output_vcf = "~{sample_basename}.softSearch.vcf.gz"
