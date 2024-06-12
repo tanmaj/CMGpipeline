@@ -40,15 +40,15 @@ workflow SoftSearchWF {
       }
   }
 
-  call MergeVCFs as MergeVCFs {
-    input:
-      input_vcfs = CompressAndIndexVCF.output_vcfgz,
-      input_vcfs_indexes = CompressAndIndexVCF.output_vcfgz_index,
-      reference_dict = reference_dict,
-      sample_basename = sample_basename,
-      docker = "broadinstitute/gatk:4.2.0.0",
-      gatk_path = "/gatk/gatk"
-  }
+  # call MergeVCFs as MergeVCFs {
+  #   input:
+  #     input_vcfs = CompressAndIndexVCF.output_vcfgz,
+  #     input_vcfs_indexes = CompressAndIndexVCF.output_vcfgz_index,
+  #     reference_dict = reference_dict,
+  #     sample_basename = sample_basename,
+  #     docker = "broadinstitute/gatk:4.2.0.0",
+  #     gatk_path = "/gatk/gatk"
+  # }
   
   call MergeVCFsBcftools as MergeVCFsBcftools {
     input:
@@ -60,7 +60,7 @@ workflow SoftSearchWF {
 
   call SoftSearch_filter as SoftSearch_filter {
     input:
-      input_vcf = MergeVCFs.output_vcf,
+      input_vcf = MergeVCFsBcftools.output_vcf,
       sample_basename = sample_basename
   }
 
@@ -72,8 +72,8 @@ workflow SoftSearchWF {
   }
 
   output {
-    File output_complete_vcf = MergeVCFs.output_vcf
-    File output_complete_vcf_index = MergeVCFs.output_vcf_index
+    File output_complete_vcf = MergeVCFsBcftools.output_vcf
+    File output_complete_vcf_index = MergeVCFsBcftools.output_vcf_index
     File output_vcf = SoftSearch_filter.output_vcf
     File? output_tsv_name = SoftSearch_annotSV.sv_variants_tsv
   }
