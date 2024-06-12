@@ -282,7 +282,7 @@ task MergeVCFsBcftools {
     String docker = "biocontainers/bcftools:v1.9-1-deb_cv1"
   }
   
-  command {
+  command <<<
     set -e
     ~{bcftools_path} concat --naive -Oz -o ~{sample_basename}.softSearch.vcf.gz ~{sep=' ' input_vcfs}
 
@@ -298,7 +298,8 @@ task MergeVCFsBcftools {
 
     mv sorted_cleaned_reheadered.vcf.gz ~{sample_basename}.softSearch.vcf.gz
     ~{bcftools_path} index -t ~{sample_basename}.softSearch.vcf.gz
-  }
+  >>>
+  
   runtime {
     docker: docker
     maxRetries: 3
