@@ -275,7 +275,7 @@ task MergeVCFsBcftools {
     Array[File] input_vcfs
     Array[File] input_vcfs_indexes
     String sample_basename
-    File? reference_dict
+    File reference_dict
 
     # Runtime parameters
     String bcftools_path = "bcftools"
@@ -284,7 +284,19 @@ task MergeVCFsBcftools {
   
   command {
     set -e
-    ~{bcftools_path} merge -Oz -o ~{sample_basename}.softSearch.vcf.gz ~{sep=' ' input_vcfs}
+    ~{bcftools_path} concat --naive -Oz -o ~{sample_basename}.softSearch.vcf.gz ~{sep=' ' input_vcfs}
+
+    # SoftSearch produces an incomplete header, so we need to add the contigs from the reference dictionary
+    awk '/^@SQ/ {print "##contig=<ID="$2",length="$3">"}' ~{reference_dict} | sed 's/SN://; s/LN://' > contigs_header.txt
+    bcftools view -h  ~{sample_basename}.softSearch.vcf.gz | grep -v "^#CHROM" > original_header.txt
+    cat original_header.txt contigs_header.txt > new_header.txt
+    bcftools view -h ~{sample_basename}.softSearch.vcf.gz | grep "^#CHROM" >> new_header.txt
+
+    bcftools reheader -h new_header.txt -o reheadered.vcf.gz ~{sample_basename}.softSearch.vcf.gz
+    bcftools annotate -x INFO/END -o cleaned_reheadered.vcf.gz -Oz reheadered.vcf.gz
+    bcftools sort cleaned_reheadered.vcf.gz -o sorted_cleaned_reheadered.vcf.gz -Oz
+
+    mv sorted_cleaned_reheadered.vcf.gz ~{sample_basename}.softSearch.vcf.gz
     ~{bcftools_path} index -t ~{sample_basename}.softSearch.vcf.gz
   }
   runtime {
