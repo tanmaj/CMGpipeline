@@ -36,7 +36,7 @@ task Germline {
         File? callRegionsIndex
 
         Int cores = 60
-        Int memoryGb = 40
+        Int memoryGb = 122
         Int timeMinutes = 4800
         String dockerImage = "quay.io/biocontainers/manta:1.4.0--py27_1"
     }
@@ -57,7 +57,7 @@ task Germline {
         ~{runDir}/runWorkflow.py \
         -m local \
         -j ~{cores} \
-        -g ~((~{cores} * 2))
+        -g ~{memoryGb}
 
         cp ~{runDir}/results/variants/diploidSV.vcf.gz ~{sample}.manta.vcf.gz
         cp ~{runDir}/results/variants/diploidSV.vcf.gz.tbi ~{sample}.manta.vcf.gz.tbi
@@ -70,7 +70,6 @@ task Germline {
 
     runtime {
         cpu: cores
-        memory: "~{memoryGb}G"
         docker: dockerImage
         time_minutes: timeMinutes
         requested_memory_mb_per_core: 1000
