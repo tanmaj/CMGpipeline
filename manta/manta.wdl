@@ -43,17 +43,21 @@ task Germline {
 
     command {
         set -e
+
+        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz
+        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz.tbi
+        
         configManta.py \
         ~{"--bam " + bamFile} \
         --referenceFasta ~{referenceFasta} \
-        ~{"--callRegions " + callRegions} \
+        --callRegions callable_regions.hg19.bed.gz \
         --runDir ~{runDir} \
         ~{true="--exome" false="" exome}
 
         ~{runDir}/runWorkflow.py \
         -m local \
         -j ~{cores} \
-        -g ~{memoryGb}
+        -g ~((~{cores} * 2))
 
         cp ~{runDir}/results/variants/diploidSV.vcf.gz ~{sample}.manta.vcf.gz
         cp ~{runDir}/results/variants/diploidSV.vcf.gz.tbi ~{sample}.manta.vcf.gz.tbi
