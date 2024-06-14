@@ -1250,7 +1250,7 @@
         "InheritanceMode": "AD",
         "LocusStructure": "(GCC)*",
         "DisplayRU": "GGC",
-        "SourceDisplay": "Paucar, Nilsson, Engvall et al medRxiv 2023-10-03",
+        "SourceDisplay": "Paucar2023",
         "Source": "DOI",
         "SourceId": "10.1101/2023.10.03.23296230",
         "ReferenceRegion": "chr16:72821593-72821656",
