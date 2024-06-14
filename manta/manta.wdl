@@ -44,13 +44,10 @@ task Germline {
     command {
         set -e
 
-        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz
-        wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz.tbi
-        
         configManta.py \
         ~{"--bam " + bamFile} \
         --referenceFasta ~{referenceFasta} \
-        --callRegions callable_regions.hg19.bed.gz \
+        ~{"--callRegions " + callRegions} \
         --runDir ~{runDir} \
         ~{true="--exome" false="" exome}
 

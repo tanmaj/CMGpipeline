@@ -63,6 +63,8 @@ workflow SVcalling {
 
     String SVdir = outputDir + '/structural-variants/'
 
+    call DownloadFiles
+
     call manta.Germline as manta {
         input:
             dockerImage = dockerImages["manta"],
@@ -71,6 +73,8 @@ workflow SVcalling {
             sample = sample,
             referenceFasta = referenceFasta,
             referenceFastaFai = referenceFastaFai,
+            callRegions = DownloadFiles.callRegions,
+            callRegionsIndex = DownloadFiles.callRegionsIndex,
             runDir = SVdir + 'manta/',
             exome = exome
     }
@@ -122,6 +126,20 @@ workflow SVcalling {
 ###
 ###
 ###
+task DownloadFiles {
+  command {
+    wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz
+    wget https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz.tbi
+  }
+  output {
+    File callRegions = "callable_regions.hg19.bed.gz"
+    File callRegionsIndex = "callable_regions.hg19.bed.gz.tbi"
+  }
+  runtime {
+    docker: "alesmaver/r-base"
+  }
+}
+
 task MergeMantaFiles {
   input {
     # Command parameters
