@@ -358,5 +358,22 @@
     "LocusStructure": "(GCC)*",
     "ReferenceRegion": "chrX:136648985-136649015",
     "VariantType": "Repeat"
+  },
+  {
+      "VariantType": "Repeat",
+      "LocusId": "ZFHX3",
+      "HGNCId": 777,
+      "InheritanceMode": "AD",
+      "LocusStructure": "(GCC)*",
+      "DisplayRU": "GGC",
+      "SourceDisplay": "Paucar, Nilsson, Engvall et al medRxiv 2023-10-03",
+      "Source": "DOI",
+      "SourceId": "10.1101/2023.10.03.23296230",
+      "ReferenceRegion": "chr16:72821593-72821656",
+      "SweGenMean": 21,
+      "SweGenStd": 0.8,
+      "Disease": "SCA4",
+      "NormalMax": 28,
+      "PathologicMin": 42
   }
 ]
