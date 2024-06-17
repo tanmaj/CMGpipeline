@@ -128,10 +128,12 @@ workflow SVcalling {
 ###
 task DownloadFiles {
   command {
+    echo $http_proxy
     wget --tries=3 https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz
     wget --tries=3 https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz.tbi
 
     unset https_proxy
+    echo $http_proxy
     wget --tries=3 https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz
     wget --tries=3 https://raw.githubusercontent.com/AlesMaver/CMGpipeline/master/references/blacklisted_regions/callable_regions.hg19.bed.gz.tbi
   }
