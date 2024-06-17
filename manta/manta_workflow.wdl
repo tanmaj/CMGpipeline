@@ -142,7 +142,7 @@ task DownloadFiles {
     File callRegionsIndex = "callable_regions.hg19.bed.gz.tbi"
   }
   runtime {
-    docker: "ubuntu:latest"
+    docker: "alesmaver/exome_depth"
   }
 }
 
