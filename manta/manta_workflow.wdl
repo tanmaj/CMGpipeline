@@ -140,7 +140,7 @@ task DownloadFiles {
     File callRegionsIndex = "callable_regions.hg19.bed.gz.tbi"
   }
   runtime {
-    docker: "alesmaver/r-base"
+    docker: "ubuntu:latest"
   }
 }
 
