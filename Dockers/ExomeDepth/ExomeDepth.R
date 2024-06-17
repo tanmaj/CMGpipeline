@@ -119,10 +119,14 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
     targets_df <- exons.hg19
   } else {
     targets_df <- read.table(targets, header = FALSE, sep="\t")
-    targets_ncol = ncol(targets_df)
+
     if (ncol(targets_df) == 3) {    
       targets_df$info <- "NA"
     } 
+    if (ncol(targets_df) > 4) {    
+      targets_df <- targets_df[,1:4]
+    } 
+    targets_ncol = ncol(targets_df)
   }
   colnames(targets_df)[1:4] <- c("chrom", "start", "end", "info")
 
@@ -154,7 +158,12 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
       
       df_current[1:targets_ncol]<-NULL # Skip first four columns that repeat in each file
       print(head(df_current))
-      df <- cbind(df, df_current)
+
+      # Prevent errors due to merging of data frames with unequeal row numbers
+      if(nrow(df) == nrow(df_current)){
+      	df <- cbind(df, df_current)
+	    }
+
     }
   }
   reference_counts = df
@@ -356,7 +365,7 @@ print(opt)
 
 # Redirect output to a log file to suppress warnings and messages
 log_file <- file.path(opt$output_directory, "exomedepth_log.txt")
-sink(log_file, append = FALSE)
+# sink(log_file, append = FALSE)
 
 # OPTION ONE - a single BAM file is provided
 # DO: Create a counts file for downstream use
@@ -393,5 +402,5 @@ if (!is.null(opt$test_counts_file) & !is.null(opt$reference_counts_file_list)){
 }
 
 # Close the sink to restore the standard output
-sink()
+# sink()
 
