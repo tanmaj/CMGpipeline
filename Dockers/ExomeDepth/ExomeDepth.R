@@ -121,12 +121,13 @@ callCNVs <- function(targets, annotation, test_counts_file, reference_counts_fil
     targets_df <- read.table(targets, header = FALSE, sep="\t")
 
     targets_ncol = ncol(targets_df)
-    
+
     if (ncol(targets_df) == 3) {    
       targets_df$info <- "NA"
     } 
     if (ncol(targets_df) > 4) {    
       targets_df <- targets_df[,1:4]
+      targets_ncol = ncol(targets_df)
     } 
     
   }
