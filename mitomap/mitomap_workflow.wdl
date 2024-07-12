@@ -135,8 +135,8 @@ task CreateMitoFasta {
     runtime {
         docker: "~{docker}"
         maxRetries: 3
-        requested_memory_mb_per_core: 9000
-        cpu: 1
+        requested_memory_mb_per_core: 1000
+        cpu: 8
         runtime_minutes: 60
     }
 }
