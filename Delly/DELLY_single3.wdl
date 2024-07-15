@@ -91,7 +91,7 @@ task DELLY_call {
     # requested_memory_mb_per_core: 4000
     # cpu: 2
     requested_memory_mb_per_core: 1000
-    cpu: 8
+    cpu: 16
     runtime_minutes: 720
     continueOnReturnCode: true
   }
@@ -114,7 +114,7 @@ task DELLY_merge {
     # requested_memory_mb_per_core: 4000
     # cpu: 2
     requested_memory_mb_per_core: 1000
-    cpu: 8
+    cpu: 16
     runtime_minutes: 400
     continueOnReturnCode: true
   }
@@ -145,7 +145,7 @@ task DELLY_genotype {
     # requested_memory_mb_per_core: 4000
     # cpu: 2
     requested_memory_mb_per_core: 1000
-    cpu: 8
+    cpu: 16
     runtime_minutes: 400
     continueOnReturnCode: true
   }
@@ -181,7 +181,7 @@ task DELLY_merge_genotype {
     # requested_memory_mb_per_core: 4000
     # cpu: 2
     requested_memory_mb_per_core: 1000
-    cpu: 8
+    cpu: 16
     runtime_minutes: 400
     continueOnReturnCode: true
   }
@@ -208,7 +208,7 @@ task DELLY_filter {
     # requested_memory_mb_per_core: 4000
     # cpu: 2
     requested_memory_mb_per_core: 1000
-    cpu: 8
+    cpu: 16
     runtime_minutes: 400
     continueOnReturnCode: true
   }
