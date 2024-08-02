@@ -232,6 +232,7 @@ task annotSV {
     -genomeBuild ~{genome_build} \
     -SVinputFile ~{input_vcf} \
     -outputFile ~{output_tsv_name}
+    echo "Done."
   >>>
 
   output {
