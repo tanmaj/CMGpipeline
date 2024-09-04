@@ -2329,8 +2329,8 @@ task SortSam {
     memory: "5000 MiB"
     preemptible: preemptible_tries
     maxRetries: 3
-    requested_memory_mb_per_core: 15000
-    cpu: 3
+    requested_memory_mb_per_core: 1000
+    cpu: 32
     runtime_minutes: 900
   }
   output {

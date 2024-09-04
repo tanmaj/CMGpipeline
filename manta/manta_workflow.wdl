@@ -222,7 +222,7 @@ task annotSV {
     # 2. cd-ing into the /opt/AnnotSV_3.1 directory
     # 3. Running the make PREFIX=. install-human-annotation
     docker: "alesmaver/annotsv"
-    continueOnReturnCode: true
+    # continueOnReturnCode: true
     cpu: 8
   }
 
@@ -232,6 +232,7 @@ task annotSV {
     -genomeBuild ~{genome_build} \
     -SVinputFile ~{input_vcf} \
     -outputFile ~{output_tsv_name}
+    echo "Done."
   >>>
 
   output {
