@@ -54,7 +54,7 @@ workflow Conifer_CRAM_wrapper {
     File CNV_bed = Conifer.CNV_bed
     File CNV_wig = Conifer.CNV_wig
     File output_rpkm = Conifer.output_rpkm
-    File? annotSV_tsv = Conifer.sv_variants_tsv
+    File? annotSV_tsv = Conifer.annotSV_tsv
   }
 }
 
