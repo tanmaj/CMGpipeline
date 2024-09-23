@@ -29,11 +29,13 @@ workflow Conifer_CRAM_wrapper {
 
   call CramConversions.CramToBam as CramToBam {
       input:
+        sample_basename = sample_basename,
+        input_cram = input_cram,
         ref_fasta = reference_fa,
         ref_fasta_index = reference_fai,
         ref_dict = reference_dict,
-        input_cram = input_cram,
-        sample_basename = sample_basename
+        docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817",
+        samtools_path = "samtools"
   }
 
   call Conifer.Conifer as Conifer {
