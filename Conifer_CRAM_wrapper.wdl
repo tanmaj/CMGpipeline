@@ -11,6 +11,7 @@ import "./Conifer.wdl" as Conifer
 # WORKFLOW DEFINITION 
 workflow Conifer_CRAM_wrapper {
   input {
+    String sample_basename
     File? input_cram
     File? input_cram_index
     File reference_fa
@@ -24,7 +25,7 @@ workflow Conifer_CRAM_wrapper {
     File? enrichment_bed
   } 
 
-  String sample_basename = sub(basename(input_cram), "[\_,\.].*", "" )
+  # String sample_basename = sub(basename(input_cram), "[\_,\.].*", "" )
 
   call CramConversions.CramToBam as CramToBam {
       input:
