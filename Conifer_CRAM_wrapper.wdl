@@ -29,7 +29,7 @@ workflow Conifer_CRAM_wrapper {
 
   call CramConversions.CramToBam as CramToBam {
       input:
-        sample_basename = sample_basename,
+        sample_name = sample_basename,
         input_cram = input_cram,
         ref_fasta = reference_fa,
         ref_fasta_index = reference_fai,
