@@ -9,7 +9,7 @@ import "../CRAM_conversions.wdl" as CramConversions
 import "../exp_hunter.wdl" as ExpansionHunter 
 
 # WORKFLOW DEFINITION 
-workflow Conifer_CRAM_wrapper {
+workflow ExpansionHunter_CRAM_wrapper {
   input {
     String sample_basename
     File? input_cram
