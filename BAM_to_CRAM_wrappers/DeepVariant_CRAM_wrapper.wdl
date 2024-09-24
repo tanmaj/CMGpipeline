@@ -46,10 +46,10 @@ workflow DeepVariant_CRAM_wrapper {
   }
 
   output {
-        File outputVCF = DeepVariant.outputVcf
-        File outputVCFIndex = DeepVariant.outputVCFIndex
-        File? outputVCFStatsReport = DeepVariant.outputVCFStatsReport
-        File? outputGVCF = DeepVariant.outputGVcf
-        File? outputGVCFIndex = DeepVariant.outputGVcfIndex
+      File outputVCF = DeepVariant.outputVCF
+      File outputVCFIndex = DeepVariant.outputVCFIndex
+      File? outputVCFStatsReport = DeepVariant.outputVCFStatsReport
+      File? outputGVCF = DeepVariant.outputGVCF
+      File? outputGVCFIndex = DeepVariant.outputGVCFIndex
   }
 }
