@@ -5,8 +5,8 @@ version 1.0
 # using old Conifer wf with BAM file input, but having a CRAM file for the input
 # and calling CRAM to BAM file conversion WF
 
-import "./CRAM_conversions.wdl" as CramConversions 
-import "./Conifer.wdl" as Conifer
+import "../CRAM_conversions.wdl" as CramConversions 
+import "../Conifer.wdl" as Conifer
 
 # WORKFLOW DEFINITION 
 workflow Conifer_CRAM_wrapper {
