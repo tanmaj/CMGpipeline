@@ -2,14 +2,14 @@ version 1.0
 ## Copyright CMG@KIGM, Ales Maver, Tanja Majnik
 
 # Wrapping WF 
-# using old Conifer wf with BAM file input, but having a CRAM file for the input
+# using old  wf with BAM file input, but having a CRAM file for the input
 # and calling CRAM to BAM file conversion WF
 
 import "../CRAM_conversions.wdl" as CramConversions 
 import "../DeepVariant.wdl" as DeepVariant
 
 # WORKFLOW DEFINITION 
-workflow Conifer_CRAM_wrapper {
+workflow DeepVariant_CRAM_wrapper {
   input {
     String sample_basename
     File? input_cram
