@@ -17,12 +17,6 @@ workflow DeepVariant_CRAM_wrapper {
     File reference_fa
     File reference_fai
     File reference_dict
-
-    String sample_basename
-    File referenceFasta
-    File referenceFastaIndex
-    File inputBam
-    File inputBamIndex
     String modelType
     Int? numShards
   } 
