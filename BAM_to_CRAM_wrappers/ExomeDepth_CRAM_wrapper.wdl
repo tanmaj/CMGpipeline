@@ -20,6 +20,8 @@ workflow ExomeDepth_CRAM_wrapper {
     File? target_bed
     File? exome_depth_counts_input
     Array[File]? reference_counts_files
+
+    File? input_bam
   } 
 
 
@@ -38,7 +40,7 @@ workflow ExomeDepth_CRAM_wrapper {
 
   call ExomeDepth.ExomeDepth as ExomeDepth {
       input:
-        input_bam = select_first([CramToBam.output_bam, None]),
+        input_bam = select_first([CramToBam.output_bam, input_bam]),
         input_bam_index = select_first([CramToBam.output_bai,""]),
         sample_name = sample_basename,
         target_bed = target_bed,
