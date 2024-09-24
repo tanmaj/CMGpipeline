@@ -22,9 +22,9 @@ workflow ExomeDepth_CRAM_wrapper {
     Array[File]? reference_counts_files
   } 
 
-  # String sample_basename = sub(basename(input_cram), "[\_,\.].*", "" )
 
-  call CramConversions.CramToBam as CramToBam {
+  if(!defined(exome_depth_counts_input)) {
+    call CramConversions.CramToBam as CramToBam {
       input:
         sample_name = sample_basename,
         input_cram = input_cram,
@@ -33,14 +33,16 @@ workflow ExomeDepth_CRAM_wrapper {
         ref_dict = reference_dict,
         docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817",
         samtools_path = "samtools"
+    }
   }
 
   call ExomeDepth.ExomeDepth as ExomeDepth {
       input:
-        input_bam = CramToBam.output_bam,
-        input_bam_index = CramToBam.output_bai,
+        input_bam = select_first([CramToBam.output_bam,""]),
+        input_bam_index = select_first([CramToBam.output_bai,""]),
         sample_name = sample_basename,
         target_bed = enrichment_bed,
+        exome_depth_counts_input = exome_depth_counts_input
         reference_counts_files = reference_counts_files
   }
 
