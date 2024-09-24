@@ -38,7 +38,7 @@ workflow ExomeDepth_CRAM_wrapper {
 
   call ExomeDepth.ExomeDepth as ExomeDepth {
       input:
-        input_bam = select_first([CramToBam.output_bam,""]),
+        input_bam = select_first([CramToBam.output_bam, None]),
         input_bam_index = select_first([CramToBam.output_bai,""]),
         sample_name = sample_basename,
         target_bed = target_bed,
