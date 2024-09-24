@@ -42,7 +42,7 @@ workflow ExomeDepth_CRAM_wrapper {
         input_bam_index = select_first([CramToBam.output_bai,""]),
         sample_name = sample_basename,
         target_bed = enrichment_bed,
-        exome_depth_counts_input = exome_depth_counts_input
+        exome_depth_counts_input = exome_depth_counts_input,
         reference_counts_files = reference_counts_files
   }
 
