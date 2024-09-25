@@ -47,7 +47,7 @@ workflow ExomeDepth_CRAM_wrapper {
     }
   }
 
-  if(!defined(exome_depth_counts_input)) {
+  if(defined(exome_depth_counts_input)) {
     call ExomeDepth.ExomeDepth as ExomeDepthWithoutBAM {
       input:
         #input_bam = select_first([CramToBam.output_bam, input_bam]),
