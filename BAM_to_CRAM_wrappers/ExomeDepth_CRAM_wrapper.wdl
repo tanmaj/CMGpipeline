@@ -48,7 +48,7 @@ workflow ExomeDepth_CRAM_wrapper {
   }
 
   if(!defined(exome_depth_counts_input)) {
-    call ExomeDepth.ExomeDepth as ExomeDepth {
+    call ExomeDepth.ExomeDepth as ExomeDepthWithoutBAM {
       input:
         #input_bam = select_first([CramToBam.output_bam, input_bam]),
         #input_bam_index = select_first([CramToBam.output_bai,""]),
@@ -60,6 +60,19 @@ workflow ExomeDepth_CRAM_wrapper {
   }
 
   output {
+    File? exome_depth_counts_1 = ExomeDepthWithoutBAM.exome_depth_counts
+    File? exome_depth_cnv_calls_bed_1 = ExomeDepthWithoutBAM.exome_depth_cnv_calls_bed
+    File? exome_depth_cnv_calls_csv_1 = ExomeDepthWithoutBAM.exome_depth_cnv_calls_csv
+    File? exome_depth_ratios_all_wig_gz_1 = ExomeDepthWithoutBAM.exome_depth_ratios_all_wig_gz
+    File? exome_depth_ratios_all_wig_gz_tbi_1 = ExomeDepthWithoutBAM.exome_depth_ratios_all_wig_gz_tbi
+    File? exome_depth_rolling_ratios_wig_1 = ExomeDepthWithoutBAM.exome_depth_rolling_ratios_wig
+    File? exome_depth_rolling_ratios_wig_gz_tbi_1 = ExomeDepthWithoutBAM.exome_depth_rolling_ratios_wig_gz_tbi
+    File? exome_depth_ratios_clean_wig_gz_1 = ExomeDepthWithoutBAM.exome_depth_ratios_clean_wig_gz
+    File? exome_depth_ratios_clean_wig_gz_tbi_1 = ExomeDepthWithoutBAM.exome_depth_ratios_clean_wig_gz_tbi
+    File? exome_depth_ratios_nomissing_wig_gz_1 = ExomeDepthWithoutBAM.exome_depth_ratios_nomissing_wig_gz
+    File? exome_depth_ratios_nomissing_wig_gz_tbi_1 = ExomeDepthWithoutBAM.exome_depth_ratios_nomissing_wig_gz_tbi
+    File? exome_depth_annotSV_tsv_1 = ExomeDepthWithoutBAM.exome_depth_annotSV_tsv
+
     File? exome_depth_counts = ExomeDepth.exome_depth_counts
     File? exome_depth_cnv_calls_bed = ExomeDepth.exome_depth_cnv_calls_bed
     File? exome_depth_cnv_calls_csv = ExomeDepth.exome_depth_cnv_calls_csv
