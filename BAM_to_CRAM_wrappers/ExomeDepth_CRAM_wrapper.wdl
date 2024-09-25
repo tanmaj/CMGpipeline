@@ -36,16 +36,27 @@ workflow ExomeDepth_CRAM_wrapper {
         docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817",
         samtools_path = "samtools"
     }
-  }
-
-  call ExomeDepth.ExomeDepth as ExomeDepth {
+    call ExomeDepth.ExomeDepth as ExomeDepth {
       input:
-        input_bam = select_first([CramToBam.output_bam, input_bam]),
-        input_bam_index = select_first([CramToBam.output_bai,""]),
+        input_bam = CramToBam.output_bam,
+        input_bam_index = CramToBam.output_bai),
         sample_name = sample_basename,
         target_bed = target_bed,
         exome_depth_counts_input = exome_depth_counts_input,
         reference_counts_files = reference_counts_files
+    }
+  }
+
+  if(!defined(exome_depth_counts_input)) {
+    call ExomeDepth.ExomeDepth as ExomeDepth {
+      input:
+        #input_bam = select_first([CramToBam.output_bam, input_bam]),
+        #input_bam_index = select_first([CramToBam.output_bai,""]),
+        sample_name = sample_basename,
+        target_bed = target_bed,
+        exome_depth_counts_input = exome_depth_counts_input,
+        reference_counts_files = reference_counts_files
+    }    
   }
 
   output {
