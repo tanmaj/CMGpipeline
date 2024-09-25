@@ -39,7 +39,7 @@ workflow ExomeDepth_CRAM_wrapper {
     call ExomeDepth.ExomeDepth as ExomeDepth {
       input:
         input_bam = CramToBam.output_bam,
-        input_bam_index = CramToBam.output_bai),
+        input_bam_index = CramToBam.output_bai,
         sample_name = sample_basename,
         target_bed = target_bed,
         exome_depth_counts_input = exome_depth_counts_input,
