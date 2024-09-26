@@ -42,6 +42,7 @@ workflow QualimapAndCoverageWrapper_CRAM_wrapper {
 
   call QualimapAndCoverageWrapper.QualimapAndCoverageWrapper as QualimapAndCoverageWrapper {
       input:
+        sample_basename = sample_basename,
         input_bam = CramToBam.output_bam,
         input_bam_index = CramToBam.output_bai,
         reference_fa = reference_fa,
