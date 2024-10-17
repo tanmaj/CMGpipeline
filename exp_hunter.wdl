@@ -5,10 +5,6 @@ import "./CRAM_conversions.wdl" as CramConversions
 workflow ExpansionHunter {
   input {
     String sample_id
-    #File bam_file
-    #File bai_file
-    #File reference_fasta
-
     File? bam_file
     File? bai_file
     File? cram_file
@@ -16,7 +12,6 @@ workflow ExpansionHunter {
     File reference_fasta
     File? reference_fasta_index
     File? reference_dict
-
     String expansion_hunter_docker
   }
 
