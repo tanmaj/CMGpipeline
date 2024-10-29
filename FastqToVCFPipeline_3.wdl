@@ -1529,7 +1529,7 @@ task Align {
     docker: "~{docker}"
     maxRetries: 3
     requested_memory_mb_per_core: 1000
-    cpu: 32
+    cpu: 8
     runtime_minutes: 300
   }
 }
