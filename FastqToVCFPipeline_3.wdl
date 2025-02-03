@@ -31,6 +31,7 @@ import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_
 import "./MitochondriaPipeline/MitochondriaPipeline.wdl" as MitochondriaPipeline
 ### import "./Exomiser.wdl" as Exomiser
 import "./ExomeDepth.wdl" as ExomeDepth
+import "./Stripy/Stripy_v2.wdl" as Stripy
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -48,6 +49,7 @@ workflow FastqToVCF {
     File? input_cram_hg38_index
 
     String sample_basename
+    String gender
     
     File illuminaAdapters
 
@@ -1194,6 +1196,17 @@ workflow FastqToVCF {
       expansion_hunter_docker = expansion_hunter_docker
   }
 
+  if ( !defined(targetRegions) ){
+    call Stripy.Stripy as Stripy {
+      input:
+        sample_basename = sample_basename,
+        input_bam_or_cram = select_first([ConvertToCram.output_cram, input_cram, ""]),
+        input_bam_or_cram_index = select_first([ConvertToCram.output_cram_index, input_cram_index, ""]),
+        reference_fasta = reference_fa,
+        sex = gender
+    }
+  }
+
   #call ROH.CallPlink as CallPlink {
   #input:
   #  input_vcf = CallROH.BAF_vcf,
@@ -1299,6 +1312,8 @@ workflow FastqToVCF {
     File? softsearch_annotSV = SoftsearchWF.output_tsv_name
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
+    File? stripy_tsv = Stripy.stripy_tsv
+    File? stripy_html = Stripy.stripy_html
     
     # merged haplotype caller bamout:
     File? bamout = MergeBamOuts.merged_bam_out
