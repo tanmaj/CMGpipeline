@@ -21,6 +21,7 @@ version 1.0
 # SOFTWARE.
 
 import "./CRAM_conversions.wdl" as CramConversions
+import "./VEP/Vep.wdl" as VEP
 
 workflow DeepVariant {
   input {
@@ -75,12 +76,21 @@ workflow DeepVariant {
         sampleName = sample_basename
     }
 
+  call VEP.VEP as VEPDeepVariant {
+      input:
+        sample_basename = sample_basename,
+        input_vcf = RunDeepVariant.outputVCF,
+        filename_infix = ".DeepVariant"
+  }
+
   output {
       File outputVCF = RunDeepVariant.outputVCF
       File outputVCFIndex = RunDeepVariant.outputVCFIndex
       File? outputVCFStatsReport = RunDeepVariant.outputVCFStatsReport
       File? outputGVCF = RunDeepVariant.outputGVCF
       File? outputGVCFIndex = RunDeepVariant.outputGVCFIndex
+      File VEPdeepvariantannotatedVCF = VEPDeepVariant.output_vcf
+      File VEPdeepvariantannotatedVCFIndex = VEPDeepVariant.output_vcf_index      
   }
 }
 
