@@ -199,7 +199,7 @@ task ExomeDepth {
         docker: "alesmaver/exome_depth"
         maxRetries: 3
         requested_memory_mb_per_core: 1000
-        cpu: 6
+        cpu: 16
         runtime_minutes: 180
         }
         
