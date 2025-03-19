@@ -86,7 +86,8 @@ workflow ExomeDepth {
   }
 
   output {
-    File? exome_depth_counts = exome_depth_counts_calculated
+    ## File? exome_depth_counts = exome_depth_counts_calculated
+    File? exome_depth_counts = select_first([exome_depth_counts_input, GetCounts.exome_depth_counts, GetCounts_Bedtools.exome_depth_counts])
     File? exome_depth_cnv_calls_bed = ExomeDepth.exome_depth_cnv_calls_bed
     File? exome_depth_cnv_calls_csv = ExomeDepth.exome_depth_cnv_calls_csv
     File? exome_depth_ratios_all_wig_gz = ExomeDepth.exome_depth_ratios_all_wig_gz
