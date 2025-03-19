@@ -77,11 +77,13 @@ workflow ExomeDepth {
         reference_counts_files = select_first([reference_counts_files])
     }
 
+    if (defined(ExomeDepth.exome_depth_cnv_calls_csv)) {
     call Manta.annotSV as annotSV {
       input:
         genome_build = "GRCh37",
         input_vcf = ExomeDepth.exome_depth_cnv_calls_csv,
         output_tsv_name = sample_name + ".ExomeDepth.annotSV.tsv"
+    }
     }
   }
 
