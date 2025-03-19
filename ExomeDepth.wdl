@@ -203,6 +203,8 @@ task ExomeDepth {
         requested_memory_mb_per_core: 1000
         cpu: 16
         runtime_minutes: 180
+        # continue only when rc=0 or rc=1 (know problem inside the R script)
+        continueOnReturnCode: [0, 1]
         }
         
     output {
