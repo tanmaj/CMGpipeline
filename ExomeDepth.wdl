@@ -65,7 +65,7 @@ workflow ExomeDepth {
     }
 
   # Select the output from either GetCounts or GetCounts_Bedtools
-  File exome_depth_counts_calculated = select_first([GetCounts.exome_depth_counts, GetCounts_Bedtools.exome_depth_counts])
+  File? exome_depth_counts_calculated = select_first([GetCounts.exome_depth_counts, GetCounts_Bedtools.exome_depth_counts])
 
   if(defined(reference_counts_files)) {
     call ExomeDepth {
