@@ -156,6 +156,7 @@ workflow FastqToVCF {
     File population_bcf_index
 
     # ExomeDepth
+    Boolean do_ExomeDepth = true
     Array[File]? reference_counts_files
 
     ## Boolean GenerateCRAM = false
@@ -946,15 +947,17 @@ workflow FastqToVCF {
   }
 
   # Exome depth
-  if( defined(enrichment_bed) ){
-    call ExomeDepth.ExomeDepth as ExomeDepth {
-    input:
-      sample_name = sample_basename,
-      enrichment = enrichment,
-      target_bed = enrichment_bed,
-      input_bam = SortSam.output_bam,
-      input_bam_index = SortSam.output_bam_index,
-      reference_counts_files = reference_counts_files
+  if (do_ExomeDepth) {
+    if( defined(enrichment_bed) ){
+      call ExomeDepth.ExomeDepth as ExomeDepth {
+      input:
+        sample_name = sample_basename,
+        enrichment = enrichment,
+        target_bed = enrichment_bed,
+        input_bam = SortSam.output_bam,
+        input_bam_index = SortSam.output_bam_index,
+        reference_counts_files = reference_counts_files
+      }
     }
   }
 
