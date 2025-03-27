@@ -37,7 +37,7 @@ task RunVEP {
         echo "Starting VEP analysis..."
         vep -i ~{input_vcf} \
             -o ~{annotated_vcf} \
-            --fork 48 --offline --format vcf --vcf --force_overwrite --compress_output bgzip -v \
+            --offline --format vcf --vcf --force_overwrite --compress_output bgzip -v \
             --merged \
             --cache --dir_cache /opt/vep/.vep \
             --plugin AlphaMissense,file=/opt/vep/.vep/Plugins/AlphaMissense/AlphaMissense_hg19.tsv.gz \
