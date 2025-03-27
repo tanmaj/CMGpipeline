@@ -46,6 +46,7 @@ task RunVEP {
             --allele_number \
             --assembly GRCh37 \
             --no_stats 
+            --fork 32
         tabix -p vcf ~{annotated_vcf}
         echo "Finishing VEP analysis."
         ls -ls ~{annotated_vcf}*
