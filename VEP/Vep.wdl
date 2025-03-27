@@ -50,7 +50,7 @@ task RunVEP {
         tabix -p vcf ~{annotated_vcf}
         echo "Finishing VEP analysis."
         ls -ls ~{annotated_vcf}*
-    }
+    } 
 
     runtime {
         docker: "alesmaver/vep_grch37"
