@@ -6,7 +6,7 @@ version 1.0
 # useful for mass Conifer reanalyses, when dealing with a fresh new enrichment.
 # Reference: https://github.com/AlesMaver/CMGpipeline/blob/master/Conifer.wdl
 
-
+import "./manta/manta_workflow.wdl" as manta
 
 # WORKFLOW DEFINITION 
 workflow ConiferAnalysisWF {
