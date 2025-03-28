@@ -9,7 +9,7 @@ version 1.0
 
 
 # WORKFLOW DEFINITION 
-workflow Conifer_analysis {
+workflow ConiferAnalysisWF {
   input {
     String sample_basename
     File input_rpkm
