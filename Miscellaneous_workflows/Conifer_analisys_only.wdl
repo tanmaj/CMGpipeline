@@ -62,11 +62,11 @@ workflow ConiferAnalysisWF {
   output {
     File output_conifer_calls = CONIFER_Call.output_conifer_calls
     File output_conifer_calls_wig = CONIFER_Call.output_conifer_calls_wig
-    Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
+    #Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
     File conifer_plots_tar = CONIFER_Plotcalls.conifer_plots_tar
     #File CNV_bed = CONIFER_Export.CNV_bed
     File CNV_wig = CONIFER_Export.CNV_wig
-    File output_rpkm = input_rpkm
+    #File output_rpkm = input_rpkm
     File? annotSV_tsv = annotSV.sv_variants_tsv
   }
 }
