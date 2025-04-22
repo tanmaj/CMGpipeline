@@ -21,7 +21,7 @@ version 1.0
 # SOFTWARE.
 
 import "./CRAM_conversions.wdl" as CramConversions
-import "./VEP/Vep.wdl" as VEP
+import "./VEP/Vep2.wdl" as VEP
 
 workflow DeepVariant {
   input {
@@ -89,8 +89,8 @@ workflow DeepVariant {
       File? outputVCFStatsReport = RunDeepVariant.outputVCFStatsReport
       File? outputGVCF = RunDeepVariant.outputGVCF
       File? outputGVCFIndex = RunDeepVariant.outputGVCFIndex
-      File VEPdeepvariantannotatedVCF = VEPDeepVariant.output_vcf
-      File VEPdeepvariantannotatedVCFIndex = VEPDeepVariant.output_vcf_index      
+      File? VEPdeepvariantannotatedVCF = VEPDeepVariant.output_vcf
+      File? VEPdeepvariantannotatedVCFIndex = VEPDeepVariant.output_vcf_index      
   }
 }
 
@@ -140,7 +140,7 @@ task RunDeepVariant {
         docker: "google/deepvariant:1.5.0"
         requested_memory_mb_per_core: 1000
         cpu: 30
-        runtime_minutes: 2800
+        runtime_minutes: 720
     }
 
     output {
