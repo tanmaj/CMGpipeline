@@ -31,8 +31,8 @@ workflow VEP {
         }
   }
   output {
-      File? output_vcf = select_first([Cleanup.output_vcf, RunVEP.output_vcf]) 
-      File? output_vcf_index = select_first([Cleanup.output_vcf_index, RunVEP.output_vcf_index])
+      File output_vcf = select_first([Cleanup.output_vcf, RunVEP.output_vcf]) 
+      File output_vcf_index = select_first([Cleanup.output_vcf_index, RunVEP.output_vcf_index])
   }
 
 }
@@ -110,8 +110,8 @@ task Cleanup {
     }
 
     output {
-        File? output_vcf = output_filename
-        File? output_vcf_index = output_filename + ".tbi"
+        File output_vcf = output_filename
+        File output_vcf_index = output_filename + ".tbi"
     }
 
 }
