@@ -32,7 +32,7 @@ import "./MitochondriaPipeline/MitochondriaPipeline.wdl" as MitochondriaPipeline
 ### import "./Exomiser.wdl" as Exomiser
 import "./ExomeDepth.wdl" as ExomeDepth
 import "./Stripy/Stripy_v2.wdl" as Stripy
-import "./VEP/Vep.wdl" as VEP
+import "./VEP/Vep2.wdl" as VEP
 
 
 # WORKFLOW DEFINITION 
