@@ -1365,8 +1365,8 @@ workflow FastqToVCF {
     File? exome_depth_annotSV_tsv = ExomeDepth.exome_depth_annotSV_tsv
 
     # VEP annotated vcf files
-    File? VEPannotatedVCF = VEP_AnnotateVCF.output_vcf
-    File? VEPannotatedVCFIndex = VEP_AnnotateVCF.output_vcf_index
+    File VEPannotatedVCF = VEP_AnnotateVCF.output_vcf
+    File VEPannotatedVCFIndex = VEP_AnnotateVCF.output_vcf_index
     File? VEPdeepvariantannotatedVCF = DeepVariant.VEPdeepvariantannotatedVCF
     File? VEPdeepvariantannotatedVCFIndex = DeepVariant.VEPdeepvariantannotatedVCFIndex  
 
