@@ -54,10 +54,10 @@ task BamToFastq {
   
   runtime {
     docker: "alesmaver/bwa_samtools_picard"
-    requested_memory_mb_per_core: 2000
-    cpu: 8
+    requested_memory_mb_per_core: 1000
+    cpu: 32
     runtime_minutes: 700
-    continueOnReturnCode: true
+    #continueOnReturnCode: true
   }
   
   command <<<
@@ -65,7 +65,7 @@ task BamToFastq {
     name=~{sample_basename}
     echo $name
     echo Converting BAM to Fastqs
-    java -Xmx14g -jar /usr/picard/picard.jar SamToFastq INPUT=~{input_bam} FASTQ=$name.fwd.fq.gz SECOND_END_FASTQ=$name.rev.fq.gz
+    java -Xmx32g -jar /usr/picard/picard.jar SamToFastq INPUT=~{input_bam} FASTQ=$name.fwd.fq.gz SECOND_END_FASTQ=$name.rev.fq.gz
   >>>
 
 output {
@@ -89,7 +89,7 @@ task OptitypeDnaPrepareHLA {
     docker: "mgibio/immuno_tools-cwl:1.0.1"
     #disks: "local-disk ~{space_needed_gb} SSD"
     #bootDiskSizeGb: 3*space_needed_gb
-    continueOnReturnCode: true
+    ##continueOnReturnCode: true
   }
 
   command <<<
