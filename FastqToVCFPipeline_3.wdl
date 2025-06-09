@@ -31,6 +31,9 @@ import "https://raw.githubusercontent.com/AlesMaver/gatk/master/scripts/mutect2_
 import "./MitochondriaPipeline/MitochondriaPipeline.wdl" as MitochondriaPipeline
 ### import "./Exomiser.wdl" as Exomiser
 import "./ExomeDepth.wdl" as ExomeDepth
+import "./Stripy/Stripy_v2.wdl" as Stripy
+import "./VEP/Vep2.wdl" as VEP
+
 
 # WORKFLOW DEFINITION 
 workflow FastqToVCF {
@@ -48,6 +51,7 @@ workflow FastqToVCF {
     File? input_cram_hg38_index
 
     String sample_basename
+    String gender
     
     File illuminaAdapters
 
@@ -152,6 +156,7 @@ workflow FastqToVCF {
     File population_bcf_index
 
     # ExomeDepth
+    Boolean do_ExomeDepth = true
     Array[File]? reference_counts_files
 
     ## Boolean GenerateCRAM = false
@@ -798,6 +803,13 @@ workflow FastqToVCF {
       vcfanno_docker = vcfanno_docker
   }
 
+  # Annotate sample.vcf file with VEP method
+  call VEP.VEP as VEP_AnnotateVCF {
+      input:
+        sample_basename = sample_basename,
+        input_vcf = select_first([Mutect2.filtered_vcf, SelectFinalVariants.output_vcf])
+  }
+
   # Exomiser
   # if ( defined(hpo_ids) ) {
   #   call Exomiser.Exomiser as Exomiser {
@@ -935,14 +947,17 @@ workflow FastqToVCF {
   }
 
   # Exome depth
-  if( defined(enrichment_bed) ){
-    call ExomeDepth.ExomeDepth as ExomeDepth {
-    input:
-      sample_name = sample_basename,
-      target_bed = enrichment_bed,
-      input_bam = SortSam.output_bam,
-      input_bam_index = SortSam.output_bam_index,
-      reference_counts_files = reference_counts_files
+  if (do_ExomeDepth) {
+    if( defined(enrichment_bed) ){
+      call ExomeDepth.ExomeDepth as ExomeDepth {
+      input:
+        sample_name = sample_basename,
+        enrichment = enrichment,
+        target_bed = enrichment_bed,
+        input_bam = SortSam.output_bam,
+        input_bam_index = SortSam.output_bam_index,
+        reference_counts_files = reference_counts_files
+      }
     }
   }
 
@@ -1194,6 +1209,17 @@ workflow FastqToVCF {
       expansion_hunter_docker = expansion_hunter_docker
   }
 
+  if ( !defined(targetRegions) ){
+    call Stripy.Stripy as Stripy {
+      input:
+        sample_basename = sample_basename,
+        input_bam_or_cram = select_first([ConvertToCram.output_cram, input_cram, ""]),
+        input_bam_or_cram_index = select_first([ConvertToCram.output_cram_index, input_cram_index, ""]),
+        reference_fasta = reference_fa,
+        sex = gender
+    }
+  }
+
   #call ROH.CallPlink as CallPlink {
   #input:
   #  input_vcf = CallROH.BAF_vcf,
@@ -1216,8 +1242,8 @@ workflow FastqToVCF {
   }
 
   output {
-    File output_bam = SortSam.output_bam
-    File output_bam_index = SortSam.output_bam_index
+    #File output_bam = SortSam.output_bam
+    #File output_bam_index = SortSam.output_bam_index
 
     File? output_cram = ConvertToCram.output_cram
     File? output_cram_index = ConvertToCram.output_cram_index
@@ -1234,7 +1260,7 @@ workflow FastqToVCF {
 
     File? output_rpkm = Conifer.output_rpkm 
     File? output_conifer_calls = Conifer.output_conifer_calls
-    Array[File]? output_plotcalls = Conifer.output_plotcalls
+    #Array[File]? output_plotcalls = Conifer.output_plotcalls
     File? output_conifer_calls_wig = Conifer.output_conifer_calls_wig
     #File CNV_bed = Conifer.CNV_bed
     File? CNV_wig = Conifer.CNV_wig
@@ -1299,6 +1325,8 @@ workflow FastqToVCF {
     File? softsearch_annotSV = SoftsearchWF.output_tsv_name
 
     File? expansion_hunter_vcf_annotated = ExpansionHunter.expansion_hunter_vcf_annotated
+    File? stripy_tsv = Stripy.stripy_tsv
+    File? stripy_html = Stripy.stripy_html
     
     # merged haplotype caller bamout:
     File? bamout = MergeBamOuts.merged_bam_out
@@ -1335,6 +1363,12 @@ workflow FastqToVCF {
     File? exome_depth_ratios_nomissing_wig_gz = ExomeDepth.exome_depth_ratios_nomissing_wig_gz
     File? exome_depth_ratios_nomissing_wig_gz_tbi = ExomeDepth.exome_depth_ratios_nomissing_wig_gz_tbi
     File? exome_depth_annotSV_tsv = ExomeDepth.exome_depth_annotSV_tsv
+
+    # VEP annotated vcf files
+    File VEPannotatedVCF = VEP_AnnotateVCF.output_vcf
+    File VEPannotatedVCFIndex = VEP_AnnotateVCF.output_vcf_index
+    File? VEPdeepvariantannotatedVCF = DeepVariant.VEPdeepvariantannotatedVCF
+    File? VEPdeepvariantannotatedVCFIndex = DeepVariant.VEPdeepvariantannotatedVCFIndex  
 
   }
 }
@@ -1515,7 +1549,7 @@ task Align {
   }
   
   command {
-    java -Xms8000m -Xmx8000m -jar ~{picard_path} SamToFastq INPUT=~{input_bam} FASTQ=/dev/stdout INTERLEAVE=true | bwa mem -p -t ~{threads} ~{reference_fixed_fa} /dev/stdin | samtools sort -@ ~{threads} - | java -jar ~{picard_path} AddOrReplaceReadGroups I=/dev/stdin O=/dev/stdout RGID=4 RGLB=~{sample_basename} RGPL=illumina RGPU=unit1 RGSM=~{sample_basename} | java -jar ~{picard_path} ReorderSam I=/dev/stdin O=~{sample_basename}.sorted.bam REFERENCE_SEQUENCE=~{reference_fa} SEQUENCE_DICTIONARY=~{reference_dict}
+    java -Xms1000m -Xmx1000m -jar ~{picard_path} SamToFastq INPUT=~{input_bam} FASTQ=/dev/stdout INTERLEAVE=true | bwa mem -p -t ~{threads} ~{reference_fixed_fa} /dev/stdin | samtools sort -@ ~{threads} - | java -jar ~{picard_path} AddOrReplaceReadGroups I=/dev/stdin O=/dev/stdout RGID=4 RGLB=~{sample_basename} RGPL=illumina RGPU=unit1 RGSM=~{sample_basename} | java -jar ~{picard_path} ReorderSam I=/dev/stdin O=~{sample_basename}.sorted.bam REFERENCE_SEQUENCE=~{reference_fa} SEQUENCE_DICTIONARY=~{reference_dict}
 
     java -jar ~{picard_path} MarkDuplicates  I=~{sample_basename}.sorted.bam O=~{sample_basename}.marked.bam M=~{sample_basename}.metrics.txt CREATE_INDEX=true
   }

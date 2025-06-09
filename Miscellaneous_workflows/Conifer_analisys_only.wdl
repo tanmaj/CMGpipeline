@@ -1,70 +1,31 @@
 version 1.0
 ## Copyright CMG@KIGM, Ales Maver
 
-# The manta workflow currently holds the annotSV workflow, therefore importing it from there
-import "./manta/manta_workflow.wdl" as manta
-# Conifer is also used to analyse WGS data as it proved to be useful in detecting rare CNVs while removing the common CNVs as noise
-# We use the BED file with 1Mb windows across the genome, prepared using these steps
-# The chrY and chrM chromosomes were too short to make accurate calling using conifer
-# awk {'print $1, $2'} OFS='\t' hg19.fa.fai |head -n 26 | grep -v '_' | grep -v 'chrM' > hg19.1Mb.genome
-# awk {'print $1, $2'} OFS='\t' hg19.fa.fai |head -n 26 | grep -v '_' | grep 'chrM' > hg19.mt.genome
-# bedtools makewindows -w 1000 -g hg19.1Mb.genome  > WGS1Mb.bed
-# bedtools makewindows -w 20 -g hg19.mt.genome  >> WGS1Mb.bed
+# TM, 28.3.2025
+# Conifer analysis only - without RPKM file producing
+# useful for mass Conifer reanalyses, when dealing with a fresh new enrichment.
+# Reference: https://github.com/AlesMaver/CMGpipeline/blob/master/Conifer.wdl
 
-import "./CRAM_conversions.wdl" as CramConversions
+import "../manta/manta_workflow.wdl" as manta
 
 # WORKFLOW DEFINITION 
-workflow Conifer {
+workflow ConiferAnalysisWF {
   input {
-    String? sample_basename
-    File? input_bam
-    File? input_bam_index
-    File? input_cram
-    File? input_cram_index
-    File? reference_fa
-    File? reference_fai
-    File? reference_dict
-
-    #Array[File]? input_reference_rpkms 
+    String sample_basename
+    File input_rpkm
     Array[File] input_reference_rpkms = select_first([input_reference_rpkms, [""]])
     Int? CONIFER_svd
     Float? CONIFER_threshold
-
     String? enrichment
     File? enrichment_bed
   }  
 
-  String sample_name = select_first([sample_basename, sub(basename(select_first([input_bam, input_cram, [""]])), "[\_,\.].*", "")  ])
-
-  if (defined(input_cram)) {
-    call CramConversions.CramToBam as CramToBam {
-        input:
-          # sample_name = sample_basename,
-          sample_name = sample_name,
-          input_cram = input_cram,
-          ref_fasta = reference_fa,
-          ref_fasta_index = reference_fai,
-          ref_dict = reference_dict,
-          docker = "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817",
-          samtools_path = "samtools"
-    }
-  }
-
-  call MakeRPKM {
-      input:
-        input_bam=select_first([input_bam, CramToBam.output_bam]),
-        input_bam_index=select_first([input_bam_index, CramToBam.output_bai]),
-        sample_basename=sample_name,
-        enrichment=enrichment,
-        enrichment_bed=enrichment_bed
-  }
-
   call CONIFER_Analyze {
       input:
-        input_rpkm=MakeRPKM.output_rpkm,
+        input_rpkm=input_rpkm,
         input_reference_rpkms=input_reference_rpkms,
         CONIFER_svd=CONIFER_svd,
-        sample_basename=sample_name,
+        sample_basename=sample_basename,
         enrichment=enrichment,
         enrichment_bed=enrichment_bed
 
@@ -74,20 +35,20 @@ workflow Conifer {
       input:
         input_hdf5=CONIFER_Analyze.output_hdf5,
         CONIFER_threshold=CONIFER_threshold,
-        sample_basename=sample_name
+        sample_basename=sample_basename
   }
 
     call CONIFER_Plotcalls {
       input:
         input_hdf5=CONIFER_Analyze.output_hdf5,
         input_conifer_calls=CONIFER_Call.output_conifer_calls,
-        sample_basename=sample_name
+        sample_basename=sample_basename
   }
 
   call CONIFER_Export {
       input:
         input_hdf5=CONIFER_Analyze.output_hdf5,
-        sample_basename=sample_name,
+        sample_basename=sample_basename,
         enrichment=enrichment
   }
 
@@ -95,17 +56,17 @@ workflow Conifer {
       input:
         genome_build = "GRCh37",
         input_vcf = CONIFER_Call.output_conifer_annotSV_input_bed,
-        output_tsv_name = sample_name + ".CONIFER.annotSV.tsv"
+        output_tsv_name = sample_basename + ".CONIFER.annotSV.tsv"
   }
 
   output {
     File output_conifer_calls = CONIFER_Call.output_conifer_calls
     File output_conifer_calls_wig = CONIFER_Call.output_conifer_calls_wig
-    Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
+    #Array[File] output_plotcalls = CONIFER_Plotcalls.output_plotcalls
     File conifer_plots_tar = CONIFER_Plotcalls.conifer_plots_tar
-    File CNV_bed = CONIFER_Export.CNV_bed
+    #File CNV_bed = CONIFER_Export.CNV_bed
     File CNV_wig = CONIFER_Export.CNV_wig
-    File output_rpkm = MakeRPKM.output_rpkm
+    #File output_rpkm = input_rpkm
     File? annotSV_tsv = annotSV.sv_variants_tsv
   }
 }
@@ -113,35 +74,6 @@ workflow Conifer {
 ##################
 # TASK DEFINITIONS
 ##################
-
-task MakeRPKM {
-  input {
-    # Command parameters
-    File input_bam
-    File input_bam_index
-    String sample_basename
-
-    String? enrichment
-    File? enrichment_bed
-
-    # Runtime parameters
-    String docker = "alesmaver/conifer_modified"
-  }
-  
-  command {
-  set -e
-  python /home/bio/conifer_v0.2.2/conifer.py rpkm --probes ~{enrichment_bed} --input ~{input_bam} --output ~{enrichment}_~{sample_basename}.txt 
-  }
-  runtime {
-    docker: docker
-    requested_memory_mb_per_core: 1000
-    cpu: 16
-    runtime_minutes: 500
-  }
-  output {
-    File output_rpkm = "~{enrichment}_~{sample_basename}.txt"
-  }
-}
 
 task CONIFER_Analyze {
   input {
