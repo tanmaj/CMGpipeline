@@ -58,6 +58,8 @@ task RunVEP {
             --shift_hgvs 0 \
             --allele_number \
             --assembly GRCh37 \
+            --everything \
+            --hgvsg \
             --no_stats 
         tabix -p vcf ~{annotated_vcf}
         echo "Finishing VEP analysis."
