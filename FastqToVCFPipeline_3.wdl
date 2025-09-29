@@ -2293,7 +2293,7 @@ task SamSplitter {
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
     requested_memory_mb_per_core: 1000
-    cpu: 6
+    cpu: 8
     runtime_minutes: 600
   }
 }
