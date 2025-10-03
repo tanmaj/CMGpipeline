@@ -89,7 +89,7 @@ task OptitypeDnaPrepareHLA {
     docker: "mgibio/immuno_tools-cwl:1.0.1"
     #disks: "local-disk ~{space_needed_gb} SSD"
     #bootDiskSizeGb: 3*space_needed_gb
-    ##continueOnReturnCode: true
+    continueOnReturnCode: true
   }
 
   command <<<
@@ -103,11 +103,11 @@ task OptitypeDnaPrepareHLA {
     
     echo Select only the mapped reads from the sam files:
     /opt/samtools/bin/samtools view -S -F 4 $name.aln.sam > $name.aln.map.sam
-    rm -f  $name.aln.sam
+    #rm -f  $name.aln.sam
 
     echo Convert sam files to fastq files, also stored in temp dir
     cat $name.aln.map.sam | grep -v ^@ | /usr/bin/awk '{print "@"$1"\n"$10"\n+\n"$11}' > $name.hla.fastq
-    rm -f $name.aln.map.sam
+    #rm -f $name.aln.map.sam
 
   >>>
 
