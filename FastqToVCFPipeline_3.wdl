@@ -1206,7 +1206,8 @@ workflow FastqToVCF {
       bam_file = SortSam.output_bam,
       bai_file = SortSam.output_bam_index,
       reference_fasta = reference_fa,
-      expansion_hunter_docker = expansion_hunter_docker
+      expansion_hunter_docker = expansion_hunter_docker,
+      patient_sex = gender
   }
 
   if ( !defined(targetRegions) ){
