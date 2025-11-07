@@ -44,6 +44,7 @@ task HLAHD_genotyping {
         requested_memory_mb_per_core: 1000
         cpu: 8
         runtime_minutes: 240
+        maxRetries: 1
         # memory: "16 GB"
     }
 }
