@@ -19,7 +19,7 @@ workflow HLAHD_genotyping_workflow {
     }
 
     output {
-        #File hlahd_result = HLAHD_genotyping.result
+        File hlahd_result = HLAHD_genotyping.result
     }
 }
 
@@ -32,11 +32,11 @@ task HLAHD_genotyping {
 
     command {
         bash /app/bin/hlahd.sh  -t 8  ~{input_fq1}  ~{input_fq2}  /app/HLA_gene.split.txt  /app/dictionary/  ~{sample_basename} ./
-        #cp -p ./~{sample_basename}/result/~{sample_basename}_final.result.txt ./~{sample_basename}.HLA_HD_genotype.final_result.txt
+        cp -p ./~{sample_basename}/result/~{sample_basename}_final.result.txt ./~{sample_basename}.HLA_HD_genotype.final_result.txt
     }
 
     output {
-        #File result = "./${sample_basename}/result/${sample_basename}_final.result.txt"
+        File result = sample_basename + ".HLA_HD_genotype.final_result.txt"
     }
 
     runtime {
