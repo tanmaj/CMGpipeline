@@ -31,8 +31,8 @@ task HLAHD_genotyping {
     }
 
     command {
-        bash hlahd.sh  -t 8  ~{input_fq1}  ~{input_fq2}  HLA_gene.split.txt  dictionary  ~{sample_basename} .
-        cp -p ./~{sample_basename}/result/~{sample_basename}_final.result.txt ./~{sample_basename}.HLA_HD_genotype.final_result.txt
+        bash /app/hlahd.sh  -t 8  ~{input_fq1}  ~{input_fq2}  /app/HLA_gene.split.txt  /app/dictionary/  ~{sample_basename} ./
+        #cp -p ./~{sample_basename}/result/~{sample_basename}_final.result.txt ./~{sample_basename}.HLA_HD_genotype.final_result.txt
     }
 
     output {
