@@ -43,7 +43,7 @@ task HLAHD_genotyping {
         docker: "aleksanderturk/hlahd_image:latest"
         requested_memory_mb_per_core: 1000
         cpu: 8
-        runtime_minutes: 240
+        #runtime_minutes: 600
         maxRetries: 1
         # memory: "16 GB"
     }
