@@ -220,8 +220,8 @@ task CONIFER_Call {
   runtime {
     docker: docker
     requested_memory_mb_per_core: 1000
-    cpu: 8
-    runtime_minutes: 240
+    cpu: 16
+    runtime_minutes: 480
     docker_user: "root"
   }
   output {
